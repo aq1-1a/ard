@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>التسجيل في أيين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            /* تم إزالة overflow: hidden للسماح بالتمرير */
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+            margin: 20px auto; /* تم تعديل الهوامش لتمركز أفضل */
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            color: #1a2a6c;
+            font-weight: 700;
+            letter-spacing: -1px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background: linear-gradient(90deg, #1a2a6c, #b21f1f);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #1a2a6c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+            background-color: #fff;
+        }
+
+        .phone-input {
+            position: relative;
+        }
+
+        .phone-prefix {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+            font-weight: 500;
+        }
+
+        .phone-input input {
+            padding-right: 60px;
+        }
+
+        .security-questions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .security-questions h3 {
+            margin-bottom: 20px;
+            color: #1a2a6c;
+            font-size: 1.2rem;
+        }
+
+        .question-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f5f7fa;
+            border-radius: 10px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #1a2a6c, #2a3f8f);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(90deg, #0f1a4a, #1a2a6c);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 42, 108, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .link a {
+            color: #1a2a6c;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .link a:hover {
+            color: #b21f1f;
+            text-decoration: underline;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: #1a2a6c;
+            font-size: 1.3rem;
+        }
+
+        .modal p {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.confirm {
+            background-color: #1a2a6c;
+            color: white;
+        }
+
+        .modal-btn.confirm:hover {
+            background-color: #0f1a4a;
+        }
+
+        .modal-btn.cancel {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        .modal-btn.cancel:hover {
+            background-color: #d0d0d0;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            display: none;
+            animation: slideInRight 0.5s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .notification h4 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .notification p {
+            margin-bottom: 15px;
+        }
+
+        .notification button {
+            background-color: white;
+            color: #4CAF50;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .notification button:hover {
+            background-color: #f1f1f1;
+        }
+
+        .error-message {
+            color: #b21f1f;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .logo h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>التسجيل في أيين</h1>
+        </div>
+        
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="fullName">الاسم الثلاثي (اسمك الحقيقي)</label>
+                <input type="text" id="fullName" name="fullName" maxlength="30" required>
+                <div class="error-message" id="fullNameError">يجب ألا يتجاوز الاسم 30 حرفًا</div>
+            </div>
+
+            <!-- الحقل الجديد -->
+            <div class="form-group">
+                <label for="companyName">اسم المكتب العقاري الخاص بك او اسم شركتك (اختياري)</label>
+                <input type="text" id="companyName" name="companyName">
+            </div>
+            
+            <div class="form-group">
+                <label for="birthDate">تاريخ الميلاد</label>
+                <input type="date" id="birthDate" name="birthDate" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="address">عنوان السكن</label>
+                <input type="text" id="address" name="address" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone1">رقم الهاتف الأول</label>
+                <div class="phone-input">
+                    <span class="phone-prefix">+964</span>
+                    <input type="tel" id="phone1" name="phone1" maxlength="11" pattern="[0-9]{11}" required>
+                </div>
+                <div class="error-message" id="phone1Error">يجب أن يحتوي رقم الهاتف على 11 رقمًا</div>
+                <div class="error-message" id="phoneExistsError">رقم الهاتف هذا مسجل بالفعل. يرجى استخدام رقم آخر.</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone2">رقم الهاتف الثاني (اختياري)</label>
+                <div class="phone-input">
+                    <span class="phone-prefix">+964</span>
+                    <input type="tel" id="phone2" name="phone2" maxlength="11" pattern="[0-9]{11}">
+                </div>
+                <div class="error-message" id="phone2Error">يجب أن يحتوي رقم الهاتف على 11 رقمًا</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">كلمة المرور</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">إعادة كتابة كلمة المرور للتأكيد</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                <div class="error-message" id="passwordError">كلمتا المرور غير متطابقتين</div>
+            </div>
+            
+            <div class="security-questions">
+                <h3>أسئلة الأمان</h3>
+                
+                <div class="question-group">
+                    <select id="question1" name="question1" required>
+                        <option value="" disabled selected>اختر سؤال الأمان الأول</option>
+                        <option value="ما هو اسم مدرستك الابتدائية؟">ما هو اسم مدرستك الابتدائية؟</option>
+                        <option value="ما هو اسم الشارع الذي نشأت فيه؟">ما هو اسم الشارع الذي نشأت فيه؟</option>
+                        <option value="ما هو اسم أول مدينة سافرت إليها؟">ما هو اسم أول مدينة سافرت إليها؟</option>
+                        <option value="ما هو اسم الجار الأول الذي تتذكره؟">ما هو اسم الجار الأول الذي تتذكره؟</option>
+                        <option value="ما هو اسم صديق الطفولة المفضل لديك؟">ما هو اسم صديق الطفولة المفضل لديك؟</option>
+                        <option value="ما هو عيد ميلاد أحد أفراد عائلتك المقربين؟">ما هو عيد ميلاد أحد أفراد عائلتك المقربين؟</option>
+                        <option value="ما هو اللون المفضل لديك؟">ما هو اللون المفضل لديك؟</option>
+                        <option value="ما هو الفريق الرياضي الذي تشجعه؟">ما هو الفريق الرياضي الذي تشجعه؟</option>
+                        <option value="ما هي مدينتك المفضلة؟">ما هي مدينتك المفضلة؟</option>
+                        <option value="ما هو نوع أول هاتف امتلكته؟">ما هو نوع أول هاتف امتلكته؟</option>
+                        <option value="ما هو اللقب الذي كان يناديك به أصدقاؤك؟">ما هو اللقب الذي كان يناديك به أصدقاؤك؟</option>
+                        <option value="ما هو اسم سيارتك المفضلة؟">ما هو اسم سيارتك المفضلة؟</option>
+                    </select>
+                    <input type="text" id="answer1" name="answer1" placeholder="الإجابة" required style="margin-top: 10px;">
+                </div>
+                
+                <div class="question-group">
+                    <select id="question2" name="question2" required>
+                        <option value="" disabled selected>اختر سؤال الأمان الثاني</option>
+                        <option value="ما هو اسم مدرستك الابتدائية؟">ما هو اسم مدرستك الابتدائية؟</option>
+                        <option value="ما هو اسم الشارع الذي نشأت فيه؟">ما هو اسم الشارع الذي نشأت فيه؟</option>
+                        <option value="ما هو اسم أول مدينة سافرت إليها؟">ما هو اسم أول مدينة سافرت إليها؟</option>
+                        <option value="ما هو اسم الجار الأول الذي تتذكره؟">ما هو اسم الجار الأول الذي تتذكره؟</option>
+                        <option value="ما هو اسم صديق الطفولة المفضل لديك؟">ما هو اسم صديق الطفولة المفضل لديك؟</option>
+                        <option value="ما هو عيد ميلاد أحد أفراد عائلتك المقربين؟">ما هو عيد ميلاد أحد أفراد عائلتك المقربين؟</option>
+                        <option value="ما هو اللون المفضل لديك؟">ما هو اللون المفضل لديك؟</option>
+                        <option value="ما هو الفريق الرياضي الذي تشجعه؟">ما هو الفريق الرياضي الذي تشجعه؟</option>
+                        <option value="ما هي مدينتك المفضلة؟">ما هي مدينتك المفضلة؟</option>
+                        <option value="ما هو نوع أول هاتف امتلكته؟">ما هو نوع أول هاتف امتلكته؟</option>
+                        <option value="ما هو اللقب الذي كان يناديك به أصدقاؤك؟">ما هو اللقب الذي كان يناديك به أصدقاؤك؟</option>
+                        <option value="ما هو اسم سيارتك المفضلة؟">ما هو اسم سيارتك المفضلة؟</option>
+                    </select>
+                    <input type="text" id="answer2" name="answer2" placeholder="الإجابة" required style="margin-top: 10px;">
+                </div>
+                
+                <div class="question-group">
+                    <select id="question3" name="question3" required>
+                        <option value="" disabled selected>اختر سؤال الأمان الثالث</option>
+                        <option value="ما هو اسم مدرستك الابتدائية؟">ما هو اسم مدرستك الابتدائية؟</option>
+                        <option value="ما هو اسم الشارع الذي نشأت فيه؟">ما هو اسم الشارع الذي نشأت فيه؟</option>
+                        <option value="ما هو اسم أول مدينة سافرت إليها؟">ما هو اسم أول مدينة سافرت إليها؟</option>
+                        <option value="ما هو اسم الجار الأول الذي تتذكره؟">ما هو اسم الجار الأول الذي تتذكره؟</option>
+                        <option value="ما هو اسم صديق الطفولة المفضل لديك؟">ما هو اسم صديق الطفولة المفضل لديك؟</option>
+                        <option value="ما هو عيد ميلاد أحد أفراد عائلتك المقربين؟">ما هو عيد ميلاد أحد أفراد عائلتك المقربين؟</option>
+                        <option value="ما هو اللون المفضل لديك؟">ما هو اللون المفضل لديك؟</option>
+                        <option value="ما هو الفريق الرياضي الذي تشجعه؟">ما هو الفريق الرياضي الذي تشجعه؟</option>
+                        <option value="ما هي مدينتك المفضلة؟">ما هي مدينتك المفضلة؟</option>
+                        <option value="ما هو نوع أول هاتف امتلكته؟">ما هو نوع أول هاتف امتلكته؟</option>
+                        <option value="ما هو اللقب الذي كان يناديك به أصدقاؤك؟">ما هو اللقب الذي كان يناديك به أصدقاؤك؟</option>
+                        <option value="ما هو اسم سيارتك المفضلة؟">ما هو اسم سيارتك المفضلة؟</option>
+                    </select>
+                    <input type="text" id="answer3" name="answer3" placeholder="الإجابة" required style="margin-top: 10px;">
+                </div>
+            </div>
+            
+            <button type="submit" class="btn">تسجيل</button>
+        </form>
+        
+        <div class="link">
+            <p>لدي حساب <a href="login.html">سجل الدخول</a></p>
+        </div>
+    </div>
+    
+    <!-- نافذة التأكيد -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3>تأكيد البيانات</h3>
+            <p>هل أنت متأكد من صحة البيانات التالية؟</p>
+            <p><strong>الاسم:</strong> <span id="confirmName"></span></p>
+            <p><strong>رقم الهاتف الأول:</strong> <span id="confirmPhone1"></span></p>
+            <p id="confirmPhone2Container"><strong>رقم الهاتف الثاني:</strong> <span id="confirmPhone2"></span></p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="cancelBtn">تعديل</button>
+                <button class="modal-btn confirm" id="confirmBtn">نعم</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- رسالة النجاح -->
+    <div id="successNotification" class="notification">
+        <h4>تم التسجيل بنجاح!</h4>
+        <p>لقد تم إنشاء حسابك بنجاح في أيين.</p>
+        <button id="goToLoginBtn">انتقل الآن لتسجيل الدخول</button>
+    </div>
+    
+    <script>
+        // إعداد Supabase
+        const { createClient } = supabase;
+        const supabaseUrl = 'https://rastimuoifacxcitljdw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhc3RpbXVvaWZhY3hjaXRsamR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODYxOTIsImV4cCI6MjA3NTk2MjE5Mn0.xOW2p17zvHy9z8n4q-T__jgiNE83N927oRs2Max13RQ';
+        const supabaseClient = createClient(supabaseUrl, supabaseKey);
+        
+        // عناصر DOM
+        const form = document.getElementById('signupForm');
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmName = document.getElementById('confirmName');
+        const confirmPhone1 = document.getElementById('confirmPhone1');
+        const confirmPhone2 = document.getElementById('confirmPhone2');
+        const confirmPhone2Container = document.getElementById('confirmPhone2Container');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const successNotification = document.getElementById('successNotification');
+        const goToLoginBtn = document.getElementById('goToLoginBtn');
+        const phone1Input = document.getElementById('phone1');
+        const phone2Input = document.getElementById('phone2');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const question1Select = document.getElementById('question1');
+        const question2Select = document.getElementById('question2');
+        const question3Select = document.getElementById('question3');
+        const phoneExistsError = document.getElementById('phoneExistsError');
+        
+        // معالجة إدخال رقم الهاتف الأول
+        phone1Input.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 0 && !value.startsWith('0')) {
+                value = '0' + value;
+            }
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+            this.value = value;
+            phoneExistsError.style.display = 'none'; // إخفاء الخطأ عند الكتابة
+        });
+        
+        // معالجة إدخال رقم الهاتف الثاني
+        phone2Input.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 0 && !value.startsWith('0')) {
+                value = '0' + value;
+            }
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+            this.value = value;
+        });
+        
+        // التحقق من تطابق كلمة المرور
+        confirmPasswordInput.addEventListener('input', function() {
+            const passwordError = document.getElementById('passwordError');
+            if (this.value !== passwordInput.value) {
+                passwordError.style.display = 'block';
+            } else {
+                passwordError.style.display = 'none';
+            }
+        });
+        
+        // التحقق من اختيار أسئلة أمان مختلفة
+        question2Select.addEventListener('change', function() {
+            validateSecurityQuestions();
+        });
+        
+        question3Select.addEventListener('change', function() {
+            validateSecurityQuestions();
+        });
+        
+        function validateSecurityQuestions() {
+            const q1 = question1Select.value;
+            const q2 = question2Select.value;
+            const q3 = question3Select.value;
+            
+            if (q1 && q2 && q1 === q2) {
+                question2Select.setCustomValidity('يجب اختيار أسئلة أمان مختلفة');
+            } else if (q1 && q3 && q1 === q3) {
+                question3Select.setCustomValidity('يجب اختيار أسئلة أمان مختلفة');
+            } else if (q2 && q3 && q2 === q3) {
+                question3Select.setCustomValidity('يجب اختيار أسئلة أمان مختلفة');
+            } else {
+                question2Select.setCustomValidity('');
+                question3Select.setCustomValidity('');
+            }
+        }
+        
+        // معالجة تقديم النموذج
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // إخفاء جميع رسائل الخطأ
+            document.querySelectorAll('.error-message').forEach(msg => msg.style.display = 'none');
+
+            // التحقق من صحة كلمة المرور
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                document.getElementById('passwordError').style.display = 'block';
+                return;
+            }
+            
+            // التحقق من صحة رقم الهاتف الأول
+            if (phone1Input.value.length !== 11) {
+                document.getElementById('phone1Error').style.display = 'block';
+                return;
+            }
+            
+            // التحقق من صحة رقم الهاتف الثاني إذا تم إدخاله
+            if (phone2Input.value && phone2Input.value.length !== 11) {
+                document.getElementById('phone2Error').style.display = 'block';
+                return;
+            }
+            
+            // التحقق من اختيار أسئلة أمان مختلفة
+            validateSecurityQuestions();
+            if (!question2Select.checkValidity() || !question3Select.checkValidity()) {
+                return;
+            }
+            
+            // --- التحقق من تفرد رقم الهاتف ---
+            let phone1 = phone1Input.value;
+            if (phone1.startsWith('0')) {
+                phone1 = phone1.substring(1);
+            }
+            const formattedPhone1 = '+964' + phone1;
+
+            try {
+                const { data: existingUser, error: fetchError } = await supabaseClient
+                    .from('users')
+                    .select('id')
+                    .eq('phone1', formattedPhone1)
+                    .single(); // نستخدم single للحصول على نتيجة واحدة أو null
+
+                if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 هو الخطأ عندما لا يتم العثور على سجل
+                    console.error('Error checking phone number:', fetchError);
+                    alert('حدث خطأ أثناء التحقق من رقم الهاتف. يرجى المحاولة مرة أخرى.');
+                    return;
+                }
+
+                if (existingUser) {
+                    phoneExistsError.style.display = 'block';
+                    return; // إيقاف عملية التسجيل
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
+                return;
+            }
+            
+            // --- إذا تجاوز كل التحققات، اعرض نافذة التأكيد ---
+            confirmName.textContent = document.getElementById('fullName').value;
+            confirmPhone1.textContent = formattedPhone1;
+            
+            if (phone2Input.value) {
+                let phone2 = phone2Input.value;
+                if (phone2.startsWith('0')) {
+                    phone2 = phone2.substring(1);
+                }
+                confirmPhone2.textContent = '+964' + phone2;
+                confirmPhone2Container.style.display = 'block';
+            } else {
+                confirmPhone2Container.style.display = 'none';
+            }
+            
+            confirmModal.style.display = 'flex';
+        });
+        
+        // إلغاء التأكيد
+        cancelBtn.addEventListener('click', function() {
+            confirmModal.style.display = 'none';
+        });
+        
+        // تأكيد التسجيل
+        confirmBtn.addEventListener('click', async function() {
+            confirmModal.style.display = 'none';
+            
+            // معالجة أرقام الهواتف
+            let phone1 = phone1Input.value;
+            if (phone1.startsWith('0')) {
+                phone1 = phone1.substring(1);
+            }
+            phone1 = '+964' + phone1;
+            
+            let phone2 = '';
+            if (phone2Input.value) {
+                phone2 = phone2Input.value;
+                if (phone2.startsWith('0')) {
+                    phone2 = phone2.substring(1);
+                }
+                phone2 = '+964' + phone2;
+            }
+            
+            // إعداد البيانات للإرسال إلى Supabase
+            const userData = {
+                full_name: document.getElementById('fullName').value,
+                company_name: document.getElementById('companyName').value, // إضافة الحقل الجديد
+                birth_date: document.getElementById('birthDate').value,
+                address: document.getElementById('address').value,
+                phone1: phone1,
+                phone2: phone2,
+                password: document.getElementById('password').value,
+                question1: document.getElementById('question1').value,
+                answer1: document.getElementById('answer1').value,
+                question2: document.getElementById('question2').value,
+                answer2: document.getElementById('answer2').value,
+                question3: document.getElementById('question3').value,
+                answer3: document.getElementById('answer3').value
+            };
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('users')
+                    .insert([userData]);
+                
+                if (error) {
+                    console.error('Error inserting data:', error);
+                    alert('حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى.');
+                    return;
+                }
+                
+                successNotification.style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى.');
+            }
+        });
+        
+        // الانتقال إلى صفحة تسجيل الدخول
+        goToLoginBtn.addEventListener('click', function() {
+            window.location.href = 'login.html';
+        });
+        
+        // إغلاق النوافذ المنبثقة عند النقر خارجها
+        window.addEventListener('click', function(e) {
+            if (e.target === confirmModal) {
+                confirmModal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

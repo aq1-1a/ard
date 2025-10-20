@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>استعادة كلمة المرور - أيين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            z-index: -2;
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 550px;
+            padding: 40px;
+            animation: fadeIn 0.8s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            color: #1a2a6c;
+            font-weight: 700;
+            letter-spacing: -1px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 10%;
+            width: 80%;
+            height: 3px;
+            background: linear-gradient(90deg, #1a2a6c, #b21f1f);
+            border-radius: 2px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #555;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .form-step {
+            display: none;
+        }
+        .form-step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        .form-group input:focus {
+            border-color: #1a2a6c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+            background-color: #fff;
+        }
+        
+        .form-group input:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        .phone-input {
+            position: relative;
+        }
+
+        .phone-prefix {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+            font-weight: 500;
+        }
+
+        .phone-input input {
+            padding-right: 60px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #1a2a6c, #2a3f8f);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: linear-gradient(90deg, #0f1a4a, #1a2a6c);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 42, 108, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* --- الأنماط الجديدة --- */
+        .support-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .support-link a {
+            color: #1a2a6c;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px; /* مسافة بين الأيقونة والنص */
+        }
+
+        .support-link a i {
+            font-size: 1.2rem;
+        }
+
+        .support-link a:hover {
+            color: #b21f1f;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #555;
+            font-size: 0.95rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #1a2a6c;
+            text-decoration: underline;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            display: none;
+            animation: slideInRight 0.5s ease;
+            max-width: 350px;
+        }
+
+        .notification.error {
+            background-color: #b21f1f;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .notification h4 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .notification p {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .notification button {
+            background-color: white;
+            color: #4CAF50;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .notification.error button {
+            color: #b21f1f;
+        }
+
+        .notification button:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .lockout-timer {
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="logo">
+            <h1>أيين</h1>
+        </div>
+        
+        <!-- الخطوة 1: إدخال رقم الهاتف -->
+        <div id="step1" class="form-step active">
+            <div class="page-title">استعادة كلمة المرور</div>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">أدخل رقم الهاتف المسجل لدينا للبدء</p>
+            <form id="phoneForm">
+                <div class="form-group">
+                    <label for="phone">رقم الهاتف</label>
+                    <div class="phone-input">
+                        <span class="phone-prefix">+964</span>
+                        <input type="tel" id="phone" name="phone" maxlength="11" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn" id="verifyPhoneBtn">تحقق</button>
+            </form>
+            <!-- تم تحديث رابط الدعم -->
+            <div class="support-link">
+                <a href="dam.html">
+                    <i class="fas fa-headset"></i>
+                    <span>الدعم الفني</span>
+                </a>
+            </div>
+            <!-- تم إضافة رابط العودة -->
+            <div class="back-link">
+                <a href="login.html">تذكرت كلمة المرور؟ العودة لتسجيل الدخول</a>
+            </div>
+        </div>
+
+        <!-- الخطوة 2: استمارة الأمان -->
+        <div id="step2" class="form-step">
+            <div class="page-title">تأكيد الهوية</div>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">أدخل بياناتك بدقة للتحقق من هويتك</p>
+            <form id="securityForm">
+                <div class="form-group">
+                    <label for="fullName">الاسم الثلاثي</label>
+                    <input type="text" id="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="companyName">اسم المكتب العقاري او الشركة</label>
+                    <input type="text" id="companyName">
+                </div>
+                <div class="form-group">
+                    <label for="birthDate">تاريخ الميلاد</label>
+                    <input type="date" id="birthDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">عنوان السكن</label>
+                    <input type="text" id="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone1">رقم الهاتف الأول</label>
+                    <div class="phone-input">
+                        <span class="phone-prefix">+964</span>
+                        <input type="tel" id="phone1" name="phone1" maxlength="11" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="phone2">رقم الهاتف الثاني</label>
+                    <div class="phone-input">
+                        <span class="phone-prefix">+964</span>
+                        <input type="tel" id="phone2" name="phone2" maxlength="11">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lastPassword">آخر كلمة مرور تتذكرها (يجب ألا تكون فارغة)</label>
+                    <input type="password" id="lastPassword" required>
+                </div>
+                <div class="form-group">
+                    <label id="q1_label">السؤال الأول</label>
+                    <input type="text" id="answer1" placeholder="الإجابة" required>
+                </div>
+                <div class="form-group">
+                    <label id="q2_label">السؤال الثاني</label>
+                    <input type="text" id="answer2" placeholder="الإجابة" required>
+                </div>
+                <div class="form-group">
+                    <label id="q3_label">السؤال الثالث</label>
+                    <input type="text" id="answer3" placeholder="الإجابة" required>
+                </div>
+                <button type="submit" class="btn" id="verifyDataBtn">تحقق من البيانات</button>
+            </form>
+            <!-- تم إضافة رابط العودة -->
+            <div class="back-link">
+                <a href="login.html">تذكرت كلمة المرور؟ العودة لتسجيل الدخول</a>
+            </div>
+        </div>
+
+        <!-- الخطوة 3: إعادة تعيين كلمة المرور -->
+        <div id="step3" class="form-step">
+            <div class="page-title">تعيين كلمة مرور جديدة</div>
+            <form id="resetPasswordForm">
+                <div class="form-group">
+                    <label for="newPassword">كلمة المرور الجديدة</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmNewPassword">تأكيد كلمة المرور الجديدة</label>
+                    <input type="password" id="confirmNewPassword" required>
+                </div>
+                <button type="submit" class="btn">إعادة تعيين كلمة المرور</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- رسالة الإشعار -->
+    <div id="notification" class="notification">
+        <h4 id="notificationTitle">نجاح</h4>
+        <p id="notificationMessage">تمت العملية بنجاح.</p>
+        <button id="notificationBtn">حسناً</button>
+    </div>
+    
+    <script>
+        // إعداد Supabase
+        const { createClient } = supabase;
+        const supabaseUrl = 'https://rastimuoifacxcitljdw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhc3RpbXVvaWZhY3hjaXRsamR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODYxOTIsImV4cCI6MjA3NTk2MjE5Mn0.xOW2p17zvHy9z8n4q-T__jgiNE83N927oRs2Max13RQ';
+        const supabaseClient = createClient(supabaseUrl, supabaseKey);
+        
+        // عناصر DOM
+        const steps = document.querySelectorAll('.form-step');
+        const phoneForm = document.getElementById('phoneForm');
+        const securityForm = document.getElementById('securityForm');
+        const resetPasswordForm = document.getElementById('resetPasswordForm');
+        const notification = document.getElementById('notification');
+        const notificationTitle = document.getElementById('notificationTitle');
+        const notificationMessage = document.getElementById('notificationMessage');
+        const notificationBtn = document.getElementById('notificationBtn');
+        
+        let currentUserData = null;
+        let lockoutInterval = null;
+
+        // --- دوال مساعدة للمطابقة المرنة (النسخة المصححة نهائياً) ---
+
+        function normalizePhoneNumber(phone) {
+            if (!phone) return '';
+            // إزالة كل الرموز غير الرقمية أولاً
+            let digits = phone.replace(/\D/g, '');
+            // إزالة البادئة 0 أو 964 من البداية
+            return digits.replace(/^(0|964)/, '');
+        }
+
+        function normalizeText(text) {
+            if (!text) return '';
+            return text.trim().replace(/\s+/g, ' ');
+        }
+
+        // إنشاء جزيئات الخلفية التفاعلية
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 5 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                particle.style.animationDuration = `${Math.random() * 10 + 15}s`;
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        function showStep(stepNumber) {
+            steps.forEach(step => step.classList.remove('active'));
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+        }
+
+        function showNotification(title, message, isError = false) {
+            notificationTitle.textContent = title;
+            notificationMessage.innerHTML = message;
+            notification.classList.toggle('error', isError);
+            notification.style.display = 'block';
+        }
+
+        function formatPhoneInput(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length > 0 && !value.startsWith('0')) {
+                value = '0' + value;
+            }
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+            input.value = value;
+        }
+
+        document.getElementById('phone').addEventListener('input', function() {
+            formatPhoneInput(this);
+        });
+
+        document.getElementById('phone1').addEventListener('input', function() {
+            formatPhoneInput(this);
+        });
+
+        document.getElementById('phone2').addEventListener('input', function() {
+            formatPhoneInput(this);
+        });
+
+        notificationBtn.addEventListener('click', () => {
+            notification.style.display = 'none';
+        });
+
+        // التحقق من حالة القفل (تم تحديثه لإصلاح الخطأ 406)
+        async function checkLockoutStatus(phone) {
+            const { data, error } = await supabaseClient
+                .from('password_recovery_attempts')
+                .select('*')
+                .like('phone', phone);
+
+            if (error) {
+                console.error("Error checking lockout:", error);
+                return { locked: false };
+            }
+            
+            if (data && data.length > 0) {
+                const attemptData = data[0];
+                
+                if (attemptData.permanently_locked) {
+                    showNotification('حساب مقفول', 'لقد تم قفل إمكانية استعادة كلمة المرور لهذا الحساب بشكل نهائي. يرجى <a href="dam.html" style="color:#fff; text-decoration:underline;">التواصل مع الدعم الفني</a>.', true);
+                    return { locked: true, permanent: true };
+                }
+                if (attemptData.locked_until && new Date(attemptData.locked_until) > new Date()) {
+                    startLockoutTimer(attemptData.locked_until);
+                    return { locked: true, until: attemptData.locked_until };
+                }
+            }
+            return { locked: false };
+        }
+
+        // التعامل مع المحاولة الفاشلة (تم تحديثه أيضاً لإصلاح الخطأ 406)
+        async function handleFailedAttempt(phone) {
+            // تم تغيير .eq() إلى .like() هنا أيضاً
+            const { data: attemptData, error: fetchError } = await supabaseClient
+                .from('password_recovery_attempts')
+                .select('attempts_count')
+                .like('phone', phone)
+                .single();
+
+            let newAttemptsCount = (attemptData?.attempts_count || 0) + 1;
+            let lockDuration = null;
+            let message = 'بيانات غير متطابقة. يرجى التحقق والمحاولة مرة أخرى.';
+
+            switch (newAttemptsCount) {
+                case 3: lockDuration = 5; message = 'بيانات غير متطابقة. تم قفل الحساب لمدة 5 دقائق.'; break;
+                case 4: lockDuration = 30; message = 'بيانات غير متطابقة. تم قفل الحساب لمدة 30 دقيقة.'; break;
+                case 5: lockDuration = 8 * 60; message = 'بيانات غير متطابقة. تم قفل الحساب لمدة 8 ساعات.'; break;
+                case 6: lockDuration = 24 * 60; message = 'بيانات غير متطابقة. تم قفل الحساب لمدة 24 ساعة.'; break;
+                case 7: lockDuration = null;
+                    message = 'لقد تجاوزت عدد المحاولات المسموح بها. تم قفل إمكانية استعادة كلمة المرور لهذا الحساب بشكل نهائي. يرجى <a href="dam.html" style="color:#fff; text-decoration:underline;">التواصل مع الدعم الفني</a>.';
+                    break;
+            }
+            
+            let lockedUntil = null;
+            if (lockDuration) {
+                lockedUntil = new Date(Date.now() + lockDuration * 60000);
+            }
+
+            const { error: upsertError } = await supabaseClient
+                .from('password_recovery_attempts')
+                .upsert({
+                    phone: phone,
+                    attempts_count: newAttemptsCount,
+                    locked_until: lockedUntil,
+                    permanently_locked: newAttemptsCount >= 7
+                }, {
+                    onConflict: 'phone'
+                });
+
+            if (upsertError) {
+                console.error("Error updating attempts:", upsertError);
+            }
+
+            showNotification('فشل التحقق', message, true);
+            if (lockedUntil) {
+                startLockoutTimer(lockedUntil);
+            }
+            
+            return newAttemptsCount >= 3;
+        }
+
+        function startLockoutTimer(lockedUntilDate) {
+            const verifyBtn = document.getElementById('verifyDataBtn');
+            verifyBtn.disabled = true;
+            
+            if (lockoutInterval) clearInterval(lockoutInterval);
+
+            lockoutInterval = setInterval(() => {
+                const now = new Date();
+                const distance = new Date(lockedUntilDate) - now;
+
+                if (distance < 0) {
+                    clearInterval(lockoutInterval);
+                    verifyBtn.disabled = false;
+                    showNotification('تم فتح القفل', 'يمكنك المحاولة مرة أخرى الآن.', false);
+                    return;
+                }
+
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                showNotification('الحساب مقفول', `الرجاء الانتظار <span class="lockout-timer">${hours} ساعة ${minutes} دقيقة ${seconds} ثانية</span> قبل المحاولة مرة أخرى.`, true);
+            }, 1000);
+        }
+
+        // --- معالجات النماذج ---
+
+        phoneForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const phoneInput = document.getElementById('phone');
+            if (phoneInput.value.length !== 11) {
+                showNotification('خطأ', 'يجب أن يحتوي رقم الهاتف على 11 رقمًا.', true);
+                return;
+            }
+            
+            let phone = phoneInput.value;
+            if (phone.startsWith('0')) phone = phone.substring(1);
+            phone = '+964' + phone;
+
+            const lockStatus = await checkLockoutStatus(phone);
+            if (lockStatus.locked) return;
+
+            const { data, error } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('phone1', phone)
+                .single();
+
+            if (error || !data) {
+                showNotification('خطأ', 'رقم الهاتف غير مسجل لدينا.', true);
+                return;
+            }
+
+            currentUserData = data;
+            document.getElementById('q1_label').textContent = currentUserData.question1;
+            document.getElementById('q2_label').textContent = currentUserData.question2;
+            document.getElementById('q3_label').textContent = currentUserData.question3;
+            
+            showStep(2);
+        });
+
+        securityForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const inputFullName = normalizeText(document.getElementById('fullName').value);
+            const dbFullName = normalizeText(currentUserData.full_name);
+
+            const inputCompany = normalizeText(document.getElementById('companyName').value);
+            const dbCompany = normalizeText(currentUserData.company_name || '');
+
+            const inputBirthDate = document.getElementById('birthDate').value;
+            const dbBirthDate = currentUserData.birth_date;
+
+            const inputAddress = normalizeText(document.getElementById('address').value);
+            const dbAddress = normalizeText(currentUserData.address);
+
+            const inputPhone1 = normalizePhoneNumber(document.getElementById('phone1').value);
+            const dbPhone1 = normalizePhoneNumber(currentUserData.phone1);
+            
+            const inputPhone2 = normalizePhoneNumber(document.getElementById('phone2').value);
+            const dbPhone2 = normalizePhoneNumber(currentUserData.phone2 || '');
+
+            const inputAnswer1 = normalizeText(document.getElementById('answer1').value);
+            const dbAnswer1 = normalizeText(currentUserData.answer1);
+
+            const inputAnswer2 = normalizeText(document.getElementById('answer2').value);
+            const dbAnswer2 = normalizeText(currentUserData.answer2);
+
+            const inputAnswer3 = normalizeText(document.getElementById('answer3').value);
+            const dbAnswer3 = normalizeText(currentUserData.answer3);
+
+            const isDataCorrect = 
+                inputFullName === dbFullName &&
+                inputCompany === dbCompany &&
+                inputBirthDate === dbBirthDate &&
+                inputAddress === dbAddress &&
+                inputPhone1 === dbPhone1 &&
+                inputPhone2 === dbPhone2 &&
+                document.getElementById('lastPassword').value.trim() !== '' &&
+                inputAnswer1 === dbAnswer1 &&
+                inputAnswer2 === dbAnswer2 &&
+                inputAnswer3 === dbAnswer3;
+
+            if (isDataCorrect) {
+                showStep(3);
+                await supabaseClient
+                    .from('password_recovery_attempts')
+                    .update({ attempts_count: 0, locked_until: null, permanently_locked: false })
+                    .eq('phone', currentUserData.phone1);
+            } else {
+                const phone = currentUserData.phone1;
+                const shouldLock = await handleFailedAttempt(phone);
+                if (shouldLock) {
+                    // The form is already disabled by the timer function
+                }
+            }
+        });
+
+        resetPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmNewPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                showNotification('خطأ', 'كلمتا المرور غير متطابقتين.', true);
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('users')
+                .update({ password: newPassword })
+                .eq('id', currentUserData.id);
+
+            if (error) {
+                console.error("Error updating password:", error);
+                showNotification('خطأ', 'حدث خطأ أثناء تحديث كلمة المرور. يرجى المحاولة مرة أخرى.', true);
+            } else {
+                showNotification('نجاح', 'تم تحديث كلمة المرور بنجاح. سيتم نقلك إلى صفحة تسجيل الدخول.', false);
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 3000);
+            }
+        });
+
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+        });
+    </script>
+</body>
+</html>
