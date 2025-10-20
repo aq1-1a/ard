@@ -1461,10 +1461,10 @@
 
             // تهيئة الخريطة فقط في المرة الأولى
             if (!map) {
-                map = L.map('map').setView(coords, 15);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
+                 map = L.map('mapContainer').setView([lat, lng], 15);
+    L.tileLayer('https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf5kcxKDmxByQC', {
+        attribution: '© <a href="https://www.maptiler.com/copyright/" target="_blank">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>'
+    }).addTo(map);
                 marker = L.marker(coords).addTo(map);
             } else {
                 // تحديث عرض الخريطة والعلامة للمكالمات اللاحقة

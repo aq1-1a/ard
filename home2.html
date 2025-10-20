@@ -2678,10 +2678,10 @@
                     marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع التقريبي`).openPopup();
                 }
                 
-                // إضافة طبقة الخريطة
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(mapInstance);
+               // إضافة طبقة الخريطة الآمنة (MapTiler)
+L.tileLayer('https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf5kcxKDmxByQC', {
+    attribution: '© <a href="https://www.maptiler.com/copyright/" target="_blank">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>'
+}).addTo(mapInstance);
                 
                 map = mapInstance;
             }, 100);
