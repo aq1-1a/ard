@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>المكاتب والشركات - أيين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* --- منع التحديد والإبراز والقائمة المنبثقة على جميع العناصر --- */
+        button, a, input, textarea, select {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        
+        button:active, a:active {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            padding: 0;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Main Content */
+        main {
+            padding: 20px;
+            min-height: 100vh;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Search Section */
+        .search-section {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 45px 15px 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f9f9f9;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #1a2a6c;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 42, 108, 0.1);
+            background-color: #fff;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1a2a6c;
+            font-size: 1.2rem;
+        }
+
+        /* Companies Section */
+        .companies-section {
+            margin-top: 20px;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .companies-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .company-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 180px;
+        }
+
+        .company-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .company-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .company-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1a2a6c;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .company-posts {
+            font-size: 0.9rem;
+            color: #666;
+            background-color: #f5f5f5;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+
+        /* No Results Message */
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 3000;
+            display: none;
+            animation: slideInRight 0.5s ease;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .notification.success {
+            background-color: #4CAF50;
+        }
+
+        .notification.error {
+            background-color: #f44336;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .companies-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main {
+                padding: 15px;
+            }
+            
+            .search-section {
+                padding: 15px;
+            }
+            
+            .company-card {
+                padding: 20px 15px;
+                min-height: 160px;
+            }
+            
+            .company-logo {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+            
+            .company-name {
+                font-size: 1.2rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- المحتوى الرئيسي -->
+    <main>
+        <!-- قسم البحث -->
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن اسم شركة أو مكتب...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+        </div>
+
+        <!-- قسم الشركات والمكاتب -->
+        <div class="companies-section">
+            <h2 class="section-title">المكاتب والشركات</h2>
+            <div class="loading" id="loadingSpinner">
+                <div class="spinner"></div>
+            </div>
+            <div class="companies-container" id="companiesContainer" style="display: none;">
+                <!-- سيتم ملؤه ديناميكيًا -->
+            </div>
+            <div class="no-results" id="noResults" style="display: none;">
+                لم يتم العثور على شركات أو مكاتب مطابقة لبحثك
+            </div>
+        </div>
+    </main>
+
+    <!-- رسالة الإشعار -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // إعداد Supabase
+        const { createClient } = supabase;
+        const supabaseUrl = 'https://rastimuoifacxcitljdw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhc3RpbXVvaWZhY3hjaXRsamR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODYxOTIsImV4cCI6MjA3NTk2MjE5Mn0.xOW2p17zvHy9z8n4q-T__jgiNE83N927oRs2Max13RQ';
+        const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+        // عناصر DOM
+        const searchInput = document.getElementById('searchInput');
+        const companiesContainer = document.getElementById('companiesContainer');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const noResults = document.getElementById('noResults');
+        const notification = document.getElementById('notification');
+
+        // متغيرات عامة
+        let allCompanies = [];
+        let filteredCompanies = [];
+
+        // عرض إشعار
+        function showNotification(message, type = 'success') {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // تحميل جميع الشركات والمكاتب
+        async function loadAllCompanies() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error loading companies:', error);
+                    showNotification('حدث خطأ أثناء تحميل الشركات والمكاتب', 'error');
+                    return [];
+                }
+                
+                // تصفية المستخدمين الذين لديهم اسم شركة أو مكتب
+                return data.filter(user => user.company_name && user.company_name.trim() !== '') || [];
+            } catch (error) {
+                console.error('Error loading companies:', error);
+                showNotification('حدث خطأ أثناء تحميل الشركات والمكاتب', 'error');
+                return [];
+            }
+        }
+
+        // تحميل عدد المنشورات لكل شركة
+        async function loadCompanyPostsCount(userId) {
+            try {
+                const { count, error } = await supabaseClient
+                    .from('msg3')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', userId)
+                    .eq('post_status', 'الإعلان نشط الان');
+                
+                if (error) {
+                    console.error('Error loading company posts count:', error);
+                    return 0;
+                }
+                
+                return count || 0;
+            } catch (error) {
+                console.error('Error loading company posts count:', error);
+                return 0;
+            }
+        }
+
+        // عرض الشركات والمكاتب
+        async function displayCompanies(companies) {
+            companiesContainer.innerHTML = '';
+            
+            if (companies.length === 0) {
+                companiesContainer.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            companiesContainer.style.display = 'grid';
+            noResults.style.display = 'none';
+            
+            // تحميل عدد المنشورات لكل شركة
+            const companiesWithPostsCount = await Promise.all(
+                companies.map(async (company) => {
+                    const postsCount = await loadCompanyPostsCount(company.id);
+                    return { ...company, postsCount };
+                })
+            );
+            
+            companiesWithPostsCount.forEach(company => {
+                const companyCard = document.createElement('div');
+                companyCard.className = 'company-card';
+                companyCard.onclick = () => goToCompanyProfile(company.id);
+                
+                // استخراج الحرف الأول من اسم الشركة
+                const firstLetter = company.company_name ? company.company_name.charAt(0).toUpperCase() : 'C';
+                
+                companyCard.innerHTML = `
+                    <div class="company-logo">${firstLetter}</div>
+                    <div class="company-name">${company.company_name || 'شركة'}</div>
+                    ${company.postsCount > 0 ? `<div class="company-posts">${company.postsCount} منشور</div>` : ''}
+                `;
+                
+                companiesContainer.appendChild(companyCard);
+            });
+        }
+
+        // البحث عن الشركات والمكاتب
+        function searchCompanies(query) {
+            if (!query.trim()) {
+                filteredCompanies = [...allCompanies];
+            } else {
+                const lowerQuery = query.toLowerCase();
+                filteredCompanies = allCompanies.filter(company => {
+                    const companyName = company.company_name ? company.company_name.toLowerCase() : '';
+                    
+                    // البحث في أسماء الشركات والمكاتب فقط
+                    return companyName.includes(lowerQuery);
+                });
+            }
+            
+            displayCompanies(filteredCompanies);
+        }
+
+        // الانتقال إلى ملف الشركة الشخصي
+        function goToCompanyProfile(companyId) {
+            window.location.href = `profile.html?id=${companyId}`;
+        }
+
+        // مستمعو الأحداث
+        searchInput.addEventListener('input', (e) => {
+            searchCompanies(e.target.value);
+        });
+
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', async () => {
+            loadingSpinner.style.display = 'flex';
+            companiesContainer.style.display = 'none';
+            noResults.style.display = 'none';
+            
+            allCompanies = await loadAllCompanies();
+            filteredCompanies = [...allCompanies];
+            
+            loadingSpinner.style.display = 'none';
+            displayCompanies(filteredCompanies);
+        });
+    </script>
+</body>
+</html>
