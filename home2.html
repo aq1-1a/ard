@@ -1,0 +1,2877 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>العقارات - أيين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button, a, input, textarea, select {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            background-color: #f5f5f5;
+        }
+
+        /* Header with Search */
+        .header {
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-family: 'Tajawal', sans-serif;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1a2a6c;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* منطقة نتائج البحث */
+        .search-results-container {
+            background-color: white;
+            padding: 15px;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-height: 400px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 90;
+        }
+
+        .search-results-container.active {
+            display: block;
+        }
+
+        .search-results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-results-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a2a6c;
+        }
+
+        .search-results-count {
+            font-size: 0.9rem;
+            color: #666;
+            background-color: #f0f0f0;
+            padding: 4px 10px;
+            border-radius: 15px;
+        }
+
+        .search-results {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .search-result-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #eee;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .search-result-item:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-result-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a2a6c;
+            margin-bottom: 5px;
+        }
+
+        .search-result-details {
+            font-size: 0.85rem;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .search-result-price {
+            font-weight: 600;
+            color: #b21f1f;
+        }
+
+        .search-result-location {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .clear-search-results {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-search-results:hover {
+            background-color: #c82333;
+        }
+
+        /* عارض الشرائح الجديد المضمون مع السحب - محسن */
+        .premium-slider {
+            position: relative;
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 0;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            touch-action: pan-y;
+        }
+
+        .premium-slider-container {
+            position: relative;
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        .premium-slider-title {
+            text-align: center;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .premium-slider-wrapper {
+            position: relative;
+            height: 50vh; /* تقليل الارتفاع */
+            min-height: 300px; /* الحد الأدنى للارتفاع */
+            max-height: 450px; /* الحد الأقصى للارتفاع */
+            overflow: hidden;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            cursor: grab;
+            width: 100%;
+        }
+
+        .premium-slider-wrapper.dragging {
+            cursor: grabbing;
+        }
+
+        .premium-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+            transform: translateX(100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .premium-slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .premium-slide.prev {
+            transform: translateX(-100%);
+        }
+
+        .premium-slide-content {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            cursor: pointer;
+            flex-direction: column;
+        }
+
+        .premium-slide-image-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: #f8f9fa;
+            width: 100%;
+            height: 65%; /* زيادة ارتفاع الصورة إلى 65% */
+        }
+
+        .premium-slide-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .premium-slide:hover .premium-slide-image {
+            transform: scale(1.05);
+        }
+
+        .premium-slide-info {
+            flex: 0 0 auto;
+            padding: 10px 12px; /* تقليل الحشو */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            height: 35%; /* تقليل ارتفاع المعلومات إلى 35% */
+            gap: 2px; /* إضافة فجوة صغيرة بين العناصر */
+        }
+
+        .premium-slide-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a2a6c;
+            margin: 0;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .premium-slide-location {
+            font-size: 0.85rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin: 0;
+        }
+
+        .premium-slide-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #b21f1f;
+            margin: 0;
+            text-align: center;
+        }
+
+        .premium-slide-negotiable {
+            font-size: 0.75rem;
+            color: #666;
+            text-align: center;
+            margin: 0;
+        }
+
+        .premium-slide-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .premium-slide-hint:hover {
+            opacity: 1;
+        }
+
+        .premium-slide-indicators {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .premium-slide-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid white;
+        }
+
+        .premium-slide-indicator.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        .premium-slide-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #666;
+        }
+
+        .premium-slide-loading i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .premium-slide-error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #999;
+        }
+
+        .premium-slide-error i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: #ddd;
+        }
+
+        /* فاصل احدث المشاركات*/
+        .latest-posts-separator {
+            text-align: center;
+            padding: 15px;
+            background-color: #f5f5f5;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1a2a6c;
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .latest-posts-separator::before,
+        .latest-posts-separator::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background-color: #ddd;
+        }
+
+        .latest-posts-separator::before {
+            right: 10px;
+        }
+
+        .latest-posts-separator::after {
+            left: 10px;
+        }
+
+        /* Main Content - ملء الشاشة بالكامل */
+        main { 
+            padding: 0;
+            min-height: 100vh; 
+            width: 100%;
+        }
+
+        /* Posts Container - ملء الشاشة بالكامل */
+        .posts-container { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0;
+            width: 100%;
+        }
+        
+        /* Post Card - ملء الشاشة بالكامل بدون إطارات */
+        .post-card { 
+            background-color: white; 
+            border-bottom: 1px solid #eee;
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            width: 100%; 
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+        .post-card:last-child {
+            border-bottom: none;
+        }
+        .post-card:hover { 
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Image Carousel - ملء العرض بالكامل */
+        .post-images { 
+            position: relative; 
+            height: 200px; 
+            background-color: #f0f0f0; 
+            overflow: hidden; 
+            width: 100%;
+            touch-action: pan-y;
+        }
+        .post-image-carousel { 
+            position: relative; 
+            height: 100%; 
+            width: 100%; 
+        }
+        .carousel-image-container { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            display: none; 
+            cursor: pointer;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+        }
+        .carousel-image-container.active { 
+            display: block; 
+        }
+        .carousel-image { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            pointer-events: none; 
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+        }
+        .carousel-nav { 
+            position: absolute; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            background-color: rgba(0,0,0,0.6); 
+            color: white; 
+            border: none; 
+            padding: 10px; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            border-radius: 50%; 
+            width: 40px; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: background-color 0.3s, transform 0.3s; 
+            z-index: 2; 
+        }
+        .carousel-nav:hover { 
+            background-color: rgba(0,0,0,0.8); 
+            transform: translateY(-50%) scale(1.1); 
+        }
+        .carousel-nav.prev { 
+            right: 10px; 
+        }
+        .carousel-nav.next { 
+            left: 10px; 
+        }
+        .carousel-indicators { 
+            position: absolute; 
+            bottom: 10px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            display: flex; 
+            gap: 8px; 
+            z-index: 2; 
+        }
+        .indicator { 
+            width: 8px; 
+            height: 8px; 
+            border-radius: 50%; 
+            background-color: rgba(255, 255, 255, 0.5); 
+            cursor: pointer; 
+            transition: background-color 0.3s; 
+        }
+        .indicator.active { 
+            background-color: white; 
+        }
+
+        .post-content { 
+            padding: 12px; 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .post-title { 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            color: #1a2a6c; 
+            margin-bottom: 10px; 
+            line-height: 1.4; 
+        }
+        .post-title .highlight { 
+            font-size: 1.2rem; 
+            font-weight: 800; 
+            color: #b21f1f; 
+        }
+        .post-details { 
+            font-size: 0.85rem; 
+            color: #555; 
+            line-height: 1.5; 
+            flex-grow: 1; 
+        }
+        .post-details p { 
+            margin-bottom: 6px; 
+            display: flex; 
+            justify-content: space-between; 
+        }
+        .post-details strong { 
+            color: #333; 
+        }
+        .post-details .price-display {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #b21f1f;
+            font-family: 'Tajawal', sans-serif;
+            padding: 4px 8px;
+            background-color: rgba(178, 31, 31, 0.05);
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .post-code {
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .post-code i { 
+            font-size: 0.8rem; 
+        }
+        
+        .post-footer { 
+            padding: 12px; 
+            background-color: #f9f9f9; 
+            border-top: 1px solid #eee; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 8px; 
+        }
+        .advertiser-info { 
+            font-size: 0.85rem; 
+            color: #666; 
+        }
+        .advertiser-info .company-name {
+            color: #1a2a6c;
+            font-weight: 600;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .advertiser-info .company-name i { 
+            font-size: 0.8rem; 
+            color: #b21f1f; 
+        }
+        .post-actions { 
+            display: flex; 
+            gap: 6px; 
+            flex-wrap: wrap; 
+        }
+        .post-actions button { 
+            padding: 8px 10px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 0.75rem; 
+            transition: all 0.2s ease; 
+            font-weight: 500; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .post-actions .details-btn { 
+            background-color: #17a2b8; 
+            color: white; 
+        }
+        .post-actions .map-btn { 
+            background-color: #007bff; 
+            color: white; 
+        }
+        .post-actions .contact-btn { 
+            background-color: #28a745; 
+            color: white; 
+        }
+        .post-actions .inquiry-btn { 
+            background-color: #6c757d; 
+            color: white; 
+        }
+        .post-actions button:hover { 
+            opacity: 0.8; 
+            transform: scale(1.05); 
+        }
+        .map-link { 
+            color: #1a2a6c; 
+            text-decoration: none; 
+            font-weight: 500; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 4px; 
+            transition: color 0.3s; 
+            cursor: pointer; 
+            font-size: 0.85rem;
+            padding: 6px 10px;
+            background-color: rgba(26, 42, 108, 0.1);
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        .map-link:hover { 
+            color: #0f1a4a; 
+            background-color: rgba(26, 42, 108, 0.2);
+        }
+
+        /* Image Modal */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 3000;
+            overflow: hidden;
+        }
+
+        .image-modal-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-modal-image {
+            max-width: 90%;
+            max-height: 80%;
+            object-fit: contain;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+        }
+
+        .close-image-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .close-image-modal:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: rotate(90deg);
+        }
+
+        .image-modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s, transform 0.3s;
+            z-index: 3001;
+        }
+
+        .image-modal-nav:hover {
+            background-color: rgba(0,0,0,0.8);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .image-modal-nav.prev {
+            right: 20px;
+        }
+
+        .image-modal-nav.next {
+            left: 20px;
+        }
+
+        .image-modal-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 3001;
+        }
+
+        .image-modal-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .image-modal-indicator.active {
+            background-color: white;
+        }
+
+        /* Modal Styles - ملء الشاشة بالكامل */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: white; 
+            z-index: 2000; 
+            overflow-y: auto; 
+        }
+        
+        .modal-content {
+            background: white;
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+            color: white;
+            padding: 15px;
+            border: none;
+            margin-bottom: 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .close-modal {
+            color: white;
+            font-size: 1.3rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 70px);
+        }
+        
+        .detail-section {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-right: 4px solid #1a2a6c;
+        }
+        
+        .detail-section h4 {
+            color: #1a2a6c;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .detail-section p {
+            margin: 8px 0;
+            font-size: 0.9rem;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .detail-section strong {
+            color: #333;
+        }
+
+        /* Slider Modal - نافذة خاصة ببطاقات عارض الشرائح */
+        .slider-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 2000;
+        }
+        
+        .slider-modal-content {
+            background: white;
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .slider-modal-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 15px;
+            border: none;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .slider-modal-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .close-slider-modal {
+            color: white;
+            font-size: 1.3rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .close-slider-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .slider-modal-body {
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 70px);
+        }
+        
+        .slider-modal-images {
+            position: relative;
+            height: 250px;
+            background-color: #f0f0f0;
+            overflow: hidden;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            touch-action: pan-y;
+        }
+        
+        .slider-modal-image-carousel {
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+        
+        .slider-modal-image-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            cursor: pointer;
+        }
+        
+        .slider-modal-image-container.active {
+            display: block;
+        }
+        
+        .slider-modal-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .slider-modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s, transform 0.3s;
+            z-index: 2;
+        }
+        
+        .slider-modal-nav:hover {
+            background-color: rgba(0,0,0,0.8);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .slider-modal-nav.prev {
+            right: 10px;
+        }
+        
+        .slider-modal-nav.next {
+            left: 10px;
+        }
+        
+        .slider-modal-indicators {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 2;
+        }
+        
+        .slider-modal-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .slider-modal-indicator.active {
+            background-color: white;
+        }
+        
+        .slider-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .slider-modal-action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .slider-modal-contact-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .slider-modal-contact-btn:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .slider-modal-inquiry-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .slider-modal-inquiry-btn:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        /* Contact Modal - ملء الشاشة بالكامل */
+        .contact-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 2000;
+        }
+        
+        .contact-modal-content {
+            background: white;
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .contact-modal-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 15px;
+            border: none;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .contact-modal-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .close-contact-modal {
+            color: white;
+            font-size: 1.3rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .close-contact-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .contact-modal-body {
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 70px);
+        }
+        
+        .contact-info {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-right: 4px solid #28a745;
+        }
+        
+        .contact-info h4 {
+            color: #28a745;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .phone-number {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .phone-number span {
+            font-weight: 600;
+            color: #333;
+            font-size: 1rem;
+        }
+        
+        .phone-number button {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.1rem;
+        }
+        
+        .phone-number button:hover {
+            background: #218838;
+            transform: scale(1.1);
+        }
+
+        /* Map Modal - ملء الشاشة بالكامل */
+        .map-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 2000;
+        }
+        
+        .map-modal-content {
+            background: white;
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .map-modal-header {
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+            color: white;
+            padding: 15px;
+            border: none;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .map-modal-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .close-map-modal {
+            color: white;
+            font-size: 1.3rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .close-map-modal:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .map-container {
+            flex-grow: 1;
+            width: 100%;
+            height: calc(100vh - 70px);
+        }
+
+        /* تصميم الإشعارات */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .notification {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 300px;
+            max-width: calc(100vw - 40px);
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notification.show { transform: translateX(0); opacity: 1; }
+        .notification::before { content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%; }
+        .notification.success::before { background-color: #4CAF50; }
+        .notification.error::before { background-color: #f44336; }
+        .notification.info::before { background-color: #2196F3; }
+        .notification-icon { font-size: 1.5rem; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .notification.success .notification-icon { background-color: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+        .notification.error .notification-icon { background-color: rgba(244, 67, 54, 0.2); color: #f44336; }
+        .notification.info .notification-icon { background-color: rgba(33, 150, 243, 0.2); color: #2196F3; }
+        .notification-content { flex-grow: 1; }
+        .notification-title { font-weight: 600; font-size: 1rem; margin-bottom: 5px; color: #333; }
+        .notification-message { font-size: 0.9rem; color: #666; line-height: 1.4; }
+        .notification-close { background: none; border: none; color: #aaa; cursor: pointer; font-size: 1.2rem; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s ease; }
+        .notification-close:hover { background-color: rgba(0, 0, 0, 0.05); color: #666; }
+
+        /* No Results Message */
+        .no-results {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+            padding: 40px 20px;
+            background-color: white;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .premium-slider-wrapper {
+                height: 45vh; /* تقليل الارتفاع للأجهزة المتوسطة */
+                min-height: 300px;
+            }
+            
+            .premium-slide-info {
+                padding: 12px;
+            }
+            
+            .premium-slide-title {
+                font-size: 1rem;
+            }
+            
+            .premium-slide-price {
+                font-size: 1rem;
+            }
+            
+            .post-images {
+                height: 180px;
+            }
+            
+            .post-title {
+                font-size: 1rem;
+            }
+            
+            .post-details {
+                font-size: 0.8rem;
+            }
+            
+            .post-actions {
+                justify-content: center;
+            }
+            
+            .post-actions button {
+                flex: 1;
+                min-width: 100px;
+            }
+            
+            .modal-body,
+            .contact-modal-body {
+                padding: 12px;
+            }
+            
+            .detail-section,
+            .contact-info {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .premium-slider-wrapper {
+                height: 40vh; /* تقليل الارتفاع أكثر للأجهزة الصغيرة */
+                min-height: 250px;
+            }
+            
+            .premium-slide-hint {
+                font-size: 0.7rem;
+                padding: 5px 10px;
+            }
+            
+            .post-images {
+                height: 160px;
+            }
+            
+            .post-content {
+                padding: 10px;
+            }
+            
+            .post-footer {
+                padding: 10px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .post-actions {
+                gap: 5px;
+            }
+            
+            .post-actions button {
+                padding: 6px 10px;
+                font-size: 0.7rem;
+            }
+            
+            .modal-header,
+            .contact-modal-header,
+            .map-modal-header {
+                padding: 12px;
+            }
+            
+            .modal-header h2,
+            .contact-modal-header h2,
+            .map-modal-header h2 {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* إضافة تأثيرات السحب */
+        .swipe-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Search -->
+    <header class="header">
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="ابحث عن عقار، شركة، رقم هاتف...">
+            <i class="fas fa-search search-icon"></i>
+            <button class="clear-search" id="clearSearch">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- منطقة نتائج البحث -->
+    <div class="search-results-container" id="searchResultsContainer">
+        <div class="search-results-header">
+            <h3 class="search-results-title">نتائج البحث</h3>
+            <span class="search-results-count" id="searchResultsCount">0 نتيجة</span>
+            <button class="clear-search-results" id="clearSearchResults">
+                <i class="fas fa-times"></i> مسح البحث
+            </button>
+        </div>
+        <div class="search-results" id="searchResults">
+            <!-- سيتم عرض نتائج البحث هنا ديناميكيًا -->
+        </div>
+    </div>
+
+    <!-- عارض الشرائح الجديد المضمون مع السحب -->
+    <div class="premium-slider" id="premiumSlider">
+        <div class="premium-slider-container">
+            <h2 class="premium-slider-title">العروض المميزة</h2>
+            <div class="premium-slider-wrapper" id="premiumSliderWrapper">
+                <!-- سيتم إضافة الشرائح هنا ديناميكيًا -->
+            </div>
+            <div class="premium-slide-indicators" id="premiumIndicators">
+                <!-- سيتم إضافة المؤشرات هنا ديناميكيًا -->
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- فاصل احدث المشاركات-->
+    <div class="latest-posts-separator" id="latestPostsSeparator">
+        أحدث المشاركات
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <main>
+        <div class="posts-container" id="postsContainer">
+            <!-- سيتم عرض المشاركات هنا ديناميكيًا -->
+        </div>
+    </main>
+
+    <!-- نافذة الصورة المكبرة -->
+    <div id="imageModal" class="image-modal">
+        <div class="image-modal-content">
+            <button class="close-image-modal" id="closeImageModal">&times;</button>
+            <button class="image-modal-nav prev" id="prevImageModal"><i class="fas fa-chevron-right"></i></button>
+            <button class="image-modal-nav next" id="nextImageModal"><i class="fas fa-chevron-left"></i></button>
+            <img src="" alt="صورة عقار" class="image-modal-image" id="modalImage">
+            <div class="image-modal-indicators" id="imageModalIndicators"></div>
+        </div>
+    </div>
+
+    <!-- نافذة تفاصيل المشاركة -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>تفاصيل المشاركة</h2>
+                <button class="close-modal" id="closeDetailsModal">&times;</button>
+            </div>
+            <div class="modal-body" id="detailsModalBody">
+                <!-- سيتم تعبئة التفاصيل هنا ديناميكيًا -->
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة خاصة ببطاقات عارض الشرائح -->
+    <div id="sliderModal" class="slider-modal">
+        <div class="slider-modal-content">
+            <div class="slider-modal-header">
+                <h2>تفاصيل العقار</h2>
+                <button class="close-slider-modal" id="closeSliderModal">&times;</button>
+            </div>
+            <div class="slider-modal-body" id="sliderModalBody">
+                <!-- سيتم تعبئة التفاصيل هنا ديناميكيًا -->
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الاتصال -->
+    <div id="contactModal" class="contact-modal">
+        <div class="contact-modal-content">
+            <div class="contact-modal-header">
+                <h2>معلومات الاتصال</h2>
+                <button class="close-contact-modal" id="closeContactModal">&times;</button>
+            </div>
+            <div class="contact-modal-body" id="contactModalBody">
+                <!-- سيتم تعبئة معلومات الاتصال هنا ديناميكيًا -->
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الخريطة -->
+    <div id="mapModal" class="map-modal">
+        <div class="map-modal-content">
+            <div class="map-modal-header">
+                <h2>موقع العقار</h2>
+                <button class="close-map-modal" id="closeMapModal">&times;</button>
+            </div>
+            <div class="map-container" id="mapContainer">
+                <!-- سيتم عرض الخريطة هنا ديناميكيًا -->
+            </div>
+        </div>
+    </div>
+
+    <!-- حاوية الإشعارات -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // إعداد Supabase
+        const { createClient } = supabase;
+        const supabaseUrl = 'https://rastimuoifacxcitljdw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhc3RpbXVvaWZhY3hjaXRsamR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODYxOTIsImV4cCI6MjA3NTk2MjE5Mn0.xOW2p17zvHy9z8n4q-T__jgiNE83N927oRs2Max13RQ';
+        const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+        // عناصر DOM
+        const postsContainer = document.getElementById('postsContainer');
+        const notificationContainer = document.getElementById('notificationContainer');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        
+        // عناصر منطقة نتائج البحث
+        const searchResultsContainer = document.getElementById('searchResultsContainer');
+        const searchResults = document.getElementById('searchResults');
+        const searchResultsCount = document.getElementById('searchResultsCount');
+        const clearSearchResultsBtn = document.getElementById('clearSearchResults');
+        
+        // عناصر عارض الشرائح المميز
+        const premiumSlider = document.getElementById('premiumSlider');
+        const premiumSliderWrapper = document.getElementById('premiumSliderWrapper');
+        const premiumIndicators = document.getElementById('premiumIndicators');
+        
+        // عناصر النوافذ
+        const detailsModal = document.getElementById('detailsModal');
+        const detailsModalBody = document.getElementById('detailsModalBody');
+        const closeDetailsModal = document.getElementById('closeDetailsModal');
+
+        // عناصر نافذة عارض الشرائح
+        const sliderModal = document.getElementById('sliderModal');
+        const sliderModalBody = document.getElementById('sliderModalBody');
+        const closeSliderModal = document.getElementById('closeSliderModal');
+
+        const contactModal = document.getElementById('contactModal');
+        const contactModalBody = document.getElementById('contactModalBody');
+        const closeContactModal = document.getElementById('closeContactModal');
+
+        const mapModal = document.getElementById('mapModal');
+        const mapContainer = document.getElementById('mapContainer');
+        const closeMapModal = document.getElementById('closeMapModal');
+
+        // عناصر نافذة الصورة
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const closeImageModal = document.getElementById('closeImageModal');
+        const prevImageModal = document.getElementById('prevImageModal');
+        const nextImageModal = document.getElementById('nextImageModal');
+        const imageModalIndicators = document.getElementById('imageModalIndicators');
+
+        // متغيرات عامة
+        let currentPostId = null;
+        let map = null;
+        let allPosts = [];
+        let currentImageIndex = 0;
+        let currentPostImages = [];
+        let currentSlideIndex = 0;
+        let sliderInterval = null;
+        let isSliderPaused = false;
+        let currentSliderPostId = null;
+        let currentSliderImageIndex = 0;
+        let premiumSlides = [];
+        let currentPremiumSlide = 0;
+
+        // متغيرات السحب
+        let isDragging = false;
+        let startX = 0;
+        let currentX = 0;
+        let dragThreshold = 50;
+
+        // متغيرات السحب للصور
+        let imageSwipeStartX = 0;
+        let imageSwipeEndX = 0;
+        let imageSwipeThreshold = 50;
+        let isImageSwiping = false;
+
+        // عرض إشعار
+        function showNotification(title, message, type = 'success', duration = 5000) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            let iconClass = '';
+            if (type === 'success') iconClass = 'fas fa-check-circle';
+            else if (type === 'error') iconClass = 'fas fa-exclamation-circle';
+            else if (type === 'info') iconClass = 'fas fa-info-circle';
+            
+            notification.innerHTML = `
+                <div class="notification-icon"><i class="${iconClass}"></i></div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close"><i class="fas fa-times"></i></button>
+            `;
+            
+            notificationContainer.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 10);
+            
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.addEventListener('click', () => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 400);
+            });
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 400);
+            }, duration);
+        }
+
+        // دالة معالجة الصور المضمونة
+        function processImages(images) {
+            if (!images) return ['ard.png'];
+            
+            // إذا كانت صورة واحدة
+            if (typeof images === 'string' && !images.startsWith('[')) {
+                return [images];
+            }
+            
+            // إذا كانت مصفوفة JSON
+            if (typeof images === 'string') {
+                try {
+                    const parsed = JSON.parse(images);
+                    return Array.isArray(parsed) && parsed.length > 0 ? parsed : ['ard.png'];
+                } catch (e) {
+                    return ['ard.png'];
+                }
+            }
+            
+            // إذا كانت مصفوفة بالفعل
+            if (Array.isArray(images)) {
+                return images.length > 0 ? images : ['ard.png'];
+            }
+            
+            // القيمة الافتراضية
+            return ['ard.png'];
+        }
+
+        // دالة التحقق من الصورة
+        function validateImage(imageUrl) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = imageUrl;
+                
+                // timeout بعد 5 ثواني
+                setTimeout(() => resolve(false), 5000);
+            });
+        }
+
+        // تحميل جميع المشاركات النشطة من msg3
+        async function loadActivePosts() {
+            try {
+                // جلب المشاركات النشطة فقط
+                const { data: activePosts, error } = await supabaseClient 
+                    .from('msg3')
+                    .select('*')
+                    .or('post_status.eq.الإعلان نشط الآن,post_status.eq.الإعلان نشط الان')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                // جلب معلومات المستخدمين لكل مشاركة
+                const postsWithUserInfo = await Promise.all(
+                    activePosts.map(async (post) => {
+                        const { data: userData, error: userError } = await supabaseClient
+                            .from('users')
+                            .select('full_name, phone1, phone2, company_name')
+                            .eq('id', post.user_id)
+                            .single();
+                        
+                        if (userError) {
+                            console.error('Error fetching user data:', userError);
+                            return { ...post, userInfo: null };
+                        }
+                        
+                        return { ...post, userInfo: userData };
+                    })
+                );
+                
+                allPosts = postsWithUserInfo;
+                displayPosts(allPosts);
+                initializePremiumSlider(allPosts);
+                
+            } catch (error) {
+                showNotification('خطأ', 'حدث خطأ أثناء تحميل المشاركات', 'error');
+                console.error('Error loading posts:', error);
+            }
+        }
+
+        // تهيئة عارض الشرائح المميز مع السحب
+        async function initializePremiumSlider(posts) {
+            if (posts.length === 0) return;
+            
+            premiumSliderWrapper.innerHTML = '';
+            premiumIndicators.innerHTML = '';
+            premiumSlides = [];
+            
+            // معالجة أول 5 منشورات للعرض في السلايدر
+            const featuredPosts = posts.slice(0, 5);
+            
+            for (let i = 0; i < featuredPosts.length; i++) {
+                const post = featuredPosts[i];
+                
+                // معالجة الصور بالطريقة المضمونة
+                const images = processImages(post.images);
+                const displayImage = images[0]; // أول صورة
+                
+                // التحقق من الصورة
+                const isValidImage = await validateImage(displayImage);
+                const finalImage = isValidImage ? displayImage : 'ard.png';
+                
+                // تنسيق السعر
+                const priceFormatted = post.price ? parseInt(post.price).toLocaleString('ar-IQ') + ' دينار عراقي' : 'غير محدد';
+                
+                // إنشاء شريحة بدون أزرار
+                const slide = document.createElement('div');
+                slide.className = `premium-slide ${i === 0 ? 'active' : ''}`;
+                slide.innerHTML = `
+                    <div class="premium-slide-content" onclick="showSliderPostDetails('${post.post_id}')">
+                        <div class="premium-slide-image-container">
+                            <img src="${finalImage}" alt="صورة عقار" class="premium-slide-image" draggable="false">
+                        </div>
+                        <div class="premium-slide-info">
+                            <h3 class="premium-slide-title">متوفر ${post.offer_type} ${post.property_type}</h3>
+                            <div class="premium-slide-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                ${post.governorate} - ${post.precise_address}
+                            </div>
+                            <div class="premium-slide-price">${priceFormatted}</div>
+                            <div class="premium-slide-negotiable">${post.price_negotiable}</div>
+                        </div>
+                    </div>
+                `;
+                
+                premiumSliderWrapper.appendChild(slide);
+                premiumSlides.push({
+                    element: slide,
+                    post: post,
+                    image: finalImage
+                });
+                
+                // إنشاء مؤشر
+                const indicator = document.createElement('div');
+                indicator.className = `premium-slide-indicator ${i === 0 ? 'active' : ''}`;
+                indicator.onclick = () => goToPremiumSlide(i);
+                premiumIndicators.appendChild(indicator);
+            }
+            
+            // إعداد أحداث السحب
+            setupSwipeGestures();
+            
+            // بدء التمرير التلقائي
+            startPremiumSlider();
+            
+            // عرض إشعار بالنجاح
+            showNotification('نجاح', `تم تحميل ${premiumSlides.length} عقار مميز`, 'success', 3000);
+        }
+
+        // إعداد إيماءات السحب
+        function setupSwipeGestures() {
+            const slider = premiumSliderWrapper;
+            
+            // أحداث الماوس
+            slider.addEventListener('mousedown', handleDragStart);
+            slider.addEventListener('mousemove', handleDragMove);
+            slider.addEventListener('mouseup', handleDragEnd);
+            slider.addEventListener('mouseleave', handleDragEnd);
+            
+            // أحداث اللمس
+            slider.addEventListener('touchstart', handleTouchStart, { passive: true });
+            slider.addEventListener('touchmove', handleTouchMove, { passive: true });
+            slider.addEventListener('touchend', handleTouchEnd);
+        }
+
+        // بدء السحب
+        function handleDragStart(e) {
+            isDragging = true;
+            startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            premiumSliderWrapper.classList.add('dragging');
+            pauseSlider();
+        }
+
+        // حركة السحب
+        function handleDragMove(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+        }
+
+        // نهاية السحب
+        function handleDragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            premiumSliderWrapper.classList.remove('dragging');
+            
+            const diffX = startX - currentX;
+            
+            if (Math.abs(diffX) > dragThreshold) {
+                if (diffX > 0) {
+                    // السحب لليسار - الشريحة التالية
+                    nextPremiumSlide();
+                } else {
+                    // السحب لليمين - الشريحة السابقة
+                    prevPremiumSlide();
+                }
+            }
+            
+            resumeSlider();
+        }
+
+        // أحداث اللمس
+        function handleTouchStart(e) {
+            handleDragStart(e);
+        }
+
+        function handleTouchMove(e) {
+            handleDragMove(e);
+        }
+
+        function handleTouchEnd(e) {
+            handleDragEnd(e);
+        }
+
+        // بدء تشغيل عارض الشرائح المميز
+        function startPremiumSlider() {
+            if (sliderInterval) clearInterval(sliderInterval);
+            
+            sliderInterval = setInterval(() => {
+                if (!isSliderPaused && premiumSlides.length > 0) {
+                    nextPremiumSlide();
+                }
+            }, 5000);
+        }
+
+        // الانتقال إلى الشريحة التالية
+        function nextPremiumSlide() {
+            const nextIndex = (currentPremiumSlide + 1) % premiumSlides.length;
+            goToPremiumSlide(nextIndex);
+        }
+
+        // الانتقال إلى الشريحة السابقة
+        function prevPremiumSlide() {
+            const prevIndex = (currentPremiumSlide - 1 + premiumSlides.length) % premiumSlides.length;
+            goToPremiumSlide(prevIndex);
+        }
+
+        // الانتقال إلى شريحة معينة
+        function goToPremiumSlide(index) {
+            if (index < 0 || index >= premiumSlides.length) return;
+            
+            // إزالة الكلاسات من الشريحة الحالية
+            premiumSlides[currentPremiumSlide].element.classList.remove('active');
+            premiumSlides[currentPremiumSlide].element.classList.add('prev');
+            
+            // تحديث المؤشر الحالي
+            premiumIndicators.children[currentPremiumSlide].classList.remove('active');
+            
+            // تحديث الفهرس
+            currentPremiumSlide = index;
+            
+            // إضافة الكلاسات للشريحة الجديدة
+            premiumSlides[currentPremiumSlide].element.classList.remove('prev');
+            premiumSlides[currentPremiumSlide].element.classList.add('active');
+            
+            // تحديث المؤشر الجديد
+            premiumIndicators.children[currentPremiumSlide].classList.add('active');
+        }
+
+        // عرض المشاركات
+        function displayPosts(posts) {
+            postsContainer.innerHTML = '';
+            if (posts.length === 0) {
+                postsContainer.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3>لا توجد نتائج</h3>
+                        <p>لم يتم العثور على عقارات تطابق بحثك</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            posts.forEach(post => {
+                const postCard = createPostCard(post);
+                postsContainer.appendChild(postCard);
+                // إعداد السحب بعد إضافة البطاقة إلى DOM
+                setupImageSwipe(post.post_id, processImages(post.images).length);
+            });
+        }
+
+        // عرض نتائج البحث
+        function displaySearchResults(posts) {
+            searchResults.innerHTML = '';
+            searchResultsCount.textContent = `${posts.length} نتيجة`;
+            
+            if (posts.length === 0) {
+                searchResults.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3>لا توجد نتائج</h3>
+                        <p>لم يتم العثور على عقارات تطابق بحثك</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            posts.forEach(post => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+                resultItem.onclick = () => showPostDetails(post.post_id);
+                
+                // معالجة الصور بالطريقة المضمونة
+                const displayImages = processImages(post.images);
+                const displayImage = displayImages[0];
+                
+                // تنسيق السعر
+                const priceFormatted = post.price ? parseInt(post.price).toLocaleString('ar-IQ') + ' دينار عراقي' : 'غير محدد';
+                
+                // معلومات المعلن
+                const advertiserName = post.company_name || post.advertiser_name;
+                
+                resultItem.innerHTML = `
+                    <div class="search-result-title">متوفر ${post.offer_type} ${post.property_type}</div>
+                    <div class="search-result-details">
+                        <span class="search-result-price">${priceFormatted}</span>
+                        <span class="search-result-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${post.governorate} - ${post.precise_address}
+                        </span>
+                    </div>
+                `;
+                
+                searchResults.appendChild(resultItem);
+            });
+        }
+
+        // إنشاء بطاقة مشاركة
+        function createPostCard(post) {
+            const card = document.createElement('div');
+            card.className = 'post-card';
+            card.setAttribute('data-post-id', post.post_id);
+            
+            // معالجة الصور بالطريقة المضمونة
+            const displayImages = processImages(post.images);
+            
+            // إنشاء العنوان
+            const title = `متوفر <span class="highlight">${post.offer_type} ${post.property_type}</span> في ${post.governorate} ${post.precise_address}`;
+            
+            // إنشاء HTML للصور
+            let imagesHTML = `
+                <div class="post-images" id="post-images-${post.post_id}">
+                    <div class="post-image-carousel" id="carousel-${post.post_id}">
+                        ${displayImages.map((img, index) => `
+                            <div class="carousel-image-container ${index === 0 ? 'active' : ''}" data-index="${index}" onclick="openImageModal('${post.post_id}', ${index})">
+                                <img src="${img}" alt="صورة عقار" class="carousel-image" draggable="false">
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${displayImages.length > 1 ? `
+                        <div class="carousel-indicators">${displayImages.map((_, i) => `<span class="indicator ${i === 0 ? 'active' : ''}" onclick="goToSlide('${post.post_id}', ${i})"></span>`).join('')}</div>
+                        
+                    ` : ''}
+                </div>
+            `;
+            
+            // تنسيق السعر
+            const priceFormatted = post.price ? parseInt(post.price).toLocaleString('ar-IQ') + '    '+'      ' : 'غير محدد';
+            
+            // معلومات المعلن
+            const advertiserName = post.company_name || post.advertiser_name;
+            
+            // إنشاء HTML للمحتوى
+            let contentHTML = `
+                <div class="post-content">
+                    <h3 class="post-title">${title}</h3>
+                    <div class="post-details">
+                        
+                        <p><strong>السعر:</strong> <span class="price-display">${priceFormatted}         ${post.price_negotiable}</span></p>
+                        
+                </div>
+            `;
+            
+            // إنشاء HTML للأزرار
+            let actionsHTML = `
+                <div class="post-footer">
+                    <div class="advertiser-info">
+                        <p><strong>${advertiserName}</strong></p>
+                        
+                    </div>
+                    <div class="post-actions">
+                        <button class="details-btn" onclick="showPostDetails('${post.post_id}')">
+                            <i class="fas fa-info-circle"></i>
+                            عرض التفاصيل
+                        </button>
+                        <button class="map-btn" onclick="showLocationOnMap('${post.location}', '${post.governorate}', '${post.precise_address}')">
+                            <i class="fas fa-map-marked-alt"></i>
+                            العنوان على الخريطة 
+                        </button>
+                        <button class="contact-btn" onclick="showContactInfo('${post.user_id}')">
+                            <i class="fas fa-phone"></i>
+                            اتصال
+                        </button>
+                        <button class="inquiry-btn" onclick="goToInquiryPage()">
+                            <i class="fas fa-envelope"></i>
+                            استفسار أكثر
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // تجميع كل الـ HTML
+            card.innerHTML = imagesHTML + contentHTML + actionsHTML;
+            
+            return card;
+        }
+
+        // إعداد أحداث السحب للصور
+        function setupImageSwipe(postId, imageCount) {
+            if (imageCount <= 1) return;
+            
+            const postImages = document.getElementById(`post-images-${postId}`);
+            if (!postImages) return;
+            
+            // أحداث الماوس
+            postImages.addEventListener('mousedown', (e) => handleImageSwipeStart(e, postId));
+            postImages.addEventListener('mousemove', (e) => handleImageSwipeMove(e, postId));
+            postImages.addEventListener('mouseup', (e) => handleImageSwipeEnd(e, postId));
+            postImages.addEventListener('mouseleave', (e) => handleImageSwipeEnd(e, postId));
+            
+            // أحداث اللمس
+            postImages.addEventListener('touchstart', (e) => handleImageTouchStart(e, postId), { passive: true });
+            postImages.addEventListener('touchmove', (e) => handleImageTouchMove(e, postId), { passive: true });
+            postImages.addEventListener('touchend', (e) => handleImageTouchEnd(e, postId));
+        }
+
+        // بدء السحب للصور
+        function handleImageSwipeStart(e, postId) {
+            isImageSwiping = true;
+            imageSwipeStartX = e.clientX;
+        }
+
+        // حركة السحب للصور
+        function handleImageSwipeMove(e, postId) {
+            if (!isImageSwiping) return;
+            e.preventDefault();
+        }
+
+        // نهاية السحب للصور
+        function handleImageSwipeEnd(e, postId) {
+            if (!isImageSwiping) return;
+            isImageSwiping = false;
+            
+            imageSwipeEndX = e.clientX;
+            const diffX = imageSwipeStartX - imageSwipeEndX;
+            
+            if (Math.abs(diffX) > imageSwipeThreshold) {
+                if (diffX > 0) {
+                    // السحب لليسار - الصورة التالية
+                    moveCarousel(postId, 1);
+                } else {
+                    // السحب لليمين - الصورة السابقة
+                    moveCarousel(postId, -1);
+                }
+            }
+        }
+
+        // أحداث اللمس للصور
+        function handleImageTouchStart(e, postId) {
+            isImageSwiping = true;
+            imageSwipeStartX = e.touches[0].clientX;
+        }
+
+        function handleImageTouchMove(e, postId) {
+            if (!isImageSwiping) return;
+            e.preventDefault();
+        }
+
+        function handleImageTouchEnd(e, postId) {
+            if (!isImageSwiping) return;
+            isImageSwiping = false;
+            
+            imageSwipeEndX = e.changedTouches[0].clientX;
+            const diffX = imageSwipeStartX - imageSwipeEndX;
+            
+            if (Math.abs(diffX) > imageSwipeThreshold) {
+                if (diffX > 0) {
+                    // السحب لليسار - الصورة التالية
+                    moveCarousel(postId, 1);
+                } else {
+                    // السحب لليمين - الصورة السابقة
+                    moveCarousel(postId, -1);
+                }
+            }
+        }
+
+        // فتح نافذة الصورة المكبرة
+        function openImageModal(postId, imageIndex) {
+            const post = allPosts.find(p => p.post_id === postId);
+            if (!post) return;
+            
+            // معالجة الصور بالطريقة المضمونة
+            const displayImages = processImages(post.images);
+            
+            currentPostImages = displayImages;
+            currentImageIndex = imageIndex || 0;
+            
+            // عرض الصورة الحالية
+            modalImage.src = currentPostImages[currentImageIndex];
+            
+            // تحديث المؤشرات
+            updateImageModalIndicators();
+            
+            // عرض النافذة
+            imageModal.style.display = 'block';
+            
+            // منع التمرير في الخلفية
+            document.body.style.overflow = 'hidden';
+            
+            // إعداد أحداث السحب للصورة المكبرة
+            setupImageModalSwipe();
+        }
+
+        // إعداد أحداث السحب للصورة المكبرة
+        function setupImageModalSwipe() {
+            const modalContent = document.querySelector('.image-modal-content');
+            
+            // إزالة المستمعين القديمة
+            modalContent.removeEventListener('mousedown', handleModalSwipeStart);
+            modalContent.removeEventListener('mousemove', handleModalSwipeMove);
+            modalContent.removeEventListener('mouseup', handleModalSwipeEnd);
+            modalContent.removeEventListener('mouseleave', handleModalSwipeEnd);
+            
+            modalContent.removeEventListener('touchstart', handleModalTouchStart);
+            modalContent.removeEventListener('touchmove', handleModalTouchMove);
+            modalContent.removeEventListener('touchend', handleModalTouchEnd);
+            
+            // إضافة مستمعين جدد
+            modalContent.addEventListener('mousedown', handleModalSwipeStart);
+            modalContent.addEventListener('mousemove', handleModalSwipeMove);
+            modalContent.addEventListener('mouseup', handleModalSwipeEnd);
+            modalContent.addEventListener('mouseleave', handleModalSwipeEnd);
+            
+            modalContent.addEventListener('touchstart', handleModalTouchStart, { passive: true });
+            modalContent.addEventListener('touchmove', handleModalTouchMove, { passive: true });
+            modalContent.addEventListener('touchend', handleModalTouchEnd);
+        }
+
+        // بدء السحب للصورة المكبرة
+        function handleModalSwipeStart(e) {
+            isImageSwiping = true;
+            imageSwipeStartX = e.clientX;
+        }
+
+        // حركة السحب للصورة المكبرة
+        function handleModalSwipeMove(e) {
+            if (!isImageSwiping) return;
+            e.preventDefault();
+        }
+
+        // نهاية السحب للصورة المكبرة
+        function handleModalSwipeEnd(e) {
+            if (!isImageSwiping) return;
+            isImageSwiping = false;
+            
+            imageSwipeEndX = e.clientX;
+            const diffX = imageSwipeStartX - imageSwipeEndX;
+            
+            if (Math.abs(diffX) > imageSwipeThreshold) {
+                if (diffX > 0) {
+                    // السحب لليسار - الصورة التالية
+                    if (currentImageIndex < currentPostImages.length - 1) {
+                        goToImageModalSlide(currentImageIndex + 1);
+                    }
+                } else {
+                    // السحب لليمين - الصورة السابقة
+                    if (currentImageIndex > 0) {
+                        goToImageModalSlide(currentImageIndex - 1);
+                    }
+                }
+            }
+        }
+
+        // أحداث اللمس للصورة المكبرة
+        function handleModalTouchStart(e) {
+            isImageSwiping = true;
+            imageSwipeStartX = e.touches[0].clientX;
+        }
+
+        function handleModalTouchMove(e) {
+            if (!isImageSwiping) return;
+            e.preventDefault();
+        }
+
+        function handleModalTouchEnd(e) {
+            if (!isImageSwiping) return;
+            isImageSwiping = false;
+            
+            imageSwipeEndX = e.changedTouches[0].clientX;
+            const diffX = imageSwipeStartX - imageSwipeEndX;
+            
+            if (Math.abs(diffX) > imageSwipeThreshold) {
+                if (diffX > 0) {
+                    // السحب لليسار - الصورة التالية
+                    if (currentImageIndex < currentPostImages.length - 1) {
+                        goToImageModalSlide(currentImageIndex + 1);
+                    }
+                } else {
+                    // السحب لليمين - الصورة السابقة
+                    if (currentImageIndex > 0) {
+                        goToImageModalSlide(currentImageIndex - 1);
+                    }
+                }
+            }
+        }
+
+        // تحديث مؤشرات الصور في النافذة المكبرة
+        function updateImageModalIndicators() {
+            imageModalIndicators.innerHTML = '';
+            
+            if (currentPostImages.length <= 1) return;
+            
+            currentPostImages.forEach((_, index) => {
+                const indicator = document.createElement('span');
+                indicator.className = `image-modal-indicator ${index === currentImageIndex ? 'active' : ''}`;
+                indicator.onclick = () => goToImageModalSlide(index);
+                imageModalIndicators.appendChild(indicator);
+            });
+        }
+
+        // الانتقال إلى صورة معينة في النافذة المكبرة
+        function goToImageModalSlide(index) {
+            if (index < 0 || index >= currentPostImages.length) return;
+            
+            currentImageIndex = index;
+            modalImage.src = currentPostImages[currentImageIndex];
+            updateImageModalIndicators();
+        }
+
+        // عرض تفاصيل المشاركة من الشريط
+        function showSliderPostDetails(postId, imageIndex = 0) {
+            pauseSlider();
+            currentSliderPostId = postId;
+            currentSliderImageIndex = imageIndex;
+            
+            try {
+                const post = allPosts.find(p => p.post_id === postId);
+                if (!post) return;
+                
+                // معالجة الصور بالطريقة المضمونة
+                const displayImages = processImages(post.images);
+                
+                // تنسيق السعر
+                const priceFormatted = post.price ? parseInt(post.price).toLocaleString('ar-IQ') + ' دينار عراقي' : 'غير محدد';
+                
+                // إنشاء HTML للصور
+                let imagesHTML = `
+                    <div class="slider-modal-images" id="slider-modal-images-${post.post_id}">
+                        <div class="slider-modal-image-carousel" id="slider-carousel-${post.post_id}">
+                            ${displayImages.map((img, index) => `
+                                <div class="slider-modal-image-container ${index === imageIndex ? 'active' : ''}" data-index="${index}">
+                                    <img src="${img}" alt="صورة عقار" class="slider-modal-image">
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${displayImages.length > 1 ? `
+                            <div class="slider-modal-indicators">${displayImages.map((_, i) => `<span class="slider-modal-indicator ${i === imageIndex ? 'active' : ''}" onclick="goToSliderModalSlide('${post.post_id}', ${i})"></span>`).join('')}</div>
+                           
+                        ` : ''}
+                    </div>
+                `;
+                
+                // إنشاء HTML للمحتوى
+                let contentHTML = `
+                     <div class="detail-section">
+                        <h4>معلومات العقار</h4>
+                        ${post.property_number ? `<p><strong>رقم العقار:</strong> <span>${post.property_number}</span></p>` : ''}
+                        ${post.deed_type ? `<p><strong>نوع العقار:</strong> <span>${post.deed_type}</span></p>` : ''}
+                        <p><strong>المساحة:</strong> <span>${post.area_number} ${post.area_unit}</span></p>
+                        <p><strong>حالة العقار:</strong> <span>${post.property_condition}</span></p>
+                        ${post.features ? `<p><strong>المميزات:</strong> <span>${post.features}</span></p>` : ''}
+                        ${post.notes ? `<p><strong>ملاحظات:</strong> <span>${post.notes}</span></p>` : ''}
+                        <p><strong>السعر:</strong> <span class="price-display">${priceFormatted} (${post.price_negotiable})</span></p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>معلومات الموقع</h4>
+                        <p><strong>المحافظة:</strong> <span>${post.governorate}</span></p>
+                        <p><strong>العنوان الدقيق:</strong> <span>${post.precise_address}</span></p>
+                        ${post.location ? `
+                            <div style="margin-top: 10px;">
+                                <a href="#" class="map-link" onclick="showLocationOnMap('${post.location}', '${post.governorate}', '${post.precise_address}'); return false;">
+                                    <i class="fas fa-map-marker-alt"></i> مشاهدة الموقع على الخريطة
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                // إنشاء HTML للأزرار
+                let actionsHTML = `
+                    <div class="slider-modal-actions">
+                        <button class="slider-modal-action-btn slider-modal-contact-btn" onclick="showContactInfo('${post.user_id}')">
+                            <i class="fas fa-phone"></i>
+                            اتصال
+                        </button>
+                        <button class="slider-modal-action-btn slider-modal-inquiry-btn" onclick="goToInquiryPage()">
+                            <i class="fas fa-envelope"></i>
+                            استفسار أكثر
+                        </button>
+                    </div>
+                `;
+                
+                // تجميع كل الـ HTML
+                sliderModalBody.innerHTML = imagesHTML + contentHTML + actionsHTML;
+                sliderModal.style.display = 'block';
+                
+                // منع التمرير في الخلفية
+                document.body.style.overflow = 'hidden';
+                
+                // إعداد أحداث السحب للصور في نافذة عارض الشرائح
+                setupSliderModalImageSwipe(post.post_id, displayImages.length);
+                
+            } catch (error) {
+                showNotification('خطأ', 'حدث خطأ أثناء تحميل تفاصيل المشاركة', 'error');
+            }
+        }
+
+        // إعداد أحداث السحب للصور في نافذة عارض الشرائح
+        function setupSliderModalImageSwipe(postId, imageCount) {
+            if (imageCount <= 1) return;
+            
+            const sliderModalImages = document.getElementById(`slider-modal-images-${postId}`);
+            if (!sliderModalImages) return;
+            
+            // أحداث الماوس
+            sliderModalImages.addEventListener('mousedown', (e) => handleSliderModalSwipeStart(e, postId));
+            sliderModalImages.addEventListener('mousemove', (e) => handleSliderModalSwipeMove(e, postId));
+            sliderModalImages.addEventListener('mouseup', (e) => handleSliderModalSwipeEnd(e, postId));
+            sliderModalImages.addEventListener('mouseleave', (e) => handleSliderModalSwipeEnd(e, postId));
+            
+            // أحداث اللمس
+            sliderModalImages.addEventListener('touchstart', (e) => handleSliderModalTouchStart(e, postId), { passive: true });
+            sliderModalImages.addEventListener('touchmove', (e) => handleSliderModalTouchMove(e, postId), { passive: true });
+            sliderModalImages.addEventListener('touchend', (e) => handleSliderModalTouchEnd(e, postId));
+        }
+
+        // بدء السحب للصور في نافذة عارض الشرائح
+        function handleSliderModalSwipeStart(e, postId) {
+            isImageSwiping = true;
+            imageSwipeStartX = e.clientX;
+        }
+
+        // حركة السحب للصور في نافذة عارض الشرائح
+        function handleSliderModalSwipeMove(e, postId) {
+            if (!isImageSwiping) return;
+            e.preventDefault();
+        }
+
+        // نهاية السحب للصور في نافذة عارض الشرائح
+        function handleSliderModalSwipeEnd(e, postId) {
+            if (!isImageSwiping) return;
+            isImageSwiping = false;
+            
+            imageSwipeEndX = e.clientX;
+            const diffX = imageSwipeStartX - imageSwipeEndX;
+            
+            if (Math.abs(diffX) > imageSwipeThreshold) {
+                if (diffX > 0) {
+                    // السحب لليسار - الصورة التالية
+                    moveSliderModalCarousel(postId, 1);
+                } else {
+                    // السحب لليمين - الصورة السابقة
+                    moveSliderModalCarousel(postId, -1);
+                }
+            }
+        }
+
+        // أحداث اللمس للصور في نافذة عارض الشرائح
+        function handleSliderModalTouchStart(e, postId) {
+            isImageSwiping = true;
+            imageSwipeStartX = e.touches[0].clientX;
+        }
+
+        function handleSliderModalTouchMove(e, postId) {
+            if (!isImageSwiping) return;
+            e.preventDefault();
+        }
+
+        function handleSliderModalTouchEnd(e, postId) {
+            if (!isImageSwiping) return;
+            isImageSwiping = false;
+            
+            imageSwipeEndX = e.changedTouches[0].clientX;
+            const diffX = imageSwipeStartX - imageSwipeEndX;
+            
+            if (Math.abs(diffX) > imageSwipeThreshold) {
+                if (diffX > 0) {
+                    // السحب لليسار - الصورة التالية
+                    moveSliderModalCarousel(postId, 1);
+                } else {
+                    // السحب لليمين - الصورة السابقة
+                    moveSliderModalCarousel(postId, -1);
+                }
+            }
+        }
+
+        // دوال عرض الصور في نافذة عارض الشرائح
+        function goToSliderModalSlide(postId, slideIndex) {
+            const carousel = document.getElementById(`slider-carousel-${postId}`);
+            const containers = carousel.querySelectorAll('.slider-modal-image-container');
+            const indicators = carousel.parentElement.querySelectorAll('.slider-modal-indicator');
+            
+            if (!containers || containers.length === 0) return;
+            containers.forEach(container => container.classList.remove('active'));
+            if (containers[slideIndex]) containers[slideIndex].classList.add('active');
+            indicators.forEach((ind, i) => ind.classList.toggle('active', i === slideIndex));
+            
+            currentSliderImageIndex = slideIndex;
+        }
+
+        function moveSliderModalCarousel(postId, direction) {
+            const carousel = document.getElementById(`slider-carousel-${postId}`);
+            const containers = carousel.querySelectorAll('.slider-modal-image-container');
+            if (containers.length <= 1) return;
+            
+            const activeContainer = carousel.querySelector('.slider-modal-image-container.active');
+            let currentIndex = Array.from(containers).indexOf(activeContainer);
+            if (currentIndex === -1) currentIndex = 0;
+            
+            let newIndex = currentIndex + direction;
+            if (newIndex < 0) newIndex = containers.length - 1;
+            if (newIndex >= containers.length) newIndex = 0;
+            
+            goToSliderModalSlide(postId, newIndex);
+        }
+
+        // عرض تفاصيل المشاركة
+        async function showPostDetails(postId) {
+            try {
+                const { data: post, error } = await supabaseClient
+                    .from('msg3')
+                    .select('*')
+                    .eq('post_id', postId)
+                    .single();
+                
+                if (error) throw error;
+                
+                const priceFormatted = post.price ? parseInt(post.price).toLocaleString('ar-IQ') + '  دينار عراقي  '+'     ' : 'غير محدد';
+                
+                let detailsHTML = `
+                    <div class="detail-section">
+                        <h4>معلومات العقار</h4>
+                        ${post.property_number ? `<p><strong>رقم العقار:</strong> <span>${post.property_number}</span></p>` : ''}
+                        ${post.deed_type ? `<p><strong>نوع العقار:</strong> <span>${post.deed_type}</span></p>` : ''}
+                        <p><strong>المساحة:</strong> <span>${post.area_number} ${post.area_unit}</span></p>
+                        <p><strong>حالة العقار:</strong> <span>${post.property_condition}</span></p>
+                        ${post.features ? `<p><strong>المميزات:</strong> <span>${post.features}</span></p>` : ''}
+                        ${post.notes ? `<p><strong>ملاحظات:</strong> <span>${post.notes}</span></p>` : ''}
+                        <p><strong>السعر:</strong> <span class="price-display">${priceFormatted} (${post.price_negotiable})</span></p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>معلومات الموقع</h4>
+                        <p><strong>المحافظة:</strong> <span>${post.governorate}</span></p>
+                        <p><strong>العنوان الدقيق:</strong> <span>${post.precise_address}</span></p>
+                        ${post.location ? `
+                            <div style="margin-top: 10px;">
+                                <a href="#" class="map-link" onclick="showLocationOnMap('${post.location}', '${post.governorate}', '${post.precise_address}'); return false;">
+                                    <i class="fas fa-map-marker-alt"></i> مشاهدة الموقع على الخريطة
+                                </a>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                if (post.post_code) {
+                    detailsHTML += `
+                        <div class="detail-section">
+                            <h4>معلومات المشاركة</h4>
+                            <div class="post-code"><i class="fas fa-hashtag"></i> كود المشاركة: ${post.post_code}</div>
+                        </div>
+                    `;
+                }
+                
+                detailsModalBody.innerHTML = detailsHTML;
+                detailsModal.style.display = 'block';
+                
+                // منع التمرير في الخلفية
+                document.body.style.overflow = 'hidden';
+                
+            } catch (error) {
+                showNotification('خطأ', 'حدث خطأ أثناء تحميل تفاصيل المشاركة', 'error');
+            }
+        }
+
+        // عرض معلومات الاتصال
+        async function showContactInfo(userId) {
+            try {
+                const { data: userData, error } = await supabaseClient
+                    .from('users')
+                    .select('full_name, phone1, phone2, company_name')
+                    .eq('id', userId)
+                    .single();
+                
+                if (error) throw error;
+                
+                let contactHTML = `
+                    <div class="contact-info">
+                        <h4>${userData.company_name || userData.full_name}</h4>
+                `;
+                
+                if (userData.phone1) {
+                    contactHTML += `
+                        <div class="phone-number">
+                            <span>${userData.phone1}</span>
+                            <button onclick="makeCall('${userData.phone1}')">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                if (userData.phone2) {
+                    contactHTML += `
+                        <div class="phone-number">
+                            <span>${userData.phone2}</span>
+                            <button onclick="makeCall('${userData.phone2}')">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                contactHTML += `</div>`;
+                
+                contactModalBody.innerHTML = contactHTML;
+                contactModal.style.display = 'block';
+                
+                // منع التمرير في الخلفية
+                document.body.style.overflow = 'hidden';
+                
+            } catch (error) {
+                showNotification('خطأ', 'حدث خطأ أثناء تحميل معلومات الاتصال', 'error');
+            }
+        }
+
+        // إجراء مكالمة
+        function makeCall(phoneNumber) {
+            window.location.href = `tel:${phoneNumber}`;
+        }
+
+        // الانتقال إلى صفحة الاستفسار
+        function goToInquiryPage() {
+            window.location.href = 'msg.html';
+        }
+
+        // عرض الموقع على الخريطة
+        function showLocationOnMap(location, governorate, preciseAddress) {
+            // إغلاق النوافذ الأخرى
+            detailsModal.style.display = 'none';
+            contactModal.style.display = 'none';
+            sliderModal.style.display = 'none';
+            
+            // عرض نافذة الخريطة
+            mapModal.style.display = 'block';
+            
+            // منع التمرير في الخلفية
+            document.body.style.overflow = 'hidden';
+            
+            // تهيئة الخريطة
+            setTimeout(() => {
+                if (map) {
+                    map.remove();
+                }
+                
+                let mapInstance;
+                let marker;
+                
+                // تحليل إحداثيات الموقع من قاعدة البيانات
+                if (location && location.includes(',')) {
+                    const coords = location.split(',');
+                    const lat = parseFloat(coords[0]);
+                    const lng = parseFloat(coords[1]);
+                    
+                    // التحقق من صحة الإحداثيات
+                    if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                        // إنشاء الخريطة مع التركيز على موقع العقار الحقيقي
+                        mapInstance = L.map('mapContainer').setView([lat, lng], 15);
+                        
+                        // إضافة علامة للموقع الحقيقي
+                        marker = L.marker([lat, lng]).addTo(mapInstance);
+                        marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع الدقيق للعقار`).openPopup();
+                    } else {
+                        // إذا كانت الإحداثيات غير صالحة، استخدم موقع افتراضي
+                        mapInstance = L.map('mapContainer').setView([33.3152, 44.3661], 10);
+                        marker = L.marker([33.3152, 44.3661]).addTo(mapInstance);
+                        marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع التقريبي`).openPopup();
+                    }
+                } else {
+                    // إذا لم تكن الإحداثيات متوفرة، استخدم موقع افتراضي
+                    mapInstance = L.map('mapContainer').setView([33.3152, 44.3661], 10);
+                    marker = L.marker([33.3152, 44.3661]).addTo(mapInstance);
+                    marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع التقريبي`).openPopup();
+                }
+                
+               // إضافة طبقة الخريطة الآمنة (MapTiler)
+L.tileLayer('https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf5kcxKDmxByQC', {
+    attribution: '© <a href="https://www.maptiler.com/copyright/" target="_blank">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>'
+}).addTo(mapInstance);
+                
+                map = mapInstance;
+            }, 100);
+        }
+
+        // دوال عرض الصور
+        function goToSlide(postId, slideIndex) {
+            const carousel = document.getElementById(`carousel-${postId}`);
+            const containers = carousel.querySelectorAll('.carousel-image-container');
+            const indicators = carousel.parentElement.querySelectorAll('.indicator');
+            
+            if (!containers || containers.length === 0) return;
+            containers.forEach(container => container.classList.remove('active'));
+            if (containers[slideIndex]) containers[slideIndex].classList.add('active');
+            indicators.forEach((ind, i) => ind.classList.toggle('active', i === slideIndex));
+        }
+
+        function moveCarousel(postId, direction) {
+            const carousel = document.getElementById(`carousel-${postId}`);
+            const containers = carousel.querySelectorAll('.carousel-image-container');
+            if (containers.length <= 1) return;
+            
+            const activeContainer = carousel.querySelector('.carousel-image-container.active');
+            let currentIndex = Array.from(containers).indexOf(activeContainer);
+            if (currentIndex === -1) currentIndex = 0;
+            
+            let newIndex = currentIndex + direction;
+            if (newIndex < 0) newIndex = containers.length - 1;
+            if (newIndex >= containers.length) newIndex = 0;
+            
+            goToSlide(postId, newIndex);
+        }
+
+        // إيقاف شريط الشرائح
+        function pauseSlider() {
+            isSliderPaused = true;
+        }
+
+        // استئناف شريط الشرائح
+        function resumeSlider() {
+            isSliderPaused = false;
+        }
+
+        // البحث الديناميكي
+        function searchPosts(query) {
+            if (!query.trim()) {
+                // إخفاء نتائج البحث وإظهار عارض الشرائح وفاصل المنشورات
+                searchResultsContainer.classList.remove('active');
+                premiumSlider.style.display = 'block';
+                document.getElementById('latestPostsSeparator').style.display = 'block';
+                clearSearchBtn.style.display = 'none';
+                return;
+            }
+            
+            clearSearchBtn.style.display = 'block';
+            
+            const filteredPosts = allPosts.filter(post => {
+                // البحث في العنوان
+                const title = `متوفر ${post.offer_type} ${post.property_type} في ${post.governorate} ${post.precise_address}`;
+                const titleMatch = title.toLowerCase().includes(query.toLowerCase());
+                
+                // البحث في اسم الشركة/المكتب
+                const companyName = post.company_name || '';
+                const companyNameMatch = companyName.toLowerCase().includes(query.toLowerCase());
+                
+                // البحث في اسم المعلن
+                const advertiserName = post.advertiser_name || '';
+                const advertiserNameMatch = advertiserName.toLowerCase().includes(query.toLowerCase());
+                
+                // البحث في أرقام الهواتف
+                let phoneMatch = false;
+                if (post.userInfo) {
+                    const phone1 = post.userInfo.phone1 || '';
+                    const phone2 = post.userInfo.phone2 || '';
+                    phoneMatch = phone1.includes(query) || phone2.includes(query);
+                }
+                
+                // البحث في كود المشاركة
+                const postCode = post.post_code || '';
+                const postCodeMatch = postCode.toLowerCase().includes(query.toLowerCase());
+                
+                return titleMatch || companyNameMatch || advertiserNameMatch || phoneMatch || postCodeMatch;
+            });
+            
+            // عرض نتائج البحث
+            displaySearchResults(filteredPosts);
+            
+            // إظهار منطقة نتائج البحث وإخفاء عارض الشرائح وفاصل المنشورات
+            searchResultsContainer.classList.add('active');
+            premiumSlider.style.display = 'none';
+            document.getElementById('latestPostsSeparator').style.display = 'none';
+        }
+
+        // مستمعو الأحداث للنوافذ
+        closeDetailsModal.addEventListener('click', () => {
+            detailsModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            resumeSlider();
+        });
+
+        closeSliderModal.addEventListener('click', () => {
+            sliderModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            resumeSlider();
+        });
+
+        closeContactModal.addEventListener('click', () => {
+            contactModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        closeMapModal.addEventListener('click', () => {
+            mapModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            if (map) {
+                map.remove();
+                map = null;
+            }
+        });
+
+        // مستمعو الأحداث لنافذة الصورة
+        closeImageModal.addEventListener('click', () => {
+            imageModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        prevImageModal.addEventListener('click', () => {
+            if (currentImageIndex > 0) {
+                goToImageModalSlide(currentImageIndex - 1);
+            } else {
+                goToImageModalSlide(currentPostImages.length - 1);
+            }
+        });
+
+        nextImageModal.addEventListener('click', () => {
+            if (currentImageIndex < currentPostImages.length - 1) {
+                goToImageModalSlide(currentImageIndex + 1);
+            } else {
+                goToImageModalSlide(0);
+            }
+        });
+
+        // مستمعو الأحداث للبحث
+        searchInput.addEventListener('input', (e) => {
+            searchPosts(e.target.value);
+        });
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchPosts('');
+        });
+
+        // مستمع حدث زر مسح نتائج البحث
+        clearSearchResultsBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchPosts('');
+        });
+
+        // منع السحب والقائمة السياقية على الصور
+        document.addEventListener('dragstart', (e) => {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // منع النسخ على الصور
+        document.addEventListener('copy', (e) => {
+            if (window.getSelection().toString() === '' && e.target.tagName === 'IMG') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            loadActivePosts();
+        });
+    </script>
+</body>
+</html>
