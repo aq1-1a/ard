@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الرسائل - أيين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        button, a, input, textarea, select {
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        
+        button:active, a:active {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Mobile-First Chat Container */
+        .chat-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            background-color: #f5f5f5;
+            position: relative;
+        }
+
+        /* Conversations List - Mobile Optimized */
+        .conversations-list {
+            width: 100%;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 0;
+            right: -100%;
+            height: 100%;
+            transition: right 0.3s ease;
+            z-index: 10;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .conversations-list.active {
+            right: 0;
+        }
+
+        .search-section {
+            padding: 15px;
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-family: 'Tajawal', sans-serif;
+            background-color: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            background-color: #fff;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1a2a6c;
+            font-size: 1.2rem;
+        }
+
+        .conversations {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #fff;
+        }
+
+        .conversation-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            background-color: #fff;
+        }
+
+        .conversation-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .conversation-item.active {
+            background-color: #e8f0fe;
+            border-right: 4px solid #1a2a6c;
+        }
+
+        .conversation-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .conversation-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-left: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .conversation-info {
+            flex: 1;
+        }
+
+        .conversation-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a2a6c;
+            margin-bottom: 3px;
+        }
+
+        .conversation-company {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .conversation-preview {
+            font-size: 0.9rem;
+            color: #555;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 5px;
+        }
+
+        .conversation-time {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .unread-badge {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .delete-conversation {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(220, 53, 69, 0.3);
+        }
+
+        .conversation-item:hover .delete-conversation {
+            opacity: 1;
+        }
+
+        .delete-conversation:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Chat Area - Mobile Optimized */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background-color: #f5f5f5;
+        }
+
+        .chat-header {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-user-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .chat-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-left: 12px;
+        }
+
+        .chat-user-details {
+            flex: 1;
+        }
+
+        .chat-user-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .chat-user-company {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .property-summary-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .property-summary-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* تم تعديل هذا الجزء - تقليص مساحة الرسائل */
+        .messages-container {
+            flex: 1;
+            padding: 5px;
+            overflow-y: auto;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            max-width: 80%;
+            margin-bottom: 8px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .message.new-message {
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .message.sent {
+            align-self: flex-end;
+        }
+
+        .message.received {
+            align-self: flex-start;
+        }
+
+        .message-bubble {
+            padding: 8px 12px;
+            border-radius: 20px;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received .message-bubble {
+            background-color: #fff;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 0.65rem;
+            color: #888;
+            margin-top: 2px;
+            text-align: left;
+        }
+
+        .message.sent .message-time {
+            text-align: right;
+        }
+
+        .property-summary {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 12px;
+            padding: 6px;
+            margin-top: 4px;
+            font-size: 0.8rem;
+            color: #856404;
+        }
+
+        .property-summary-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: #1a2a6c;
+        }
+
+        .property-summary-detail {
+            margin-bottom: 2px;
+        }
+
+        .property-summary-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+
+        .property-summary-btn-small {
+            background-color: #1a2a6c;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 3px 8px;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .property-summary-btn-small:hover {
+            background-color: #0f1a4a;
+            transform: translateY(-1px);
+        }
+
+        /* تم تعديل هذا الجزء - حقل الكتابة في وضع ثابت مرتفع */
+        .message-input-container {
+            position: relative;
+            bottom: 0;
+            padding: 12px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-family: 'Tajawal', sans-serif;
+            resize: none;
+            max-height: 80px;
+            min-height: 40px;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: #1a2a6c;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 42, 108, 0.1);
+            background-color: #fff;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(26, 42, 108, 0.3);
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(26, 42, 108, 0.4);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* نص توضيحي تحت حقل الكتابة */
+        .input-hint {
+            font-size: 0.75rem;
+            color: #666;
+            text-align: center;
+            padding: 5px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .input-hint i {
+            color: #1a2a6c;
+            font-size: 0.8rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: #888;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+
+        .empty-state h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(26, 42, 108, 0.3);
+            z-index: 20;
+            transition: all 0.3s ease;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(26, 42, 108, 0.4);
+        }
+
+        /* Modals - Mobile Optimized */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-content.large {
+            max-width: 90%;
+        }
+
+        @keyframes slideUp {
+            from { 
+                transform: translateY(50px); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateY(0); 
+                opacity: 1; 
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            color: #1a2a6c;
+            font-size: 1.3rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: #333;
+            background-color: #f0f0f0;
+        }
+
+        .properties-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .property-item {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            border-right: 3px solid #1a2a6c;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .property-item:hover {
+            background-color: #e8f0fe;
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .property-item-title {
+            font-weight: 600;
+            color: #1a2a6c;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .property-item-details {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .property-item-price {
+            font-weight: 600;
+            color: #28a745;
+            margin-top: 8px;
+        }
+
+        #map {
+            height: 350px;
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        .details-item {
+            display: flex;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .details-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .details-label {
+            font-weight: 600;
+            color: #1a2a6c;
+            min-width: 120px;
+            margin-left: 15px;
+        }
+
+        .details-value {
+            color: #333;
+            flex: 1;
+            word-wrap: break-word;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            display: none;
+            animation: slideInRight 0.5s ease;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideInRight {
+            from { 
+                transform: translateX(100%); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateX(0); 
+                opacity: 1; 
+            }
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #f44336, #da190b);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            .chat-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                height: calc(100vh - 20px);
+                margin-top: 10px;
+                border-radius: 15px;
+                overflow: hidden;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .conversations-list {
+                width: 350px;
+                position: relative;
+                right: 0;
+                box-shadow: none;
+                border-left: 1px solid #e0e0e0;
+            }
+
+            .back-btn {
+                display: none;
+            }
+
+            .fab {
+                display: none;
+            }
+
+            .message {
+                max-width: 70%;
+            }
+
+            .input-hint {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Touch Optimizations */
+        @media (hover: none) {
+            .conversation-item:hover {
+                background-color: #fff;
+            }
+
+            .conversation-item:active {
+                background-color: #f0f0f0;
+            }
+
+            .send-btn:hover {
+                transform: none;
+            }
+
+            .send-btn:active {
+                transform: scale(0.95);
+            }
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 767px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .conversation-item {
+                padding: 12px 15px;
+            }
+            
+            .conversation-avatar {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+            
+            .message-input-container {
+                padding: 10px;
+            }
+            
+            .notification {
+                right: 10px;
+                left: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Chat Container -->
+    <div class="chat-container">
+        <!-- Conversations List -->
+        <div class="conversations-list" id="conversationsList">
+            <div class="search-section">
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن مستخدم...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+            <div class="conversations" id="conversationsContainer">
+                <!-- سيتم ملؤه ديناميكيًا -->
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area" id="chatArea">
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-comments"></i>
+                <h3>اختر محادثة للبدء</h3>
+                <p>اختر محادثة من القائمة لبدء الدردشة</p>
+            </div>
+            
+            <div id="chatContent" style="display: none; height: 100%; display: flex; flex-direction: column;">
+                <div class="chat-header">
+                    <button class="back-btn" id="backBtn">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <div class="chat-user-info">
+                        <div class="chat-user-avatar" id="chatUserAvatar">U</div>
+                        <div class="chat-user-details">
+                            <div class="chat-user-name" id="chatUserName">اسم المستخدم</div>
+                            <div class="chat-user-company" id="chatUserCompany">اسم الشركة</div>
+                        </div>
+                    </div>
+                    <button class="property-summary-btn" id="propertySummaryBtn">
+                        <i class="fas fa-home"></i> العقارات
+                    </button>
+                </div>
+                
+                <div class="messages-container" id="messagesContainer">
+                    <!-- سيتم ملؤه ديناميكيًا -->
+                </div>
+                
+                <div class="message-input-container">
+                    <div class="input-wrapper">
+                        <textarea id="messageInput" class="message-input" placeholder="اكتب رسالتك..." rows="1"></textarea>
+                        <button class="send-btn" id="sendBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="input-hint">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>للاستفسار عن إعلان معين، اختر العقار من قائمة العقارات في الأعلى</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" id="fabBtn">
+        <i class="fas fa-comments"></i>
+    </button>
+
+    <!-- Properties Modal -->
+    <div id="propertiesModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>اختر منشوراً للاستفسار عنه</h2>
+                <button class="close-btn" id="closePropertiesModal">&times;</button>
+            </div>
+            <div class="properties-list" id="propertiesList">
+                <!-- سيتم ملؤه ديناميكيًا -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Modal -->
+    <div id="mapModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>موقع العقار على الخريطة</h2>
+                <button class="close-btn" id="closeMapModal">&times;</button>
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>تفاصيل العقار</h2>
+                <button class="close-btn" id="closeDetailsModal">&times;</button>
+            </div>
+            <div id="detailsContent">
+                <!-- سيتم ملؤه ديناميكيًا -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // إعداد Supabase
+        const { createClient } = supabase;
+        const supabaseUrl = 'https://rastimuoifacxcitljdw.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhc3RpbXVvaWZhY3hjaXRsamR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODYxOTIsImV4cCI6MjA3NTk2MjE5Mn0.xOW2p17zvHy9z8n4q-T__jgiNE83N927oRs2Max13RQ';
+        const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+        // عناصر DOM
+        const searchInput = document.getElementById('searchInput');
+        const conversationsList = document.getElementById('conversationsList');
+        const conversationsContainer = document.getElementById('conversationsContainer');
+        const emptyState = document.getElementById('emptyState');
+        const chatContent = document.getElementById('chatContent');
+        const chatUserName = document.getElementById('chatUserName');
+        const chatUserCompany = document.getElementById('chatUserCompany');
+        const chatUserAvatar = document.getElementById('chatUserAvatar');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const propertySummaryBtn = document.getElementById('propertySummaryBtn');
+        const propertiesModal = document.getElementById('propertiesModal');
+        const propertiesList = document.getElementById('propertiesList');
+        const mapModal = document.getElementById('mapModal');
+        const detailsModal = document.getElementById('detailsModal');
+        const notification = document.getElementById('notification');
+        const backBtn = document.getElementById('backBtn');
+        const fabBtn = document.getElementById('fabBtn');
+
+        // متغيرات عامة
+        let currentUser = null;
+        let currentConversation = null;
+        let currentConversationUser = null;
+        let allUsers = [];
+        let allConversations = [];
+        let filteredUsers = [];
+        let map = null;
+        let marker = null;
+        let messagePollingInterval = null;
+        let conversationPollingInterval = null;
+        let lastMessageCount = 0;
+        let unreadMessages = new Map(); // لتتبع الرسائل غير المقروءة
+        let lastReadTimestamps = new Map(); // لتتبع آخر مرة تمت قراءة المحادثة
+
+        // عرض إشعار
+        function showNotification(message, type = 'success') {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // التحقق من حالة تسجيل الدخول
+        async function checkLoginStatus() {
+            try {
+                const currentUserData = localStorage.getItem('currentUser');
+                
+                if (!currentUserData) {
+                    window.location.href = 'login.html';
+                    return null;
+                }
+                
+                const userData = JSON.parse(currentUserData);
+                
+                const { data: checkData, error: checkError } = await supabaseClient
+                    .from('chek')
+                    .select('*')
+                    .eq('user_id', userData.id)
+                    .eq('is_logged_in', true)
+                    .single();
+                
+                if (checkError || !checkData) {
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'login.html';
+                    return null;
+                }
+                
+                const now = new Date().toISOString();
+                await supabaseClient
+                    .from('chek')
+                    .update({ last_activity: now })
+                    .eq('user_id', userData.id);
+                
+                return userData;
+                
+            } catch (error) {
+                console.error('Error checking login status:', error);
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+                return null;
+            }
+        }
+
+        // تحميل جميع المستخدمين
+        async function loadAllUsers() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error loading users:', error);
+                    return [];
+                }
+                
+                return data || [];
+            } catch (error) {
+                console.error('Error loading users:', error);
+                return [];
+            }
+        }
+
+        // تحميل المحادثات مع تحديث تلقائي
+        async function loadConversations() {
+            try {
+                // استخدام استعلام واحد أكثر كفاءة
+                const { data: conversations, error } = await supabaseClient
+                    .from('conversations')
+                    .select('*')
+                    .or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`)
+                    .order('updated_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error loading conversations:', error);
+                    return [];
+                }
+                
+                // التحقق من المحادثات المحذوفة
+                const { data: deletedConversations } = await supabaseClient
+                    .from('deleted_conversations')
+                    .select('conversation_id')
+                    .eq('user_id', currentUser.id);
+                
+                const deletedIds = deletedConversations ? deletedConversations.map(dc => dc.conversation_id) : [];
+                
+                // تحميل آخر رسالة لكل محادثة وعدد الرسائل غير المقروءة
+                const conversationsWithMessages = await Promise.all(
+                    (conversations || []).map(async (conv) => {
+                        const { data: messages } = await supabaseClient
+                            .from('messages')
+                            .select('content, created_at, sender_id, receiver_id')
+                            .eq('conversation_id', conv.id)
+                            .order('created_at', { ascending: false })
+                            .limit(1);
+                        
+                        // حساب الرسائل غير المقروءة باستخدام الطريقة البديلة
+                        const unreadCount = await getUnreadMessagesCount(conv.id);
+                        
+                        return {
+                            ...conv,
+                            messages: messages || [],
+                            unread_count: unreadCount
+                        };
+                    })
+                );
+                
+                return conversationsWithMessages.filter(conv => !deletedIds.includes(conv.id));
+            } catch (error) {
+                console.error('Error loading conversations:', error);
+                return [];
+            }
+        }
+
+        // حساب الرسائل غير المقروءة (بدون استخدام is_read)
+        async function getUnreadMessagesCount(conversationId) {
+            try {
+                // الحصول على آخر مرة تمت قراءة المحادثة
+                const lastRead = lastReadTimestamps.get(conversationId);
+                
+                if (!lastRead) {
+                    // إذا لم تكن هناك سجلات، عد جميع الرسائل كمقروءة
+                    return 0;
+                }
+                
+                // حساب الرسائل التي تم إرسالها بعد آخر قراءة
+                const { data: unreadMessages, error } = await supabaseClient
+                    .from('messages')
+                    .select('id')
+                    .eq('conversation_id', conversationId)
+                    .eq('receiver_id', currentUser.id)
+                    .gt('created_at', lastRead);
+                
+                if (error) {
+                    console.error('Error counting unread messages:', error);
+                    return 0;
+                }
+                
+                return unreadMessages ? unreadMessages.length : 0;
+            } catch (error) {
+                console.error('Error counting unread messages:', error);
+                return 0;
+            }
+        }
+
+        // تحميل الرسائل لمحادثة معينة
+        async function loadMessages(conversationId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('messages')
+                    .select('*')
+                    .eq('conversation_id', conversationId)
+                    .or(`and(is_deleted_by_sender.eq.false,sender_id.eq.${currentUser.id}),and(is_deleted_by_receiver.eq.false,receiver_id.eq.${currentUser.id})`)
+                    .order('created_at', { ascending: true });
+                
+                if (error) {
+                    console.error('Error loading messages:', error);
+                    return [];
+                }
+                
+                return data || [];
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                return [];
+            }
+        }
+
+        // عرض المحادثات مع إشعارات غير مقروءة
+        function displayConversations(conversations) {
+            conversationsContainer.innerHTML = '';
+            
+            if (conversations.length === 0) {
+                conversationsContainer.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: #888;">لا توجد محادثات</div>';
+                return;
+            }
+            
+            conversations.forEach(conv => {
+                const otherUserId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
+                const otherUser = allUsers.find(u => u.id === otherUserId);
+                
+                if (!otherUser) return;
+                
+                const conversationItem = document.createElement('div');
+                conversationItem.className = 'conversation-item';
+                conversationItem.dataset.conversationId = conv.id;
+                conversationItem.dataset.userId = otherUserId;
+                
+                // استخراج الحرف الأول من الاسم
+                const firstLetter = otherUser.full_name ? otherUser.full_name.charAt(0).toUpperCase() : 'U';
+                
+                // الحصول على آخر رسالة
+                const lastMessage = conv.messages && conv.messages.length > 0 ? conv.messages[0] : null;
+                const messagePreview = lastMessage ? lastMessage.content : 'لا توجد رسائل';
+                const messageTime = lastMessage ? formatTime(lastMessage.created_at) : '';
+                
+                let unreadBadge = '';
+                if (conv.unread_count > 0) {
+                    unreadBadge = `<div class="unread-badge">${conv.unread_count}</div>`;
+                }
+                
+                conversationItem.innerHTML = `
+                    <div class="conversation-header">
+                        <div class="conversation-avatar">${firstLetter}</div>
+                        <div class="conversation-info">
+                            <div class="conversation-name">${otherUser.full_name || 'مستخدم'}</div>
+                            ${otherUser.company_name ? `<div class="conversation-company">${otherUser.company_name}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="conversation-preview">${messagePreview}</div>
+                    <div class="conversation-time">${messageTime}</div>
+                    ${unreadBadge}
+                    <button class="delete-conversation" onclick="deleteConversation('${conv.id}', '${otherUserId}', event)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                
+                conversationItem.addEventListener('click', (e) => {
+                    if (!e.target.closest('.delete-conversation')) {
+                        openConversation(conv.id, otherUser);
+                    }
+                });
+                
+                conversationsContainer.appendChild(conversationItem);
+            });
+        }
+
+        // عرض الرسائل مع تحديث تلقائي
+        function displayMessages(messages, isNewMessage = false) {
+            if (!isNewMessage) {
+                messagesContainer.innerHTML = '';
+            }
+            
+            if (messages.length === 0) {
+                if (!isNewMessage) {
+                    messagesContainer.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: #888;">لا توجد رسائل في هذه المحادثة</div>';
+                }
+                return;
+            }
+            
+            // عرض الرسائل الجديدة فقط إذا كانت هناك رسائل جديدة
+            const startIndex = isNewMessage ? lastMessageCount : 0;
+            
+            for (let i = startIndex; i < messages.length; i++) {
+                const msg = messages[i];
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.sender_id === currentUser.id ? 'sent' : 'received'}`;
+                
+                if (isNewMessage && i === messages.length - 1) {
+                    messageDiv.classList.add('new-message');
+                }
+                
+                let messageContent = `<div class="message-bubble">${msg.content}</div>`;
+                
+                // إذا كانت رسالة ملخص عقار
+                if (msg.message_type === 'property_summary' && msg.property_id) {
+                    messageContent += `
+                        <div class="property-summary">
+                            <div class="property-summary-title">استفسار عن عقار</div>
+                            <div class="property-summary-detail">${msg.content}</div>
+                        </div>
+                    `;
+                }
+                
+                messageContent += `<div class="message-time">${formatTime(msg.created_at)}</div>`;
+                
+                messageDiv.innerHTML = messageContent;
+                
+                if (isNewMessage) {
+                    messagesContainer.appendChild(messageDiv);
+                } else {
+                    messagesContainer.appendChild(messageDiv);
+                }
+            }
+            
+            // التمرير إلى آخر رسالة بسلاسة
+            if (messagesContainer.scrollHeight > messagesContainer.clientHeight) {
+                messagesContainer.scrollTo({
+                    top: messagesContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+            
+            lastMessageCount = messages.length;
+        }
+
+        // فتح محادثة ووضع علامة مقروءة
+        async function openConversation(conversationId, otherUser) {
+            currentConversation = conversationId;
+            currentConversationUser = otherUser;
+            
+            // تحديث واجهة المستخدم
+            emptyState.style.display = 'none';
+            chatContent.style.display = 'flex';
+            
+            // تحديث معلومات المستخدم في رأس الدردشة
+            chatUserName.textContent = otherUser.full_name || 'مستخدم';
+            chatUserCompany.textContent = otherUser.company_name || '';
+            const firstLetter = otherUser.full_name ? otherUser.full_name.charAt(0).toUpperCase() : 'U';
+            chatUserAvatar.textContent = firstLetter;
+            
+            // تحديث المحادثة النشطة
+            document.querySelectorAll('.conversation-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const activeItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+            
+            // إغلاق قائمة المحادثات في الموبايل
+            if (window.innerWidth < 768) {
+                conversationsList.classList.remove('active');
+            }
+            
+            // تحميل الرسائل
+            const messages = await loadMessages(conversationId);
+            lastMessageCount = 0; // إعادة تعيين العداد
+            displayMessages(messages);
+            
+            // وضع علامة مقروءة على المحادثة
+            markConversationAsRead(conversationId);
+            
+            // تحديث قائمة المحادثات لإزالة الإشعارات
+            allConversations = await loadConversations();
+            displayConversations(allConversations);
+            
+            // بدء الاستطلاع للرسائل الجديدة
+            startMessagePolling();
+        }
+
+        // وضع علامة مقروءة على المحادثة (بدون استخدام is_read)
+        function markConversationAsRead(conversationId) {
+            // حفظ وقت القراءة الحالي
+            lastReadTimestamps.set(conversationId, new Date().toISOString());
+            
+            // حفظ في localStorage للاستمرارية
+            const readData = JSON.parse(localStorage.getItem('readConversations') || '{}');
+            readData[conversationId] = new Date().toISOString();
+            localStorage.setItem('readConversations', JSON.stringify(readData));
+        }
+
+        // بدء الاستطلاع للرسائل الجديدة
+        function startMessagePolling() {
+            if (messagePollingInterval) {
+                clearInterval(messagePollingInterval);
+            }
+            
+            messagePollingInterval = setInterval(async () => {
+                if (currentConversation) {
+                    const messages = await loadMessages(currentConversation);
+                    if (messages.length > lastMessageCount) {
+                        displayMessages(messages, true);
+                    }
+                }
+            }, 2000); // كل ثانيتين للتحديث الأسرع
+        }
+
+        // بدء الاستطلاع لتحديث قائمة المحادثات
+        function startConversationPolling() {
+            if (conversationPollingInterval) {
+                clearInterval(conversationPollingInterval);
+            }
+            
+            conversationPollingInterval = setInterval(async () => {
+                const newConversations = await loadConversations();
+                
+                // التحقق مما إذا كانت هناك تغييرات
+                if (JSON.stringify(newConversations) !== JSON.stringify(allConversations)) {
+                    allConversations = newConversations;
+                    displayConversations(allConversations);
+                    
+                    // إظهار إشعار إذا كانت هناك رسائل جديدة
+                    checkForNewMessages(newConversations);
+                }
+            }, 5000); // كل 5 ثوانٍ لتحديث قائمة المحادثات
+        }
+
+        // التحقق من الرسائل الجديدة وعرض إشعار
+        function checkForNewMessages(conversations) {
+            let totalUnread = 0;
+            let newMessageFrom = null;
+            
+            conversations.forEach(conv => {
+                if (conv.unread_count > 0) {
+                    totalUnread += conv.unread_count;
+                    if (!newMessageFrom && conv.messages && conv.messages.length > 0) {
+                        const otherUserId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
+                        const otherUser = allUsers.find(u => u.id === otherUserId);
+                        if (otherUser) {
+                            newMessageFrom = otherUser.full_name || 'مستخدم';
+                        }
+                    }
+                }
+            });
+            
+            if (totalUnread > 0 && newMessageFrom && currentConversation === null) {
+                showNotification(`رسالة جديدة من ${newMessageFrom}`, 'info');
+            }
+        }
+
+        // إيقاف الاستطلاع
+        function stopPolling() {
+            if (messagePollingInterval) {
+                clearInterval(messagePollingInterval);
+                messagePollingInterval = null;
+            }
+            if (conversationPollingInterval) {
+                clearInterval(conversationPollingInterval);
+                conversationPollingInterval = null;
+            }
+        }
+
+        // إرسال رسالة
+        async function sendMessage() {
+            const content = messageInput.value.trim();
+            if (!content || !currentConversation) return;
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('messages')
+                    .insert({
+                        conversation_id: currentConversation,
+                        sender_id: currentUser.id,
+                        receiver_id: currentConversationUser.id,
+                        content: content,
+                        message_type: 'text'
+                    });
+                
+                if (error) {
+                    console.error('Error sending message:', error);
+                    showNotification('حدث خطأ أثناء إرسال الرسالة', 'error');
+                    return;
+                }
+                
+                // تحديث وقت المحادثة
+                await supabaseClient
+                    .from('conversations')
+                    .update({ updated_at: new Date().toISOString() })
+                    .eq('id', currentConversation);
+                
+                // مسح حقل الإدخال
+                messageInput.value = '';
+                messageInput.style.height = 'auto';
+                
+                // تحديث قائمة المحادثات
+                allConversations = await loadConversations();
+                displayConversations(allConversations);
+                
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showNotification('حدث خطأ أثناء إرسال الرسالة', 'error');
+            }
+        }
+
+        // حذف محادثة - الإصدار المعدل لحذف كامل
+        async function deleteConversation(conversationId, otherUserId, event) {
+            event.stopPropagation();
+            
+            if (!confirm('هل أنت متأكد من حذف هذه المحادثة؟ سيتم حذف جميع الرسائل أيضاً.')) return;
+            
+            try {
+                // 1. حذف جميع الرسائل في المحادثة
+                const { error: messagesError } = await supabaseClient
+                    .from('messages')
+                    .delete()
+                    .eq('conversation_id', conversationId);
+                
+                if (messagesError) {
+                    console.error('Error deleting messages:', messagesError);
+                    showNotification('حدث خطأ أثناء حذف الرسائل', 'error');
+                    return;
+                }
+                
+                // 2. حذف المحادثة نفسها
+                const { error: convError } = await supabaseClient
+                    .from('conversations')
+                    .delete()
+                    .eq('id', conversationId);
+                
+                if (convError) {
+                    console.error('Error deleting conversation:', convError);
+                    showNotification('حدث خطأ أثناء حذف المحادثة', 'error');
+                    return;
+                }
+                
+                // 3. تنظيف أي سجلات في deleted_conversations
+                const { error: cleanupError } = await supabaseClient
+                    .from('deleted_conversations')
+                    .delete()
+                    .eq('conversation_id', conversationId);
+                
+                if (cleanupError) {
+                    console.error('Error cleaning up deleted conversations:', cleanupError);
+                }
+                
+                // 4. تنظيف البيانات المحلية
+                lastReadTimestamps.delete(conversationId);
+                const readData = JSON.parse(localStorage.getItem('readConversations') || '{}');
+                delete readData[conversationId];
+                localStorage.setItem('readConversations', JSON.stringify(readData));
+                
+                // 5. إزالة المحادثة من القائمة
+                const conversationItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+                if (conversationItem) {
+                    conversationItem.remove();
+                }
+                
+                // 6. إذا كانت المحادثة الحالية هي المحذوفة، إعادة تعيين الواجهة
+                if (currentConversation === conversationId) {
+                    currentConversation = null;
+                    currentConversationUser = null;
+                    emptyState.style.display = 'flex';
+                    chatContent.style.display = 'none';
+                    stopPolling();
+                }
+                
+                showNotification('تم حذف المحادثة وكل الرسائل بنجاح');
+                
+            } catch (error) {
+                console.error('Error deleting conversation:', error);
+                showNotification('حدث خطأ أثناء حذف المحادثة', 'error');
+            }
+        }
+
+        // تحميل منشورات المستخدم
+        async function loadUserProperties(userId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('msg3')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .eq('post_status', 'الإعلان نشط الان')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error loading properties:', error);
+                    return [];
+                }
+                
+                return data || [];
+            } catch (error) {
+                console.error('Error loading properties:', error);
+                return [];
+            }
+        }
+
+        // عرض منشورات المستخدم
+        function displayProperties(properties) {
+            propertiesList.innerHTML = '';
+            
+            if (properties.length === 0) {
+                propertiesList.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: #888;">لا توجد منشورات نشطة لهذا المستخدم</div>';
+                return;
+            }
+            
+            properties.forEach(property => {
+                const propertyItem = document.createElement('div');
+                propertyItem.className = 'property-item';
+                propertyItem.dataset.propertyId = property.id;
+                
+                // بناء ملخص العقار
+                let summary = `متوفر ${property.offer_type || ''} ${property.property_type || ''} ${property.property_condition || ''} في ${property.governorate || ''} ${property.precise_address || ''}`;
+                
+                let priceText = '';
+                if (property.price) {
+                    const formattedPrice = Number(property.price).toLocaleString('ar-EG') + ' دينار';
+                    priceText = `بسعر ${formattedPrice}`;
+                    if (property.price_negotiable === 'true' || property.price_negotiable === true) {
+                        priceText += ' (قابل للتفاوض)';
+                    }
+                }
+                
+                propertyItem.innerHTML = `
+                    <div class="property-item-title">${summary}</div>
+                    ${priceText ? `<div class="property-item-price">${priceText}</div>` : ''}
+                    <div class="property-summary-actions">
+                        <button class="property-summary-btn-small" onclick="selectPropertySummary('${property.id}', '${summary}', event)">
+                            <i class="fas fa-comment"></i> استفسار
+                        </button>
+                        <button class="property-summary-btn-small" onclick="showPropertyLocation('${property.location || ''}', event)">
+                            <i class="fas fa-map-marked-alt"></i> الموقع
+                        </button>
+                        <button class="property-summary-btn-small" onclick="showPropertyDetails('${property.id}', event)">
+                            <i class="fas fa-info-circle"></i> التفاصيل
+                        </button>
+                    </div>
+                `;
+                
+                propertiesList.appendChild(propertyItem);
+            });
+        }
+
+        // اختيار ملخص العقار
+        function selectPropertySummary(propertyId, summary, event) {
+            event.stopPropagation();
+            
+            // إضافة الملخص إلى حقل الإدخال
+            messageInput.value = `استفسار عن: ${summary}`;
+            
+            // إغلاق النافذة
+            propertiesModal.style.display = 'none';
+            
+            // التركيز على حقل الإدخال
+            messageInput.focus();
+        }
+
+        // عرض موقع العقار
+        function showPropertyLocation(location, event) {
+            event.stopPropagation();
+            
+            if (!location) {
+                showNotification('لا توجد إحداثيات متاحة لهذا العقار', 'error');
+                return;
+            }
+
+            const coords = location.split(',').map(coord => parseFloat(coord.trim()));
+            if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) {
+                showNotification('تنسيق الإحداثيات غير صالح', 'error');
+                return;
+            }
+
+            propertiesModal.style.display = 'none';
+            mapModal.style.display = 'flex';
+
+            // تهيئة الخريطة فقط في المرة الأولى
+            if (!map) {
+                map = L.map('map').setView(coords, 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                marker = L.marker(coords).addTo(map);
+            } else {
+                // تحديث عرض الخريطة والعلامة للمكالمات اللاحقة
+                map.setView(coords, 15);
+                marker.setLatLng(coords);
+            }
+        }
+
+        // عرض تفاصيل العقار
+        async function showPropertyDetails(propertyId, event) {
+            event.stopPropagation();
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('msg3')
+                    .select('*')
+                    .eq('id', propertyId)
+                    .single();
+                
+                if (error || !data) {
+                    console.error('Error loading property details:', error);
+                    showNotification('حدث خطأ أثناء تحميل التفاصيل', 'error');
+                    return;
+                }
+                
+                propertiesModal.style.display = 'none';
+                detailsModal.style.display = 'flex';
+                
+                const detailsContent = document.getElementById('detailsContent');
+                
+                let detailsHtml = '';
+                
+                const fields = [
+                    { label: 'رقم العقار', value: data.property_number },
+                    { label: 'نوع او صنف العقار', value: data.deed_type },
+                    { label: 'المساحة', value: (data.area_number && data.area_unit) ? `${data.area_number} ${data.area_unit}` : (data.area_number || data.area_unit) },
+                    { label: 'الحالة', value: data.property_condition },
+                    { label: 'مميزات العقار', value: data.features },
+                    { label: 'ملاحظات', value: data.notes }
+                ];
+
+                fields.forEach(field => {
+                    if (field.value) {
+                        detailsHtml += `
+                            <div class="details-item">
+                                <div class="details-label">${field.label}:</div>
+                                <div class="details-value">${field.value}</div>
+                            </div>
+                        `;
+                    }
+                });
+
+                if (!detailsHtml) {
+                    detailsHtml = '<p style="text-align: center; color: #888;">لا توجد تفاصيل إضافية متاحة.</p>';
+                }
+
+                detailsContent.innerHTML = detailsHtml;
+                
+            } catch (error) {
+                console.error('Error showing property details:', error);
+                showNotification('حدث خطأ أثناء عرض التفاصيل', 'error');
+            }
+        }
+
+        // البحث عن المستخدمين
+        function searchUsers(query) {
+            if (!query.trim()) {
+                filteredUsers = [...allUsers];
+            } else {
+                const lowerQuery = query.toLowerCase();
+                filteredUsers = allUsers.filter(user => {
+                    const fullName = user.full_name ? user.full_name.toLowerCase() : '';
+                    const companyName = user.company_name ? user.company_name.toLowerCase() : '';
+                    
+                    return fullName.includes(lowerQuery) || companyName.includes(lowerQuery);
+                });
+            }
+            
+            displaySearchResults(filteredUsers);
+        }
+
+        // عرض نتائج البحث
+        function displaySearchResults(users) {
+            conversationsContainer.innerHTML = '';
+            
+            if (users.length === 0) {
+                conversationsContainer.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: #888;">لم يتم العثور على مستخدمين</div>';
+                return;
+            }
+            
+            users.forEach(user => {
+                if (user.id === currentUser.id) return; // لا عرض المستخدم الحالي
+                
+                const userItem = document.createElement('div');
+                userItem.className = 'conversation-item';
+                userItem.dataset.userId = user.id;
+                
+                // استخراج الحرف الأول من الاسم
+                const firstLetter = user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U';
+                
+                userItem.innerHTML = `
+                    <div class="conversation-header">
+                        <div class="conversation-avatar">${firstLetter}</div>
+                        <div class="conversation-info">
+                            <div class="conversation-name">${user.full_name || 'مستخدم'}</div>
+                            ${user.company_name ? `<div class="conversation-company">${user.company_name}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="conversation-preview">ابدأ محادثة جديدة</div>
+                `;
+                
+                userItem.addEventListener('click', () => {
+                    createOrOpenConversation(user);
+                });
+                
+                conversationsContainer.appendChild(userItem);
+            });
+        }
+
+        // إنشاء أو فتح محادثة - الإصدار المعدل
+        async function createOrOpenConversation(otherUser) {
+            try {
+                console.log('بدء إنشاء/فتح محادثة مع:', otherUser.id);
+                
+                // التحقق مما إذا كانت المحادثة موجودة بالفعل - استعلام محسن
+                const { data: existingConv, error: convError } = await supabaseClient
+                    .from('conversations')
+                    .select('*')
+                    .or(`and(user1_id.eq.${currentUser.id},user2_id.eq.${otherUser.id}),and(user1_id.eq.${otherUser.id},user2_id.eq.${currentUser.id})`)
+                    .maybeSingle();
+                
+                if (convError && convError.code !== 'PGRST116') {
+                    console.error('Error checking conversation:', convError);
+                    showNotification('حدث خطأ أثناء فتح المحادثة', 'error');
+                    return;
+                }
+                
+                let conversationId;
+                
+                if (existingConv) {
+                    console.log('المحادثة موجودة بالفعل:', existingConv.id);
+                    conversationId = existingConv.id;
+                    
+                    // التحقق مما إذا كانت المحادثة محذوفة
+                    const { data: deletedCheck, error: deletedError } = await supabaseClient
+                        .from('deleted_conversations')
+                        .select('conversation_id')
+                        .eq('user_id', currentUser.id)
+                        .eq('conversation_id', conversationId)
+                        .maybeSingle();
+                    
+                    if (deletedError && deletedError.code !== 'PGRST116') {
+                        console.error('Error checking deleted conversations:', deletedError);
+                    }
+                    
+                    if (deletedCheck) {
+                        // إذا كانت المحادثة محذوفة، أنشئ محادثة جديدة بدلاً من استعادتها
+                        console.log('المحادثة كانت محذوفة، جاري إنشاء محادثة جديدة...');
+                        
+                        // إنشاء محادثة جديدة
+                        const { data: newConv, error: createError } = await supabaseClient
+                            .from('conversations')
+                            .insert({
+                                user1_id: currentUser.id,
+                                user2_id: otherUser.id
+                            })
+                            .select()
+                            .single();
+                        
+                        if (createError) {
+                            console.error('Error creating new conversation:', createError);
+                            showNotification('حدث خطأ أثناء إنشاء المحادثة', 'error');
+                            return;
+                        }
+                        
+                        conversationId = newConv.id;
+                        console.log('تم إنشاء محادثة جديدة:', conversationId);
+                    }
+                } else {
+                    console.log('إنشاء محادثة جديدة...');
+                    
+                    // إنشاء محادثة جديدة
+                    const { data: newConv, error: createError } = await supabaseClient
+                        .from('conversations')
+                        .insert({
+                            user1_id: currentUser.id,
+                            user2_id: otherUser.id
+                        })
+                        .select()
+                        .single();
+                    
+                    if (createError) {
+                        console.error('Error creating conversation:', createError);
+                        showNotification('حدث خطأ أثناء إنشاء المحادثة', 'error');
+                        return;
+                    }
+                    
+                    conversationId = newConv.id;
+                    console.log('تم إنشاء محادثة جديدة:', conversationId);
+                }
+                
+                // فتح المحادثة
+                openConversation(conversationId, otherUser);
+                
+                // تحديث قائمة المحادثات
+                allConversations = await loadConversations();
+                displayConversations(allConversations);
+                
+            } catch (error) {
+                console.error('Error creating/opening conversation:', error);
+                showNotification('حدث خطأ أثناء فتح المحادثة', 'error');
+            }
+        }
+
+        // تنسيق الوقت
+        function formatTime(dateString) {
+            if (!dateString) return '';
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'الآن';
+            if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
+            if (diffHours < 24) return `منذ ${diffHours} ساعة`;
+            if (diffDays < 7) return `منذ ${diffDays} يوم`;
+            
+            return date.toLocaleDateString('ar-EG');
+        }
+
+        // تحميل بيانات القراءة من localStorage
+        function loadReadData() {
+            try {
+                const readData = JSON.parse(localStorage.getItem('readConversations') || '{}');
+                for (const [conversationId, timestamp] of Object.entries(readData)) {
+                    lastReadTimestamps.set(conversationId, timestamp);
+                }
+            } catch (error) {
+                console.error('Error loading read data:', error);
+            }
+        }
+
+        // مستمعو الأحداث
+        searchInput.addEventListener('input', (e) => {
+            searchUsers(e.target.value);
+        });
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // تعديل ارتفاع حقل الإدخال تلقائياً
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+        });
+
+        propertySummaryBtn.addEventListener('click', async () => {
+            if (!currentConversationUser) return;
+            
+            const properties = await loadUserProperties(currentConversationUser.id);
+            displayProperties(properties);
+            propertiesModal.style.display = 'flex';
+        });
+
+        // زر الرجوع في الموبايل
+        backBtn.addEventListener('click', () => {
+            if (window.innerWidth < 768) {
+                conversationsList.classList.add('active');
+                stopPolling();
+            }
+        });
+
+        // زر FAB لفتح قائمة المحادثات
+        fabBtn.addEventListener('click', () => {
+            conversationsList.classList.add('active');
+        });
+
+        // مستمعو النوافذ المنبثقة
+        document.getElementById('closePropertiesModal').addEventListener('click', () => {
+            propertiesModal.style.display = 'none';
+        });
+
+        document.getElementById('closeMapModal').addEventListener('click', () => {
+            mapModal.style.display = 'none';
+        });
+
+        document.getElementById('closeDetailsModal').addEventListener('click', () => {
+            detailsModal.style.display = 'none';
+        });
+
+        // إغلاق النوافذ عند الضغط خارجها
+        window.addEventListener('click', (e) => {
+            if (e.target === propertiesModal) {
+                propertiesModal.style.display = 'none';
+            }
+            if (e.target === mapModal) {
+                mapModal.style.display = 'none';
+            }
+            if (e.target === detailsModal) {
+                detailsModal.style.display = 'none';
+            }
+        });
+
+        // التحقق من معرف المستخدم من URL
+        function getUserIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', async () => {
+            // التحقق من تسجيل الدخول
+            currentUser = await checkLoginStatus();
+            if (!currentUser) return;
+            
+            // تحميل بيانات القراءة
+            loadReadData();
+            
+            // تحميل جميع المستخدمين
+            allUsers = await loadAllUsers();
+            filteredUsers = [...allUsers];
+            
+            // تحميل المحادثات
+            allConversations = await loadConversations();
+            displayConversations(allConversations);
+            
+            // بدء الاستطلاع التلقائي للمحادثات
+            startConversationPolling();
+            
+            // التحقق مما إذا كان هناك معرف مستخدم في URL
+            const userId = getUserIdFromUrl();
+            if (userId) {
+                const user = allUsers.find(u => u.id === userId);
+                if (user && user.id !== currentUser.id) {
+                    await createOrOpenConversation(user);
+                }
+            }
+            
+            // في الموبايل، اعرض قائمة المحادثات افتراضياً
+            if (window.innerWidth < 768 && !userId) {
+                conversationsList.classList.add('active');
+            }
+        });
+
+        // تنظيف عند إغلاق الصفحة
+        window.addEventListener('beforeunload', () => {
+            stopPolling();
+        });
+
+        // منع التحديث التلقائي عند سحب الصفحة في الموبايل
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
+                return;
+            }
+            e.preventDefault();
+        }, { passive: false });
+
+    </script>
+</body>
+</html>
