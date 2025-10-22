@@ -394,7 +394,7 @@
                 companyCard.innerHTML = `
                     <div class="company-logo">${firstLetter}</div>
                     <div class="company-name">${company.company_name || 'شركة'}</div>
-                    ${company.postsCount > 0 ? `<div class="company-posts">${company.postsCount} منشور</div>` : ''}
+                    ${company.postsCount > 0 ? `<div class="company-posts"> اعلان ${company.postsCount} </div>` : ''}
                 `;
                 
                 companiesContainer.appendChild(companyCard);
@@ -442,4 +442,5 @@
         });
     </script>
 </body>
+
 </html>
