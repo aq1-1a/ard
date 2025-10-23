@@ -1454,6 +1454,98 @@
             transition: opacity 0.3s ease;
             z-index: 5;
         }
+
+/* نافذة تسجيل الدخول للزوار */
+.login-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 4000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.login-modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.login-modal-icon {
+    font-size: 3.5rem;
+    color: #1a2a6c;
+    margin-bottom: 15px;
+}
+
+.login-modal-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1a2a6c;
+    margin-bottom: 10px;
+}
+
+.login-modal-message {
+    color: #555;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+.login-modal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.login-modal-btn {
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+}
+
+.login-modal-btn.primary {
+    background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+    color: white;
+}
+
+.login-modal-btn.primary:hover {
+    background: linear-gradient(135deg, #0f1a4a, #1a2a6c);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(26, 42, 108, 0.3);
+}
+
+.login-modal-btn.secondary {
+    background-color: #f8f9fa;
+    color: #555;
+    border: 1px solid #ddd;
+}
+
+.login-modal-btn.secondary:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+}
+
     </style>
 </head>
 <body>
@@ -1570,7 +1662,18 @@
             </div>
         </div>
     </div>
-
+<!-- نافذة تسجيل الدخول للزوار -->
+<div id="loginModal" class="login-modal">
+    <div class="login-modal-content">
+        <i class="fas fa-user-lock login-modal-icon"></i>
+        <h3 class="login-modal-title">يجب تسجيل الدخول</h3>
+        <p class="login-modal-message">عذراً، هذه الميزة متاحة فقط للأعضاء المسجلين. يرجى تسجيل الدخول إلى حسابك أو إنشاء حساب جديد للوصول إلى جميع ميزات التطبيق.</p>
+        <div class="login-modal-buttons">
+            <a href="logup.html" class="login-modal-btn primary">إنشاء حساب جديد</a>
+            <button class="login-modal-btn secondary" id="closeLoginModal">إلغاء</button>
+        </div>
+    </div>
+</div>
     <!-- حاوية الإشعارات -->
     <div class="notification-container" id="notificationContainer"></div>
 
@@ -1652,6 +1755,41 @@
         let imageSwipeEndX = 0;
         let imageSwipeThreshold = 50;
         let isImageSwiping = false;
+
+
+
+
+// التحقق من حالة تسجيل الدخول
+async function checkLoginStatus() {
+    try {
+        const currentUserData = localStorage.getItem('currentUser');
+        if (!currentUserData) {
+            return { isLoggedIn: false, userData: null };
+        }
+        
+        const userData = JSON.parse(currentUserData);
+        const { data: checkData, error: checkError } = await supabaseClient
+            .from('chek')
+            .select('*')
+            .eq('user_id', userData.id)
+            .eq('is_logged_in', true)
+            .single();
+        
+        if (checkError || !checkData) {
+            localStorage.removeItem('currentUser');
+            return { isLoggedIn: false, userData: null };
+        }
+        
+        return { isLoggedIn: true, userData: userData };
+        
+    } catch (error) {
+        console.error('Error checking login status:', error);
+        localStorage.removeItem('currentUser');
+        return { isLoggedIn: false, userData: null };
+    }
+}
+
+
 
         // عرض إشعار
         function showNotification(title, message, type = 'success', duration = 5000) {
@@ -1835,7 +1973,7 @@
             startPremiumSlider();
             
             // عرض إشعار بالنجاح
-            showNotification(' ', `لديك ${premiumSlides.length} عروض مميزة`, 'success', 3000);
+             showNotification( ' ' ,`لديك ${premiumSlides.length} عروض مميزة`, 'success', 3000);
         }
 
         // إعداد إيماءات السحب
@@ -2062,33 +2200,32 @@
                 </div>
             `;
             
-            // إنشاء HTML للأزرار
-            let actionsHTML = `
-                <div class="post-footer">
-                    <div class="advertiser-info">
-                        <p><strong>${advertiserName}</strong></p>
-                        
-                    </div>
-                    <div class="post-actions">
-                        <button class="details-btn" onclick="showPostDetails('${post.post_id}')">
-                            <i class="fas fa-info-circle"></i>
-                            عرض التفاصيل
-                        </button>
-                        <button class="map-btn" onclick="showLocationOnMap('${post.location}', '${post.governorate}', '${post.precise_address}')">
-                            <i class="fas fa-map-marked-alt"></i>
-                            العنوان على الخريطة 
-                        </button>
-                        <button class="contact-btn" onclick="showContactInfo('${post.user_id}')">
-                            <i class="fas fa-phone"></i>
-                            اتصال
-                        </button>
-                        <button class="inquiry-btn" onclick="goToInquiryPage()">
-                            <i class="fas fa-envelope"></i>
-                            استفسار أكثر
-                        </button>
-                    </div>
-                </div>
-            `;
+           // في دالة createPostCard، قم بتعديل زر "استفسار أكثر":
+let actionsHTML = `
+    <div class="post-footer">
+        <div class="advertiser-info">
+            <p><strong>${advertiserName}</strong></p>
+        </div>
+        <div class="post-actions">
+            <button class="details-btn" onclick="showPostDetails('${post.post_id}')">
+                <i class="fas fa-info-circle"></i>
+                عرض التفاصيل
+            </button>
+            <button class="map-btn" onclick="showLocationOnMap('${post.location}', '${post.governorate}', '${post.precise_address}')">
+                <i class="fas fa-map-marked-alt"></i>
+                العنوان على الخريطة 
+            </button>
+            <button class="contact-btn" onclick="showContactInfo('${post.user_id}')">
+                <i class="fas fa-phone"></i>
+                اتصال
+            </button>
+            <button class="inquiry-btn" onclick="goToInquiryPage('${post.user_id}')">
+                <i class="fas fa-envelope"></i>
+                استفسار أكثر
+            </button>
+        </div>
+    </div>
+`;
             
             // تجميع كل الـ HTML
             card.innerHTML = imagesHTML + contentHTML + actionsHTML;
@@ -2377,19 +2514,19 @@
                     </div>
                 `;
                 
-                // إنشاء HTML للأزرار
-                let actionsHTML = `
-                    <div class="slider-modal-actions">
-                        <button class="slider-modal-action-btn slider-modal-contact-btn" onclick="showContactInfo('${post.user_id}')">
-                            <i class="fas fa-phone"></i>
-                            اتصال
-                        </button>
-                        <button class="slider-modal-action-btn slider-modal-inquiry-btn" onclick="goToInquiryPage()">
-                            <i class="fas fa-envelope"></i>
-                            استفسار أكثر
-                        </button>
-                    </div>
-                `;
+               // في دالة showSliderPostDetails، قم بتعديل زر "استفسار أكثر":
+let actionsHTML = `
+    <div class="slider-modal-actions">
+        <button class="slider-modal-action-btn slider-modal-contact-btn" onclick="showContactInfo('${post.user_id}')">
+            <i class="fas fa-phone"></i>
+            اتصال
+        </button>
+        <button class="slider-modal-action-btn slider-modal-inquiry-btn" onclick="goToInquiryPage('${post.user_id}')">
+            <i class="fas fa-envelope"></i>
+            استفسار أكثر
+        </button>
+    </div>
+`;
                 
                 // تجميع كل الـ HTML
                 sliderModalBody.innerHTML = imagesHTML + contentHTML + actionsHTML;
@@ -2629,11 +2766,55 @@
             window.location.href = `tel:${phoneNumber}`;
         }
 
-        // الانتقال إلى صفحة الاستفسار
-        function goToInquiryPage() {
+
+
+       // دالة محسنة للانتقال إلى صفحة الاستفسار مع التحقق من تسجيل الدخول
+async function goToInquiryPage(userId = null) {
+    try {
+        // التحقق من حالة تسجيل الدخول أولاً
+        const { isLoggedIn, userData } = await checkLoginStatus();
+        
+        if (!isLoggedIn) {
+            // إذا لم يكن مسجلاً دخول، عرض نافذة تسجيل الدخول
+            showLoginModal();
+            return;
+        }
+        
+        // إذا كان مسجلاً دخول، الانتقال إلى صفحة profile.html في وضع المشاهدة
+        if (userId) {
+            // الانتقال إلى صفحة الملف الشخصي للمستخدم المحدد في وضع المشاهدة
+            window.location.href = `profile.html?user_id=${userId}&view_mode=other`;
+        } else {
+            // إذا لم يتم تحديد مستخدم، الانتقال إلى صفحة الرسائل
             window.location.href = 'msg.html';
         }
+        
+    } catch (error) {
+        console.error('Error in goToInquiryPage:', error);
+        showNotification('خطأ', 'حدث خطأ أثناء الانتقال إلى صفحة الاستفسار', 'error');
+    }
+}
+// دالة محسنة لعرض نافذة تسجيل الدخول للزوار
+function showLoginModal() {
+    const loginModal = document.getElementById('loginModal');
+    if (loginModal) {
+        loginModal.style.display = 'flex';
+        
+        // منع التمرير في الخلفية
+        document.body.style.overflow = 'hidden';
+    }
+}
 
+// دالة لإغلاق نافذة تسجيل الدخول
+function closeLoginModal() {
+    const loginModal = document.getElementById('loginModal');
+    if (loginModal) {
+        loginModal.style.display = 'none';
+        
+        // إعادة التمرير في الخلفية
+        document.body.style.overflow = 'auto';
+    }
+}
         // عرض الموقع على الخريطة
         function showLocationOnMap(location, governorate, preciseAddress) {
             // إغلاق النوافذ الأخرى
@@ -2867,13 +3048,27 @@ L.tileLayer('https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf
                 return false;
             }
         });
-
-        // تهيئة الصفحة
-        document.addEventListener('DOMContentLoaded', () => {
-            loadActivePosts();
+// مستمعو الأحداث لنافذة تسجيل الدخول
+document.addEventListener('DOMContentLoaded', () => {
+    const closeLoginModalBtn = document.getElementById('closeLoginModal');
+    const loginModal = document.getElementById('loginModal');
+    
+    if (closeLoginModalBtn) {
+        closeLoginModalBtn.addEventListener('click', closeLoginModal);
+    }
+    
+    if (loginModal) {
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                closeLoginModal();
+            }
         });
+    }
+    
+    // تحميل المشاركات
+    loadActivePosts();
+});
+        
     </script>
 </body>
-
 </html>
-
