@@ -35,7 +35,7 @@
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
-            padding-bottom: 60px; /* تقليل المساحة لشريط المهام */
+            padding-bottom: 60px;
         }
 
         @keyframes gradientBG {
@@ -44,11 +44,11 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Header - محسّن */
+        /* Header */
         header {
             background-color: rgba(255, 255, 255, 0.95);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 10px 20px; /* تقليل البادينغ */
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -57,7 +57,7 @@
             left: 0;
             right: 0;
             z-index: 1001;
-            height: 50px; /* تقليل الارتفاع */
+            height: 50px;
         }
 
         .logo-container {
@@ -67,7 +67,7 @@
         }
 
         .logo {
-            font-size: 1.6rem; /* تقليل حجم الخط */
+            font-size: 1.6rem;
             color: #1a2a6c;
             font-weight: 700;
         }
@@ -75,14 +75,14 @@
         .user-info {
             color: #555;
             font-weight: 500;
-            font-size: 0.85rem; /* تقليل حجم الخط */
+            font-size: 0.85rem;
             display: none;
         }
 
         .header-icons {
             display: flex;
             align-items: center;
-            gap: 12px; /* تقليل المسافة */
+            gap: 12px;
             justify-content: flex-end;
             flex: 1;
         }
@@ -91,10 +91,10 @@
             position: relative;
             background: none;
             border: none;
-            font-size: 1.3rem; /* تقليل حجم الأيقونة */
+            font-size: 1.3rem;
             color: #1a2a6c;
             cursor: pointer;
-            padding: 6px; /* تقليل البادينغ */
+            padding: 6px;
             border-radius: 50%;
             transition: background-color 0.3s ease;
         }
@@ -110,7 +110,7 @@
             background-color: #dc3545;
             color: white;
             border-radius: 50%;
-            width: 18px; /* تقليل الحجم */
+            width: 18px;
             height: 18px;
             font-size: 0.65rem;
             display: flex;
@@ -123,7 +123,7 @@
             position: absolute;
             top: 4px;
             left: 4px;
-            width: 10px; /* تقليل الحجم */
+            width: 10px;
             height: 10px;
             background-color: #28a745;
             border-radius: 50%;
@@ -134,9 +134,9 @@
             background: linear-gradient(135deg, #1a2a6c, #b21f1f);
             color: white;
             border: none;
-            border-radius: 50%; /* جعله دائري */
-            width: 45px; /* عرض دائري */
-            height: 45px; /* ارتفاع دائري */
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -185,7 +185,8 @@
             height: 100vh;
             background-color: rgba(255, 255, 255, 0.98);
             box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
-            padding-top: 60px; /* تقليل البادينغ العلوي */
+            padding-top: 60px;
+            padding-bottom: 80px;
             transform: translateX(100%);
             transition: transform 0.3s ease-in-out;
             z-index: 1000;
@@ -253,7 +254,13 @@
 
         .sidebar-footer {
             padding: 15px;
+            padding-bottom: 25px;
             border-top: 1px solid #eee;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.98);
         }
 
         .logout-btn {
@@ -286,10 +293,10 @@
             box-shadow: none;
         }
 
-        /* Main Content - محسّن */
+        /* Main Content */
         main {
             margin-right: 0;
-            padding: 50px 0 0; /* تقليل البادينغ العلوي */
+            padding: 50px 0 0;
             min-height: 100vh;
             transition: filter 0.3s ease-in-out;
             width: 100%;
@@ -297,12 +304,12 @@
 
         .sidebar-open main {
             filter: blur(3px);
-            pointer-events: none; /* منع التفاعل مع المحتوى */
+            pointer-events: none;
         }
 
         .content-frame {
             width: 100%;
-            height: calc(100vh - 50px); /* تعديل الارتفاع */
+            height: calc(100vh - 50px);
             border: none;
             background: transparent;
             display: block;
@@ -314,7 +321,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 60px; /* تقليل الارتفاع */
+            height: 60px;
             background-color: rgba(255, 255, 255, 0.95);
             box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -329,13 +336,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 5px 12px; /* تقليل البادينغ */
+            padding: 5px 12px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
             color: #1a2a6c;
             border-radius: 8px;
-            min-width: 65px; /* تقليل العرض الأدنى */
+            min-width: 65px;
         }
 
         .taskbar-item:hover {
@@ -347,19 +354,19 @@
         }
 
         .taskbar-item i {
-            font-size: 1.3rem; /* تقليل حجم الأيقونة */
+            font-size: 1.3rem;
             margin-bottom: 2px;
         }
 
         .taskbar-item span {
-            font-size: 0.65rem; /* تقليل حجم الخط */
+            font-size: 0.65rem;
             font-weight: 500;
         }
 
         /* Notifications Panel */
         .notifications-panel {
             position: fixed;
-            top: 50px; /* تعديل الموقع */
+            top: 50px;
             left: 20px;
             width: 350px;
             max-height: 500px;
@@ -445,7 +452,7 @@
         /* Toast Notification */
         .toast-notification {
             position: fixed;
-            top: 65px; /* تعديل الموقع */
+            top: 65px;
             left: 50%;
             transform: translateX(-50%);
             background-color: white;
@@ -495,7 +502,7 @@
             font-size: 1rem;
         }
 
-        /* Modal للزوار - جديد */
+        /* Modal للزوار */
         .modal {
             display: none;
             position: fixed;
@@ -585,7 +592,7 @@
             transform: translateY(-2px);
         }
 
-        /* Responsive - محسّن */
+        /* Responsive */
         @media (min-width: 768px) {
             header {
                 padding: 10px 30px;
@@ -657,11 +664,10 @@
                 font-size: 1rem;
             }
             .create-post-btn span {
-                display: none; /* إخفاء النص في الشاشات الصغيرة */
+                display: none;
             }
         }
 
-        /* تحسينات للعرض على الهواتف */
         @media (max-width: 767px) {
             .logo-container {
                 flex: 0 0 auto;
@@ -769,7 +775,7 @@
         </a>
     </div>
 
-    <!-- نافذة منبثقة للزوار - محسّنة -->
+    <!-- نافذة منبثقة للزوار -->
     <div id="guestModal" class="modal">
         <div class="modal-content">
             <i class="fas fa-user-lock" style="font-size: 3rem; color: #1a2a6c; margin-bottom: 15px;"></i>
@@ -802,7 +808,7 @@
         const mainContent = document.querySelector('main');
         const contentFrame = document.getElementById('contentFrame');
         
-        // عناصر الإشعارات الجديدة
+        // عناصر الإشعارات
         const messageBtn = document.getElementById('messageBtn');
         const messageBadge = document.getElementById('messageBadge');
         const bellBtn = document.getElementById('bellBtn');
@@ -902,6 +908,33 @@
             }
         }
 
+        // الحصول على اسم المستخدم أو الشركة من جدول users
+        async function getUserDisplayName(userId) {
+            try {
+                console.log('Fetching user data for ID:', userId);
+                
+                const { data: userData, error } = await supabaseClient
+                    .from('users')
+                    .select('full_name, company_name')
+                    .eq('id', userId)
+                    .single();
+                
+                if (error) {
+                    console.error('Error fetching user data:', error);
+                    return 'مستخدم';
+                }
+                
+                console.log('User data fetched:', userData);
+                
+                // إرجاع اسم الشركة إذا وجد، وإلا اسم المستخدم الكامل
+                return userData.company_name || userData.full_name || 'مستخدم';
+                
+            } catch (error) {
+                console.error('Error in getUserDisplayName:', error);
+                return 'مستخدم';
+            }
+        }
+
         // إنشاء إشعارات للمنشورات الجديدة فقط
         async function createNotificationsForNewPostsOnly() {
             if (!currentUser) return;
@@ -943,14 +976,22 @@
                     console.log('New posts without notifications:', newPosts.length);
                     
                     if (newPosts.length > 0) {
-                        const notifications = newPosts.map(post => ({
-                            user_id: currentUser.id,
-                            property_id: post.id,
-                            notification_type: 'new_post',
-                            title: 'منشور جديد',
-                            message: `متوفر ${post.offer_type} ${post.property_type} ${post.property_condition} في ${post.governorate} ${post.precise_address}`,
-                            is_read: false
-                        }));
+                        const notifications = [];
+                        
+                        for (const post of newPosts) {
+                            // جلب اسم المستخدم من جدول users باستخدام user_id
+                            const displayName = await getUserDisplayName(post.user_id);
+                            
+                            notifications.push({
+                                user_id: currentUser.id,
+                                property_id: post.id,
+                                // استخدام حقل message لتخزين معرف المستخدم الناشر
+                                message: `${post.user_id}|${post.offer_type} ${post.property_type} ${post.property_condition} في ${post.governorate} ${post.precise_address}`,
+                                notification_type: 'new_post',
+                                title: displayName,
+                                is_read: false
+                            });
+                        }
                         
                         const { error: insertError } = await supabaseClient
                             .from('notifications')
@@ -1035,6 +1076,23 @@
                 } else {
                     hasNewPosts = data && data.length > 0;
                     console.log('Notifications loaded:', data?.length);
+                    
+                    // تحديث عناوين الإشعارات بأسماء المستخدمين من جدول users
+                    if (data && data.length > 0) {
+                        for (const notification of data) {
+                            // استخراج معرف المستخدم الناشر من حقل message
+                            if (notification.message && notification.message.includes('|')) {
+                                const parts = notification.message.split('|');
+                                const posterId = parts[0];
+                                
+                                if (!notification.title || notification.title === 'منشور جديد') {
+                                    // جلب اسم المستخدم من جدول users
+                                    const displayName = await getUserDisplayName(posterId);
+                                    notification.title = displayName;
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 updateBellBadge();
@@ -1066,14 +1124,27 @@
                 return;
             }
             
-            notificationsList.innerHTML = notifications.map(notification => `
-                <div class="notification-item ${notification.is_read ? '' : 'unread'}" 
-                     data-id="${notification.id}">
-                    <div class="notification-title">${notification.title || 'منشور جديد'}</div>
-                    <div class="notification-message">${notification.message}</div>
-                    <div class="notification-time">${formatTime(notification.created_at)}</div>
-                </div>
-            `).join('');
+            notificationsList.innerHTML = notifications.map(notification => {
+                // استخراج معرف المستخدم الناشر ورسالة الإشعار
+                let posterId = '';
+                let notificationMessage = notification.message || '';
+                
+                if (notification.message && notification.message.includes('|')) {
+                    const parts = notification.message.split('|');
+                    posterId = parts[0];
+                    notificationMessage = parts[1] || '';
+                }
+                
+                return `
+                    <div class="notification-item ${notification.is_read ? '' : 'unread'}" 
+                         data-id="${notification.id}"
+                         data-poster-id="${posterId}">
+                        <div class="notification-title">${notification.title || 'منشور جديد'}</div>
+                        <div class="notification-message">${notificationMessage}</div>
+                        <div class="notification-time">${formatTime(notification.created_at)}</div>
+                    </div>
+                `;
+            }).join('');
             
             console.log('Notifications displayed:', notifications.length);
             
@@ -1086,9 +1157,37 @@
         async function handleNotificationClick(event) {
             const notificationItem = event.currentTarget;
             const notificationId = notificationItem.getAttribute('data-id');
+            const posterId = notificationItem.getAttribute('data-poster-id');
+            
+            console.log('Notification clicked, ID:', notificationId, 'Poster ID:', posterId);
             
             await markNotificationAsRead(notificationId);
             hideNotificationsPanel();
+            
+            // الانتقال إلى صفحة الملف الشخصي للمستخدم في وضع المشاهدة
+            if (posterId) {
+                navigateToUserProfile(posterId);
+            }
+        }
+
+        // الانتقال إلى صفحة الملف الشخصي للمستخدم في وضع المشاهدة
+        function navigateToUserProfile(userId) {
+            console.log('Navigating to user profile in view mode:', userId);
+            
+            // إغلاق الشريط الجانبي إذا كان مفتوحاً
+            closeSidebar();
+            
+            // تحديث الأزرار النشطة
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            taskbarButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // تفعيل زر الملف التعريفي
+            const profileBtn = document.getElementById('profileBtn');
+            profileBtn.classList.add('active');
+            
+            // تحميل صفحة الملف الشخصي مع معرف المستخدم ووضع المشاهدة
+            // view_mode=other يحدد أننا نريد عرض الملف الشخصي للمستخدم الآخر
+            contentFrame.src = `profile.html?user_id=${userId}&view_mode=other`;
         }
 
         // وضع علامة على الإشعار كمقروء
@@ -1143,12 +1242,16 @@
                         async (payload) => {
                             console.log('New post detected:', payload.new);
                             
+                            // جلب اسم المستخدم من جدول users
+                            const displayName = await getUserDisplayName(payload.new.user_id);
+                            
+                            // استخدام حقل message لتخزين معرف المستخدم الناشر
                             const notificationData = {
                                 user_id: currentUser.id,
                                 property_id: payload.new.id,
+                                message: `${payload.new.user_id}|${payload.new.offer_type} ${payload.new.property_type} ${payload.new.property_condition} في ${payload.new.governorate} ${payload.new.precise_address}`,
                                 notification_type: 'new_post',
-                                title: 'منشور جديد',
-                                message: `متوفر ${payload.new.offer_type} ${payload.new.property_type} ${payload.new.property_condition} في ${payload.new.governorate} ${payload.new.precise_address}`,
+                                title: displayName,
                                 is_read: false
                             };
                             
@@ -1162,7 +1265,7 @@
                                 updateBellBadge();
                                 
                                 showToastNotification(
-                                    'منشور جديد', 
+                                    displayName, 
                                     `متوفر ${payload.new.offer_type} ${payload.new.property_type} في ${payload.new.governorate}`
                                 );
                             }
@@ -1362,7 +1465,7 @@
             closeSidebar();
         });
 
-        // أحداث الإشعارات الجديدة
+        // أحداث الإشعارات
         messageBtn.addEventListener('click', () => {
             const inboxBtn = document.getElementById('inboxBtn');
             changeContent('msg.html', inboxBtn);
