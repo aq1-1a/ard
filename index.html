@@ -35,6 +35,7 @@
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
+            padding-bottom: 60px; /* تقليل المساحة لشريط المهام */
         }
 
         @keyframes gradientBG {
@@ -47,7 +48,7 @@
         header {
             background-color: rgba(255, 255, 255, 0.95);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 15px 20px;
+            padding: 10px 20px; /* تقليل البادينغ */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -56,7 +57,7 @@
             left: 0;
             right: 0;
             z-index: 1001;
-            height: 65px;
+            height: 50px; /* تقليل الارتفاع */
         }
 
         .logo-container {
@@ -66,7 +67,7 @@
         }
 
         .logo {
-            font-size: 1.8rem;
+            font-size: 1.6rem; /* تقليل حجم الخط */
             color: #1a2a6c;
             font-weight: 700;
         }
@@ -74,14 +75,14 @@
         .user-info {
             color: #555;
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.85rem; /* تقليل حجم الخط */
             display: none;
         }
 
         .header-icons {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px; /* تقليل المسافة */
             justify-content: flex-end;
             flex: 1;
         }
@@ -90,10 +91,10 @@
             position: relative;
             background: none;
             border: none;
-            font-size: 1.4rem;
+            font-size: 1.3rem; /* تقليل حجم الأيقونة */
             color: #1a2a6c;
             cursor: pointer;
-            padding: 8px;
+            padding: 6px; /* تقليل البادينغ */
             border-radius: 50%;
             transition: background-color 0.3s ease;
         }
@@ -109,9 +110,9 @@
             background-color: #dc3545;
             color: white;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 0.7rem;
+            width: 18px; /* تقليل الحجم */
+            height: 18px;
+            font-size: 0.65rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -120,24 +121,59 @@
 
         .bell-badge {
             position: absolute;
-            top: 5px;
-            left: 5px;
-            width: 12px;
-            height: 12px;
+            top: 4px;
+            left: 4px;
+            width: 10px; /* تقليل الحجم */
+            height: 10px;
             background-color: #28a745;
             border-radius: 50%;
             border: 2px solid white;
         }
 
-        .menu-toggle {
-            background: none;
+        .create-post-btn {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: white;
             border: none;
-            font-size: 1.8rem;
-            color: #1a2a6c;
+            border-radius: 50%; /* جعله دائري */
+            width: 45px; /* عرض دائري */
+            height: 45px; /* ارتفاع دائري */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
             cursor: pointer;
-            z-index: 1002;
-            padding: 5px;
-            margin-right: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .create-post-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .create-post-btn i {
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+        }
+
+        /* Overlay للشريط الجانبي */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-open .sidebar-overlay {
+            display: block;
+            opacity: 1;
         }
 
         /* Sidebar */
@@ -149,7 +185,7 @@
             height: 100vh;
             background-color: rgba(255, 255, 255, 0.98);
             box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
-            padding-top: 80px;
+            padding-top: 60px; /* تقليل البادينغ العلوي */
             transform: translateX(100%);
             transition: transform 0.3s ease-in-out;
             z-index: 1000;
@@ -253,7 +289,7 @@
         /* Main Content - محسّن */
         main {
             margin-right: 0;
-            padding: 65px 0 0;
+            padding: 50px 0 0; /* تقليل البادينغ العلوي */
             min-height: 100vh;
             transition: filter 0.3s ease-in-out;
             width: 100%;
@@ -261,20 +297,69 @@
 
         .sidebar-open main {
             filter: blur(3px);
+            pointer-events: none; /* منع التفاعل مع المحتوى */
         }
 
         .content-frame {
             width: 100%;
-            height: calc(100vh - 65px);
+            height: calc(100vh - 50px); /* تعديل الارتفاع */
             border: none;
             background: transparent;
             display: block;
         }
 
+        /* شريط المهام السفلي */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px; /* تقليل الارتفاع */
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1001;
+        }
+
+        .taskbar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 12px; /* تقليل البادينغ */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #1a2a6c;
+            border-radius: 8px;
+            min-width: 65px; /* تقليل العرض الأدنى */
+        }
+
+        .taskbar-item:hover {
+            background-color: rgba(26, 42, 108, 0.1);
+        }
+
+        .taskbar-item.active {
+            background-color: rgba(26, 42, 108, 0.15);
+        }
+
+        .taskbar-item i {
+            font-size: 1.3rem; /* تقليل حجم الأيقونة */
+            margin-bottom: 2px;
+        }
+
+        .taskbar-item span {
+            font-size: 0.65rem; /* تقليل حجم الخط */
+            font-weight: 500;
+        }
+
         /* Notifications Panel */
         .notifications-panel {
             position: fixed;
-            top: 65px;
+            top: 50px; /* تعديل الموقع */
             left: 20px;
             width: 350px;
             max-height: 500px;
@@ -360,7 +445,7 @@
         /* Toast Notification */
         .toast-notification {
             position: fixed;
-            top: 80px;
+            top: 65px; /* تعديل الموقع */
             left: 50%;
             transform: translateX(-50%);
             background-color: white;
@@ -503,29 +588,28 @@
         /* Responsive - محسّن */
         @media (min-width: 768px) {
             header {
-                padding: 15px 30px;
+                padding: 10px 30px;
             }
             .logo {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
             .user-info {
                 display: block;
                 text-align: center;
                 flex: 1;
             }
-            .menu-toggle {
-                display: none;
-            }
             .sidebar {
                 transform: translateX(0);
             }
             main {
                 margin-right: 280px;
-                padding: 65px 0 0;
+                padding: 50px 0 0;
                 filter: none;
+                pointer-events: auto;
             }
             .sidebar-open main {
                 filter: none;
+                pointer-events: auto;
             }
         }
         
@@ -534,20 +618,17 @@
                 display: none;
             }
             .header-icons {
-                gap: 10px;
+                gap: 8px;
             }
             .icon-btn {
-                font-size: 1.2rem;
-                padding: 6px;
+                font-size: 1.1rem;
+                padding: 5px;
             }
             .notifications-panel {
                 width: 300px;
                 left: 10px;
                 right: 10px;
                 margin: 0 auto;
-            }
-            .menu-toggle {
-                margin-right: 5px;
             }
             .modal-content {
                 padding: 20px;
@@ -557,6 +638,26 @@
             }
             .modal-btn {
                 width: 100%;
+            }
+            .taskbar-item {
+                min-width: 55px;
+                padding: 5px 8px;
+            }
+            .taskbar-item i {
+                font-size: 1.2rem;
+            }
+            .taskbar-item span {
+                font-size: 0.6rem;
+            }
+            .create-post-btn {
+                width: 40px;
+                height: 40px;
+            }
+            .create-post-btn i {
+                font-size: 1rem;
+            }
+            .create-post-btn span {
+                display: none; /* إخفاء النص في الشاشات الصغيرة */
             }
         }
 
@@ -576,6 +677,9 @@
     </style>
 </head>
 <body>
+    <!-- Overlay للشريط الجانبي -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <header>
         <div class="logo-container">
             <div class="logo">أيين</div>
@@ -590,8 +694,9 @@
                 <i class="fas fa-envelope"></i>
                 <span class="badge" id="messageBadge" style="display: none;">0</span>
             </button>
-            <button class="menu-toggle" id="menuToggle" aria-label="فتح القائمة">
-                <i class="fas fa-bars"></i>
+            <button class="create-post-btn" id="createPostBtn" aria-label="إنشاء مشاركة">
+                <i class="fas fa-plus"></i>
+                <span>إضافة</span>
             </button>
         </div>
     </header>
@@ -622,21 +727,9 @@
     <!-- الشريط الجانبي -->
     <nav class="sidebar">
         <div class="nav-grid">
-            <a href="#" class="nav-card active" id="homeBtn" data-page="home2.html">
-                <i class="fas fa-home"></i>
-                <h3>الصفحة الرئيسية</h3>
-            </a>
-            <a href="#" class="nav-card" id="profileBtn" data-page="profile.html">
-                <i class="fas fa-user-edit"></i>
-                <h3>الملف التعريفي</h3>
-            </a>
-            <a href="#" class="nav-card" id="createPostBtn" data-page="newpost.html">
-                <i class="fas fa-plus-circle"></i>
-                <h3>إنشاء اعلان</h3>
-            </a>
             <a href="#" class="nav-card" id="inboxBtn" data-page="mustkdm.html">
                 <i class="fas fa-th-list"></i>
-                <h3>مكتب عقار</h3>
+                <h3>الشركات والمستخدمين</h3>
             </a>
             <a href="#" class="nav-card" id="myPostsBtn" data-page="post.html">
                 <i class="fas fa-th-list"></i>
@@ -659,6 +752,22 @@
     <main>
         <iframe id="contentFrame" class="content-frame" src="home2.html"></iframe>
     </main>
+
+    <!-- شريط المهام السفلي -->
+    <div class="taskbar">
+        <a href="#" class="taskbar-item" id="sidebarToggle" aria-label="فتح القائمة">
+            <i class="fas fa-bars"></i>
+            <span>المزيد</span>
+        </a>
+        <a href="#" class="taskbar-item active" id="homeBtn" data-page="home2.html" aria-label="الصفحة الرئيسية">
+            <i class="fas fa-home"></i>
+            <span>الصفحة الرئيسية</span>
+        </a>
+        <a href="#" class="taskbar-item" id="profileBtn" data-page="profile.html" aria-label="الملف التعريفي">
+            <i class="fas fa-user-edit"></i>
+            <span>الملف التعريفي</span>
+        </a>
+    </div>
 
     <!-- نافذة منبثقة للزوار - محسّنة -->
     <div id="guestModal" class="modal">
@@ -683,10 +792,12 @@
         // عناصر DOM
         const userInfoDiv = document.getElementById('userInfo');
         const navButtons = document.querySelectorAll('.nav-card');
+        const taskbarButtons = document.querySelectorAll('.taskbar-item');
         const logoutBtn = document.getElementById('logoutBtn');
         const guestModal = document.getElementById('guestModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
-        const menuToggle = document.getElementById('menuToggle');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
         const body = document.body;
         const mainContent = document.querySelector('main');
         const contentFrame = document.getElementById('contentFrame');
@@ -703,6 +814,7 @@
         const toastTitle = document.getElementById('toastTitle');
         const toastMessage = document.getElementById('toastMessage');
         const closeToastBtn = document.getElementById('closeToastBtn');
+        const createPostBtn = document.getElementById('createPostBtn');
 
         // متغيرات حالة
         let currentUser = null;
@@ -1113,9 +1225,11 @@
         function setLoggedInMode(userData) {
             userInfoDiv.textContent = `مرحباً، ${userData.full_name || 'مستخدم'}`;
             navButtons.forEach(btn => btn.disabled = false);
+            taskbarButtons.forEach(btn => btn.disabled = false);
             logoutBtn.disabled = false;
             messageBtn.disabled = false;
             bellBtn.disabled = false;
+            createPostBtn.disabled = false;
         }
 
         // تفعيل وضع الزائر
@@ -1128,9 +1242,17 @@
                     showGuestModal();
                 });
             });
+            taskbarButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showGuestModal();
+                });
+            });
             logoutBtn.disabled = true;
             messageBtn.disabled = true;
             bellBtn.disabled = true;
+            createPostBtn.disabled = true;
             
             if (autoRefreshInterval) {
                 clearInterval(autoRefreshInterval);
@@ -1184,9 +1306,15 @@
             navButtons.forEach(btn => {
                 btn.classList.remove('active');
             });
+            taskbarButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
             if (element) {
                 element.classList.add('active');
             }
+            
+            // إغلاق الشريط الجانبي عند تغيير المحتوى
+            closeSidebar();
         }
 
         // إضافة مستمعي الأحداث
@@ -1196,8 +1324,17 @@
                 if (!this.disabled) {
                     const pageUrl = this.getAttribute('data-page');
                     changeContent(pageUrl, this);
-                    if (window.innerWidth < 768) {
-                        closeSidebar();
+                }
+            });
+        });
+
+        taskbarButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (!this.disabled) {
+                    const pageUrl = this.getAttribute('data-page');
+                    if (pageUrl) {
+                        changeContent(pageUrl, this);
                     }
                 }
             });
@@ -1206,15 +1343,13 @@
         // التحكم بالقائمة الجانبية
         function openSidebar() {
             body.classList.add('sidebar-open');
-            menuToggle.innerHTML = '<i class="fas fa-times"></i>';
         }
 
         function closeSidebar() {
             body.classList.remove('sidebar-open');
-            menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
         }
 
-        menuToggle.addEventListener('click', () => {
+        sidebarToggle.addEventListener('click', () => {
             if (body.classList.contains('sidebar-open')) {
                 closeSidebar();
             } else {
@@ -1222,10 +1357,9 @@
             }
         });
 
-        mainContent.addEventListener('click', () => {
-            if (body.classList.contains('sidebar-open')) {
-                closeSidebar();
-            }
+        // إغلاق الشريط الجانبي عند النقر على الـ overlay
+        sidebarOverlay.addEventListener('click', () => {
+            closeSidebar();
         });
 
         // أحداث الإشعارات الجديدة
@@ -1236,6 +1370,12 @@
 
         bellBtn.addEventListener('click', () => {
             showNotificationsPanel();
+        });
+
+        createPostBtn.addEventListener('click', () => {
+            if (!createPostBtn.disabled) {
+                changeContent('newpost.html', null);
+            }
         });
 
         clearNotificationsBtn.addEventListener('click', async () => {
@@ -1289,5 +1429,4 @@
         });
     </script>
 </body>
-
 </html>
