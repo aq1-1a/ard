@@ -384,7 +384,7 @@
             </div>
             
             <div class="security-questions">
-                <h3>سؤال الامان ( سيتم توجيه  هذا السؤال عند عدم تذكر كلمة المرور للتحقق من مالك الحساب  ) </h3>
+                <h3>سؤال الأمان</h3>
                 
                 <div class="form-group"> <!-- تم تغيير التصميم ليتطابق مع الحقول الأخرى -->
                     <select id="question1" name="question1" required>
@@ -638,6 +638,22 @@
                 confirmModal.style.display = 'none';
             }
         });
+
+        // === بداية الكود الجديد لمنع القائمة السياقية ===
+        
+        // منع القائمة السياقية (الضغط الطويل) على الأزرار والروابط
+        document.addEventListener('contextmenu', function(e) {
+            // تحديد العناصر التي نريد منع القائمة السياقية عليها
+            const isButton = e.target.closest('button, a[href], [onclick], [role="button"], input[type="submit"], input[type="button"], .btn, .modal-btn, .link a');
+            
+            if (isButton) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // === نهاية الكود الجديد ===
+
     </script>
 </body>
 </html>
