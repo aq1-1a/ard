@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* تعزيزات لمنع التحديد والتحديد الأزرق */
         * {
             margin: 0;
             padding: 0;
@@ -15,6 +16,25 @@
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        input, textarea, select, button, a {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* السماح بتحديد النص داخل حقول الإدخال فقط */
+        input[type="text"], input[type="tel"], input[type="password"], input[type="date"], select {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
         body {
@@ -24,7 +44,6 @@
             animation: gradientBG 15s ease infinite;
             min-height: 100vh;
             padding: 20px;
-            /* تم إزالة overflow: hidden للسماح بالتمرير */
         }
 
         @keyframes gradientBG {
@@ -40,7 +59,7 @@
             width: 100%;
             max-width: 600px;
             padding: 40px;
-            margin: 20px auto; /* تم تعديل الهوامش لتمركز أفضل */
+            margin: 20px auto;
             animation: fadeIn 0.8s ease;
         }
 
@@ -132,13 +151,6 @@
             margin-bottom: 20px;
             color: #1a2a6c;
             font-size: 1.2rem;
-        }
-
-        .question-group {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f5f7fa;
-            border-radius: 10px;
         }
 
         .btn {
@@ -339,15 +351,7 @@
                 <input type="text" id="companyName" name="companyName">
             </div>
             
-            <div class="form-group">
-                <label for="birthDate">تاريخ الميلاد</label>
-                <input type="date" id="birthDate" name="birthDate" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="address">عنوان السكن</label>
-                <input type="text" id="address" name="address" required>
-            </div>
+            <!-- تم حذف حقلي تاريخ الميلاد وعنوان السكن -->
             
             <div class="form-group">
                 <label for="phone1">رقم الهاتف الأول</label>
@@ -380,11 +384,11 @@
             </div>
             
             <div class="security-questions">
-                <h3>أسئلة الأمان</h3>
+                <h3>سؤال الامان ( سيتم توجيه  هذا السؤال عند عدم تذكر كلمة المرور للتحقق من مالك الحساب  ) </h3>
                 
-                <div class="question-group">
+                <div class="form-group"> <!-- تم تغيير التصميم ليتطابق مع الحقول الأخرى -->
                     <select id="question1" name="question1" required>
-                        <option value="" disabled selected>اختر سؤال الأمان الأول</option>
+                        <option value="" disabled selected>اختر سؤال الأمان</option>
                         <option value="ما هو اسم مدرستك الابتدائية؟">ما هو اسم مدرستك الابتدائية؟</option>
                         <option value="ما هو اسم الشارع الذي نشأت فيه؟">ما هو اسم الشارع الذي نشأت فيه؟</option>
                         <option value="ما هو اسم أول مدينة سافرت إليها؟">ما هو اسم أول مدينة سافرت إليها؟</option>
@@ -398,45 +402,10 @@
                         <option value="ما هو اللقب الذي كان يناديك به أصدقاؤك؟">ما هو اللقب الذي كان يناديك به أصدقاؤك؟</option>
                         <option value="ما هو اسم سيارتك المفضلة؟">ما هو اسم سيارتك المفضلة؟</option>
                     </select>
-                    <input type="text" id="answer1" name="answer1" placeholder="الإجابة" required style="margin-top: 10px;">
                 </div>
                 
-                <div class="question-group">
-                    <select id="question2" name="question2" required>
-                        <option value="" disabled selected>اختر سؤال الأمان الثاني</option>
-                        <option value="ما هو اسم مدرستك الابتدائية؟">ما هو اسم مدرستك الابتدائية؟</option>
-                        <option value="ما هو اسم الشارع الذي نشأت فيه؟">ما هو اسم الشارع الذي نشأت فيه؟</option>
-                        <option value="ما هو اسم أول مدينة سافرت إليها؟">ما هو اسم أول مدينة سافرت إليها؟</option>
-                        <option value="ما هو اسم الجار الأول الذي تتذكره؟">ما هو اسم الجار الأول الذي تتذكره؟</option>
-                        <option value="ما هو اسم صديق الطفولة المفضل لديك؟">ما هو اسم صديق الطفولة المفضل لديك؟</option>
-                        <option value="ما هو عيد ميلاد أحد أفراد عائلتك المقربين؟">ما هو عيد ميلاد أحد أفراد عائلتك المقربين؟</option>
-                        <option value="ما هو اللون المفضل لديك؟">ما هو اللون المفضل لديك؟</option>
-                        <option value="ما هو الفريق الرياضي الذي تشجعه؟">ما هو الفريق الرياضي الذي تشجعه؟</option>
-                        <option value="ما هي مدينتك المفضلة؟">ما هي مدينتك المفضلة؟</option>
-                        <option value="ما هو نوع أول هاتف امتلكته؟">ما هو نوع أول هاتف امتلكته؟</option>
-                        <option value="ما هو اللقب الذي كان يناديك به أصدقاؤك؟">ما هو اللقب الذي كان يناديك به أصدقاؤك؟</option>
-                        <option value="ما هو اسم سيارتك المفضلة؟">ما هو اسم سيارتك المفضلة؟</option>
-                    </select>
-                    <input type="text" id="answer2" name="answer2" placeholder="الإجابة" required style="margin-top: 10px;">
-                </div>
-                
-                <div class="question-group">
-                    <select id="question3" name="question3" required>
-                        <option value="" disabled selected>اختر سؤال الأمان الثالث</option>
-                        <option value="ما هو اسم مدرستك الابتدائية؟">ما هو اسم مدرستك الابتدائية؟</option>
-                        <option value="ما هو اسم الشارع الذي نشأت فيه؟">ما هو اسم الشارع الذي نشأت فيه؟</option>
-                        <option value="ما هو اسم أول مدينة سافرت إليها؟">ما هو اسم أول مدينة سافرت إليها؟</option>
-                        <option value="ما هو اسم الجار الأول الذي تتذكره؟">ما هو اسم الجار الأول الذي تتذكره؟</option>
-                        <option value="ما هو اسم صديق الطفولة المفضل لديك؟">ما هو اسم صديق الطفولة المفضل لديك؟</option>
-                        <option value="ما هو عيد ميلاد أحد أفراد عائلتك المقربين؟">ما هو عيد ميلاد أحد أفراد عائلتك المقربين؟</option>
-                        <option value="ما هو اللون المفضل لديك؟">ما هو اللون المفضل لديك؟</option>
-                        <option value="ما هو الفريق الرياضي الذي تشجعه؟">ما هو الفريق الرياضي الذي تشجعه؟</option>
-                        <option value="ما هي مدينتك المفضلة؟">ما هي مدينتك المفضلة؟</option>
-                        <option value="ما هو نوع أول هاتف امتلكته؟">ما هو نوع أول هاتف امتلكته؟</option>
-                        <option value="ما هو اللقب الذي كان يناديك به أصدقاؤك؟">ما هو اللقب الذي كان يناديك به أصدقاؤك؟</option>
-                        <option value="ما هو اسم سيارتك المفضلة؟">ما هو اسم سيارتك المفضلة؟</option>
-                    </select>
-                    <input type="text" id="answer3" name="answer3" placeholder="الإجابة" required style="margin-top: 10px;">
+                <div class="form-group"> <!-- تم تغيير التصميم ليتطابق مع الحقول الأخرى -->
+                    <input type="text" id="answer1" name="answer1" placeholder="الإجابة" required>
                 </div>
             </div>
             
@@ -493,8 +462,6 @@
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('confirmPassword');
         const question1Select = document.getElementById('question1');
-        const question2Select = document.getElementById('question2');
-        const question3Select = document.getElementById('question3');
         const phoneExistsError = document.getElementById('phoneExistsError');
         
         // معالجة إدخال رقم الهاتف الأول
@@ -532,32 +499,6 @@
             }
         });
         
-        // التحقق من اختيار أسئلة أمان مختلفة
-        question2Select.addEventListener('change', function() {
-            validateSecurityQuestions();
-        });
-        
-        question3Select.addEventListener('change', function() {
-            validateSecurityQuestions();
-        });
-        
-        function validateSecurityQuestions() {
-            const q1 = question1Select.value;
-            const q2 = question2Select.value;
-            const q3 = question3Select.value;
-            
-            if (q1 && q2 && q1 === q2) {
-                question2Select.setCustomValidity('يجب اختيار أسئلة أمان مختلفة');
-            } else if (q1 && q3 && q1 === q3) {
-                question3Select.setCustomValidity('يجب اختيار أسئلة أمان مختلفة');
-            } else if (q2 && q3 && q2 === q3) {
-                question3Select.setCustomValidity('يجب اختيار أسئلة أمان مختلفة');
-            } else {
-                question2Select.setCustomValidity('');
-                question3Select.setCustomValidity('');
-            }
-        }
-        
         // معالجة تقديم النموذج
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -580,12 +521,6 @@
             // التحقق من صحة رقم الهاتف الثاني إذا تم إدخاله
             if (phone2Input.value && phone2Input.value.length !== 11) {
                 document.getElementById('phone2Error').style.display = 'block';
-                return;
-            }
-            
-            // التحقق من اختيار أسئلة أمان مختلفة
-            validateSecurityQuestions();
-            if (!question2Select.checkValidity() || !question3Select.checkValidity()) {
                 return;
             }
             
@@ -666,17 +601,12 @@
             const userData = {
                 full_name: document.getElementById('fullName').value,
                 company_name: document.getElementById('companyName').value, // إضافة الحقل الجديد
-                birth_date: document.getElementById('birthDate').value,
-                address: document.getElementById('address').value,
                 phone1: phone1,
                 phone2: phone2,
                 password: document.getElementById('password').value,
                 question1: document.getElementById('question1').value,
-                answer1: document.getElementById('answer1').value,
-                question2: document.getElementById('question2').value,
-                answer2: document.getElementById('answer2').value,
-                question3: document.getElementById('question3').value,
-                answer3: document.getElementById('answer3').value
+                answer1: document.getElementById('answer1').value
+                // تم حذف حقول تاريخ الميلاد والعنوان والأسئلة الأمنية الأخرى
             };
             
             try {
