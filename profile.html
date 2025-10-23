@@ -687,48 +687,63 @@
         }
 
         /* تحسينات للخريطة */
-#map {
-    height: 450px;
-    width: 100%;
-    border-radius: 8px;
-    background-color: #f8f9fa;
-}
+        #map {
+            height: 450px;
+            width: 100%;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
 
-/* إخفاء attribution للخصوصية */
-.leaflet-control-attribution {
-    display: none !important;
-}
+        /* إخفاء attribution للخصوصية */
+        .leaflet-control-attribution {
+            display: none !important;
+        }
 
-/* تحسين مظهر الخريطة */
-.leaflet-container {
-    font-family: 'Tajawal', sans-serif !important;
-    direction: ltr !important;
-}
+        /* تحسين مظهر الخريطة */
+        .leaflet-container {
+            font-family: 'Tajawal', sans-serif !important;
+            direction: ltr !important;
+        }
 
-.leaflet-popup-content {
-    text-align: center;
-    font-family: 'Tajawal', sans-serif;
-}
+        .leaflet-popup-content {
+            text-align: center;
+            font-family: 'Tajawal', sans-serif;
+        }
 
-.leaflet-popup-content-wrapper {
-    border-radius: 8px;
-}
+        .leaflet-popup-content-wrapper {
+            border-radius: 8px;
+        }
+
         @media (max-width: 768px) {
-    #map {
-        height: 350px;
-    }
-    
-    .modal-content.large {
-        max-width: 95%;
-        margin: 10px;
-    }
-}
+            #map {
+                height: 350px;
+            }
+            
+            .modal-content.large {
+                max-width: 95%;
+                margin: 10px;
+            }
+        }
 
-@media (max-width: 480px) {
-    #map {
-        height: 300px;
-    }
-}
+        @media (max-width: 480px) {
+            #map {
+                height: 300px;
+            }
+        }
+
+        /* أنماط إضافية لوضع المشاهدة */
+        .view-mode .edit-btn,
+        .view-mode #editProfileBtn,
+        .view-mode #deleteAccountBtn {
+            display: none !important;
+        }
+
+        .view-mode .contact-info {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -928,9 +943,6 @@
     <div id="notification" class="notification"></div>
 
     <script>
-        // تم تصحيح الخطأ المتعلق بتمرير بيانات JSON في خصائص onclick
-        // تم استخدام data-* attributes بدلاً من ذلك لضمان التوافق والأمان
-
         // إعداد Supabase
         const { createClient } = supabase;
         const supabaseUrl = 'https://rastimuoifacxcitljdw.supabase.co';
@@ -978,6 +990,190 @@
         let marker = null;
         let currentPostImages = [];
 
+        // ========== نظام التمييز بين الوضعين ==========
+        
+        // التحقق من معلمات URL
+        function getUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return {
+                user_id: urlParams.get('user_id'),
+                view_mode: urlParams.get('view_mode')
+            };
+        }
+
+        // تحديد وضع العرض
+        function checkProfileMode() {
+            const { user_id, view_mode } = getUrlParams();
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            
+            console.log('URL Parameters:', { user_id, view_mode });
+            console.log('Current User:', currentUser);
+            
+            if (view_mode === 'other' && user_id) {
+                // وضع مشاهدة مستخدم آخر
+                console.log('Viewing other user profile:', user_id);
+                enableViewMode();
+                loadOtherUserProfile(user_id);
+            } else if (user_id && currentUser && user_id !== currentUser.id) {
+                // إذا تم تمرير user_id مختلف عن المستخدم الحالي
+                console.log('Viewing other user by ID:', user_id);
+                enableViewMode();
+                loadOtherUserProfile(user_id);
+            } else {
+                // الوضع الشخصي
+                console.log('Viewing own profile');
+                enableEditMode();
+                loadCurrentUserProfile();
+            }
+        }
+
+        // تفعيل وضع المشاهدة
+        function enableViewMode() {
+            console.log('Enabling view mode');
+            
+            // إضافة كلاس للجسم للتحكم في الأنماط
+            document.body.classList.add('view-mode');
+            
+            // إخفاء أزرار التعديل والحذف
+            const editButtons = document.querySelectorAll('.edit-btn, #editProfileBtn, #deleteAccountBtn');
+            editButtons.forEach(btn => {
+                if (btn) btn.style.display = 'none';
+            });
+            
+            // تعطيل الحقول في النموذج
+            document.querySelectorAll('#profileForm input, #profileForm textarea').forEach(field => {
+                field.disabled = true;
+            });
+            
+            // إخفاء أزرار التعديل في النافذة المنبثقة
+            if (editProfileBtn) editProfileBtn.style.display = 'none';
+            if (saveProfileBtn) saveProfileBtn.style.display = 'none';
+            if (cancelEditBtn) cancelEditBtn.style.display = 'none';
+            
+            // إخفاء حقول كلمة المرور
+            if (passwordFields) passwordFields.style.display = 'none';
+            if (confirmPasswordFields) confirmPasswordFields.style.display = 'none';
+        }
+
+        // تفعيل وضع التعديل
+        function enableEditMode() {
+            console.log('Enabling edit mode');
+            
+            // إزالة كلاس المشاهدة
+            document.body.classList.remove('view-mode');
+            
+            // إظهار أزرار التعديل
+            const editButtons = document.querySelectorAll('.edit-btn, #editProfileBtn, #deleteAccountBtn');
+            editButtons.forEach(btn => {
+                if (btn) btn.style.display = 'block';
+            });
+        }
+
+        // تحديث أزرار الملف الشخصي لوضع المشاهدة
+        function updateProfileActionsForViewMode() {
+            if (!profileUserData) return;
+            
+            let actionsHtml = '';
+            
+            if (profileUserData.phone1 || profileUserData.phone2) {
+                actionsHtml += `
+                    <button class="btn" id="contactBtn">
+                        <i class="fas fa-phone"></i> اتصال
+                    </button>
+                `;
+            }
+            
+            actionsHtml += `
+                <a href="msg.html?receiver_id=${profileUserData.id}" class="btn btn-secondary">
+                    <i class="fas fa-envelope"></i> استفسار
+                </a>
+            `;
+            
+            if (profileActions) {
+                profileActions.innerHTML = actionsHtml;
+                
+                // إضافة مستمع الأحداث لزر الاتصال
+                const contactBtn = document.getElementById('contactBtn');
+                if (contactBtn) {
+                    contactBtn.addEventListener('click', openContactModal);
+                }
+            }
+        }
+
+        // تحديث أزرار الملف الشخصي لوضع التعديل
+        function updateProfileActionsForEditMode() {
+            if (!profileUserData) return;
+            
+            if (profileActions) {
+                profileActions.innerHTML = `
+                    <button class="btn" id="personalInfoBtn">
+                        <i class="fas fa-user"></i> المعلومات الشخصية
+                    </button>
+                    <button class="btn btn-danger" id="deleteAccountBtn">
+                        <i class="fas fa-trash-alt"></i> حذف الحساب
+                    </button>
+                `;
+                
+                // إضافة مستمعي الأحداث
+                document.getElementById('personalInfoBtn').addEventListener('click', openProfileModal);
+                document.getElementById('deleteAccountBtn').addEventListener('click', openDeleteModal);
+            }
+        }
+
+        // تحميل بيانات المستخدم الآخر
+        async function loadOtherUserProfile(userId) {
+            console.log('Loading other user profile:', userId);
+            
+            const userData = await loadUserData(userId);
+            if (userData) {
+                profileUserData = userData;
+                
+                // عرض بيانات المستخدم
+                if (userData.company_name) {
+                    profileName.textContent = userData.company_name;
+                    profileCompany.textContent = userData.full_name || '';
+                } else {
+                    profileName.textContent = userData.full_name || 'مستخدم';
+                    profileCompany.textContent = '';
+                }
+                
+                // تحديث الأزرار لوضع المشاهدة
+                updateProfileActionsForViewMode();
+                
+                // تحميل وعرض منشورات المستخدم
+                const posts = await loadUserPosts(userId);
+                postsCount.textContent = posts.length;
+                displayPosts(posts);
+                
+                console.log('Other user profile loaded successfully');
+            } else {
+                showNotification('المستخدم غير موجود', 'error');
+                setGuestMode();
+            }
+        }
+
+        // تحميل بيانات المستخدم الحالي
+        async function loadCurrentUserProfile() {
+            console.log('Loading current user profile');
+            
+            const { isLoggedIn, userData } = await checkLoginStatus();
+            if (isLoggedIn && userData) {
+                currentUserData = userData;
+                profileUserData = userData;
+                
+                setOwnProfileMode(userData);
+                const posts = await loadUserPosts(userData.id);
+                postsCount.textContent = posts.length;
+                displayPosts(posts);
+                
+                console.log('Current user profile loaded successfully');
+            } else {
+                setGuestMode();
+            }
+        }
+
+        // ========== الدوال الأساسية ==========
+
         // عرض إشعار
         function showNotification(message, type = 'success') {
             notification.textContent = message;
@@ -994,7 +1190,6 @@
                 const currentUserData = localStorage.getItem('currentUser');
                 
                 if (!currentUserData) {
-                    setGuestMode();
                     return { isLoggedIn: false, userData: null };
                 }
                 
@@ -1009,7 +1204,6 @@
                 
                 if (checkError || !checkData) {
                     localStorage.removeItem('currentUser');
-                    setGuestMode();
                     return { isLoggedIn: false, userData: null };
                 }
                 
@@ -1024,15 +1218,8 @@
             } catch (error) {
                 console.error('Error checking login status:', error);
                 localStorage.removeItem('currentUser');
-                setGuestMode();
                 return { isLoggedIn: false, userData: null };
             }
-        }
-
-        // الحصول على معرف المستخدم من URL
-        function getUserIdFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('id');
         }
 
         // تحميل بيانات المستخدم
@@ -1058,10 +1245,9 @@
             }
         }
 
-        // تحميل منشورات المستخدم (محدث مع الفلترة)
+        // تحميل منشورات المستخدم
         async function loadUserPosts(userId) {
             try {
-                // الحصول على البيانات من جدول msg3 مع فلترة الحالة
                 let { data, error } = await supabaseClient
                     .from('msg3')
                     .select('*')
@@ -1087,19 +1273,16 @@
         function getImageUrl(imagePath) {
             if (!imagePath) return 'ard.png';
             
-            // إذا كان الرابط يحتوي على مسار كامل، استخدمه مباشرة
             if (imagePath.startsWith('http')) {
                 return imagePath;
             }
             
-            // إذا كان الرابط يحتوي على اسم ملف فقط، قم ببناء الرابط الصحيح
             if (imagePath.includes('/')) {
                 const { data } = supabaseClient.storage
                     .from('property-images')
                     .getPublicUrl(imagePath);
                 return data.publicUrl;
             } else {
-                // إذا كان اسم ملف فقط، أضفه إلى المسار الافتراضي
                 const { data } = supabaseClient.storage
                     .from('property-images')
                     .getPublicUrl(imagePath);
@@ -1107,12 +1290,11 @@
             }
         }
 
-        // معالجة الصور من حقل images (يمكن أن تكون سلسلة أو مصفوفة)
+        // معالجة الصور
         function processImages(imagesData) {
             if (!imagesData) return ['ard.png'];
             
             try {
-                // إذا كانت imagesData سلسلة JSON
                 if (typeof imagesData === 'string') {
                     const parsed = JSON.parse(imagesData);
                     if (Array.isArray(parsed) && parsed.length > 0) {
@@ -1120,18 +1302,15 @@
                     }
                 }
                 
-                // إذا كانت مصفوفة مباشرة
                 if (Array.isArray(imagesData) && imagesData.length > 0) {
                     return imagesData.map(img => getImageUrl(img));
                 }
                 
-                // إذا كانت سلسلة عادية (صورة واحدة)
                 if (typeof imagesData === 'string' && imagesData.trim() !== '') {
                     return [getImageUrl(imagesData)];
                 }
             } catch (error) {
                 console.error('Error processing images:', error);
-                // إذا فشل التحليل، عالج كسلسلة عادية
                 if (typeof imagesData === 'string' && imagesData.trim() !== '') {
                     return [getImageUrl(imagesData)];
                 }
@@ -1140,19 +1319,17 @@
             return ['ard.png'];
         }
 
-        // تنسيق السعر بشكل صحيح
+        // تنسيق السعر
         function formatPrice(price) {
             if (!price) return '';
             
-            // تحويل السعر إلى رقم
             const numPrice = Number(price);
             if (isNaN(numPrice)) return price;
             
-            // تنسيق السعر مع فواصل الآلاف
             return numPrice.toLocaleString('ar-EG') + ' دينار';
         }
 
-        // عرض المنشورات (محدث بالكامل)
+        // عرض المنشورات
         function displayPosts(posts) {
             postsContainer.innerHTML = '';
             
@@ -1165,12 +1342,10 @@
                 const postCard = document.createElement('div');
                 postCard.className = 'post-card';
                 
-                // معالجة الصور
                 const images = processImages(post.images);
                 const mainImage = images[0];
                 const imageCount = images.length;
                 
-                // بناء نص "متوفر"
                 let availabilityText = 'متوفر';
                 if (post.offer_type) availabilityText += ` ${post.offer_type}`;
                 if (post.property_type) availabilityText += ` ${post.property_type}`;
@@ -1178,7 +1353,6 @@
                 if (post.governorate) availabilityText += ` في ${post.governorate}`;
                 if (post.precise_address) availabilityText += `، ${post.precise_address}`;
 
-                // بناء نص السعر
                 let priceText = '';
                 if (post.price) {
                     const formattedPrice = formatPrice(post.price);
@@ -1240,66 +1414,20 @@
             });
         }
 
-        // فتح نافذة معرض الصور
-        function openGalleryModal(element) {
-            const post = JSON.parse(element.getAttribute('data-post'));
-            const galleryContent = document.getElementById('galleryContent');
-            const images = processImages(post.images);
-            
-            let galleryHtml = '';
-            
-            if (images.length === 0) {
-                galleryHtml = '<p style="text-align: center; color: #888;">لا توجد صور متاحة.</p>';
-            } else {
-                galleryHtml = '<div class="gallery-container">';
-                images.forEach((img, index) => {
-                    galleryHtml += `
-                        <img src="${img}" alt="صورة ${index + 1}" class="gallery-thumbnail" 
-                             onclick="openImageModal('${img}')" onerror="this.src='ard.png'">
-                    `;
-                });
-                galleryHtml += '</div>';
-            }
-            
-            galleryContent.innerHTML = galleryHtml;
-            galleryModal.style.display = 'flex';
-        }
-
-        // فتح نافذة الصورة المفردة
-        function openImageModal(imageUrl) {
-            const modalImage = document.getElementById('modalImage');
-            modalImage.src = imageUrl;
-            imageModal.style.display = 'flex';
-        }
-
         // تفعيل وضع عرض الملف الشخصي الخاص
         function setOwnProfileMode(userData) {
             profileUserData = userData;
             
-            // عرض اسم المستخدم والشركة
             profileName.textContent = userData.full_name || 'مستخدم';
             profileCompany.textContent = userData.company_name || '';
             
-            // عرض الأزرار
-            profileActions.innerHTML = `
-                <button class="btn" id="personalInfoBtn">
-                    <i class="fas fa-user"></i> المعلومات الشخصية
-                </button>
-                <button class="btn btn-danger" id="deleteAccountBtn">
-                    <i class="fas fa-trash-alt"></i> حذف الحساب
-                </button>
-            `;
-            
-            // إضافة مستمعي الأحداث
-            document.getElementById('personalInfoBtn').addEventListener('click', openProfileModal);
-            document.getElementById('deleteAccountBtn').addEventListener('click', openDeleteModal);
+            updateProfileActionsForEditMode();
         }
 
         // تفعيل وضع عرض الملف الشخصي لآخرين
         function setOtherProfileMode(userData) {
             profileUserData = userData;
             
-            // عرض اسم الشركة أو اسم المستخدم
             if (userData.company_name) {
                 profileName.textContent = userData.company_name;
                 profileCompany.textContent = userData.full_name || '';
@@ -1308,25 +1436,13 @@
                 profileCompany.textContent = '';
             }
             
-            // عرض الأزرار
-            profileActions.innerHTML = `
-                <button class="btn" id="contactBtn">
-                    <i class="fas fa-phone"></i> اتصال
-                </button>
-                <a href="msg.html?id=${userData.id}" class="btn btn-secondary">
-                    <i class="fas fa-envelope"></i> استفسار
-                </a>
-            `;
-            
-            // إضافة مستمعي الأحداث
-            document.getElementById('contactBtn').addEventListener('click', openContactModal);
+            updateProfileActionsForViewMode();
         }
 
         // تفعيل وضع الزائر
         function setGuestMode() {
             profileUserData = null;
             
-            // عرض رسالة للمستخدم
             document.querySelector('main').innerHTML = `
                 <div style="text-align: center; color: #fff; padding: 40px 20px;">
                     <h2 style="margin-bottom: 20px;">يجب تسجيل الدخول</h2>
@@ -1353,7 +1469,6 @@
             document.getElementById('phone2').value = profileUserData.phone2 || '';
             document.getElementById('company_name').value = profileUserData.company_name || '';
             
-            // إعادة تعيين وضع العرض
             setViewMode();
         }
 
@@ -1361,16 +1476,13 @@
         function setViewMode() {
             isEditMode = false;
             
-            // تعطيل الحقول
             document.querySelectorAll('#profileForm input, #profileForm textarea').forEach(field => {
                 field.disabled = true;
             });
             
-            // إخفاء حقول كلمة المرور
             passwordFields.style.display = 'none';
             confirmPasswordFields.style.display = 'none';
             
-            // عرض زر التعديل وإخفاء أزرار الحفظ والإلغاء
             editProfileBtn.style.display = 'block';
             saveProfileBtn.style.display = 'none';
             cancelEditBtn.style.display = 'none';
@@ -1380,16 +1492,13 @@
         function setEditMode() {
             isEditMode = true;
             
-            // تفعيل الحقول
             document.querySelectorAll('#profileForm input, #profileForm textarea').forEach(field => {
                 field.disabled = false;
             });
             
-            // عرض حقول كلمة المرور
             passwordFields.style.display = 'block';
             confirmPasswordFields.style.display = 'block';
             
-            // إخفاء زر التعديل وعرض أزرار الحفظ والإلغاء
             editProfileBtn.style.display = 'none';
             saveProfileBtn.style.display = 'block';
             cancelEditBtn.style.display = 'block';
@@ -1475,7 +1584,6 @@
             const formData = new FormData(profileForm);
             const updatedData = {};
             
-            // التحقق من الحقول المحمية
             const protectedFieldsChanged = 
                 formData.get('full_name') !== profileUserData.full_name ||
                 formData.get('phone1') !== profileUserData.phone1 ||
@@ -1501,7 +1609,6 @@
                 updated_at: new Date().toISOString()
             };
 
-            // التحقق من كلمة المرور الجديدة
             const newPassword = formData.get('newPassword');
             const confirmPassword = formData.get('confirmPassword');
             
@@ -1522,25 +1629,20 @@
                 console.error('Error updating profile:', error);
                 showNotification('حدث خطأ أثناء حفظ التغييرات', 'error');
             } else {
-                // تحديث البيانات في المتغيرات
                 Object.assign(profileUserData, updatedData);
                 
-                // إذا كان المستخدم الحالي، تحديث التخزين المحلي
                 if (currentUserData && currentUserData.id === profileUserData.id) {
                     Object.assign(currentUserData, updatedData);
                     localStorage.setItem('currentUser', JSON.stringify(currentUserData));
                     
-                    // تحديث العرض في الصفحة
                     profileName.textContent = profileUserData.full_name || 'مستخدم';
                     profileCompany.textContent = profileUserData.company_name || '';
                 }
                 
                 showNotification('تم حفظ التغييرات بنجاح');
                 
-                // العودة إلى وضع العرض
                 setViewMode();
                 
-                // مسح حقول كلمة المرور
                 document.getElementById('newPassword').value = '';
                 document.getElementById('confirmPassword').value = '';
             }
@@ -1551,10 +1653,8 @@
             deleteModal.style.display = 'none';
             await verifyPasswordThen(async () => {
                 try {
-                    // حذف من جدول chek
                     await supabaseClient.from('chek').delete().eq('user_id', currentUserData.id);
                     
-                    // حذف من جدول users
                     const { error } = await supabaseClient.from('users').delete().eq('id', currentUserData.id);
                     
                     if (error) {
@@ -1575,68 +1675,59 @@
         }
 
         // فتح نافذة الخريطة
-        // فتح نافذة الخريطة
-// فتح نافذة الخريطة (الإصدار المحسن)
-function openMapModal(element) {
-    const locationString = element.getAttribute('data-location');
-    if (!locationString) {
-        showNotification('لا توجد إحداثيات متاحة لهذا العقار', 'error');
-        return;
-    }
+        function openMapModal(element) {
+            const locationString = element.getAttribute('data-location');
+            if (!locationString) {
+                showNotification('لا توجد إحداثيات متاحة لهذا العقار', 'error');
+                return;
+            }
 
-    const coords = locationString.split(',').map(coord => parseFloat(coord.trim()));
-    if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) {
-        showNotification('تنسيق الإحداثيات غير صالح', 'error');
-        return;
-    }
+            const coords = locationString.split(',').map(coord => parseFloat(coord.trim()));
+            if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) {
+                showNotification('تنسيق الإحداثيات غير صالح', 'error');
+                return;
+            }
 
-    // عرض النافذة أولاً
-    mapModal.style.display = 'flex';
+            mapModal.style.display = 'flex';
 
-    // تهيئة أو تحديث الخريطة بعد تأخير بسيط
-    setTimeout(() => {
-        initializeOrUpdateMap(coords);
-    }, 100);
-}
-
-// دالة منفصلة لتهيئة أو تحديث الخريطة
-function initializeOrUpdateMap(coords) {
-    if (!map) {
-        // تهيئة الخريطة للمرة الأولى
-        map = L.map('map', {
-            zoomControl: true,
-            attributionControl: false // إخفاء attribution
-        }).setView(coords, 15);
-
-        // إضافة طبقة الخريطة
-        L.tileLayer('https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf5kcxKDmxByQC', {
-            maxZoom: 19
-        }).addTo(map);
-
-        // إضافة العلامة
-        marker = L.marker(coords).addTo(map)
-            .bindPopup('<div style="text-align: center; font-family: Tajawal, sans-serif;">📍 موقع العقار</div>')
-            .openPopup();
-
-    } else {
-        // تحديث الخريطة الموجودة
-        map.setView(coords, 15);
-        if (marker) {
-            marker.setLatLng(coords);
-        } else {
-            marker = L.marker(coords).addTo(map)
-                .bindPopup('<div style="text-align: center; font-family: Tajawal, sans-serif;">📍 موقع العقار</div>')
-                .openPopup();
+            setTimeout(() => {
+                initializeOrUpdateMap(coords);
+            }, 100);
         }
-    }
 
-    // إعادة حساب حجم الخريطة
-    setTimeout(() => {
-        if (map) {
-            map.invalidateSize(true);
+        // تهيئة أو تحديث الخريطة
+        function initializeOrUpdateMap(coords) {
+            if (!map) {
+                map = L.map('map', {
+                    zoomControl: true,
+                    attributionControl: false
+                }).setView(coords, 15);
+
+                L.tileLayer('https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf5kcxKDmxByQC', {
+                    maxZoom: 19
+                }).addTo(map);
+
+                marker = L.marker(coords).addTo(map)
+                    .bindPopup('<div style="text-align: center; font-family: Tajawal, sans-serif;">📍 موقع العقار</div>')
+                    .openPopup();
+
+            } else {
+                map.setView(coords, 15);
+                if (marker) {
+                    marker.setLatLng(coords);
+                } else {
+                    marker = L.marker(coords).addTo(map)
+                        .bindPopup('<div style="text-align: center; font-family: Tajawal, sans-serif;">📍 موقع العقار</div>')
+                        .openPopup();
+                }
+            }
+
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize(true);
+                }
+            }, 150);
         }
-    }, 150);
-}
 
         // فتح نافذة التفاصيل
         function openDetailsModal(element) {
@@ -1673,7 +1764,45 @@ function initializeOrUpdateMap(coords) {
             detailsModal.style.display = 'flex';
         }
 
-        // مستمعي الأحداث
+        // فتح نافذة معرض الصور
+        function openGalleryModal(element) {
+            const post = JSON.parse(element.getAttribute('data-post'));
+            const galleryContent = document.getElementById('galleryContent');
+            const images = processImages(post.images);
+            
+            let galleryHtml = '';
+            
+            if (images.length === 0) {
+                galleryHtml = '<p style="text-align: center; color: #888;">لا توجد صور متاحة.</p>';
+            } else {
+                galleryHtml = '<div class="gallery-container">';
+                images.forEach((img, index) => {
+                    galleryHtml += `
+                        <img src="${img}" alt="صورة ${index + 1}" class="gallery-thumbnail" 
+                             onclick="openImageModal('${img}')" onerror="this.src='ard.png'">
+                    `;
+                });
+                galleryHtml += '</div>';
+            }
+            
+            galleryContent.innerHTML = galleryHtml;
+            galleryModal.style.display = 'flex';
+        }
+
+        // فتح نافذة الصورة المفردة
+        function openImageModal(imageUrl) {
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = imageUrl;
+            imageModal.style.display = 'flex';
+        }
+
+        // إغلاق نافذة الخريطة
+        function closeMapModal() {
+            mapModal.style.display = 'none';
+        }
+
+        // ========== مستمعي الأحداث ==========
+
         profileForm.addEventListener('submit', (e) => {
             e.preventDefault();
             saveProfile();
@@ -1714,7 +1843,6 @@ function initializeOrUpdateMap(coords) {
             deleteModal.style.display = 'none';
         });
 
-        // إضافة مستمعي الأحداث للنوافذ الجديدة
         document.getElementById('closeGalleryModal').addEventListener('click', () => {
             galleryModal.style.display = 'none';
         });
@@ -1723,13 +1851,7 @@ function initializeOrUpdateMap(coords) {
             imageModal.style.display = 'none';
         });
 
-       // تعريف الدالة أولاً
-function closeMapModal() {
-    mapModal.style.display = 'none';
-}
-
-// ثم استخدامها
-document.getElementById('closeMapModal').addEventListener('click', closeMapModal);
+        document.getElementById('closeMapModal').addEventListener('click', closeMapModal);
 
         document.getElementById('closeDetailsModal').addEventListener('click', () => {
             detailsModal.style.display = 'none';
@@ -1760,11 +1882,8 @@ document.getElementById('closeMapModal').addEventListener('click', closeMapModal
             if (e.target === deleteModal) {
                 deleteModal.style.display = 'none';
             }
-             if (e.target === mapModal) {
-        closeMapModal();
-    }
             if (e.target === mapModal) {
-                mapModal.style.display = 'none';
+                closeMapModal();
             }
             if (e.target === detailsModal) {
                 detailsModal.style.display = 'none';
@@ -1777,46 +1896,13 @@ document.getElementById('closeMapModal').addEventListener('click', closeMapModal
             }
         });
 
-        // تهيئة الصفحة
+        // ========== تهيئة الصفحة ==========
+
         document.addEventListener('DOMContentLoaded', async () => {
-            // التحقق من حالة تسجيل الدخول
-            const { isLoggedIn, userData } = await checkLoginStatus();
-            currentUserData = userData;
+            console.log('Profile page initialized');
             
-            // الحصول على معرف المستخدم من URL
-            const userId = getUserIdFromUrl();
-            
-            if (!userId) {
-                // إذا لم يتم تحديد معرف، عرض الملف الشخصي للمستخدم الحالي
-                if (isLoggedIn) {
-                    setOwnProfileMode(userData);
-                    const posts = await loadUserPosts(userData.id);
-                    postsCount.textContent = posts.length;
-                    displayPosts(posts);
-                } else {
-                    setGuestMode();
-                }
-            } else {
-                // عرض الملف الشخصي للمستخدم المحدد
-                const profileData = await loadUserData(userId);
-                
-                if (profileData) {
-                    if (isLoggedIn && userData.id === userId) {
-                        // عرض الملف الشخصي الخاص
-                        setOwnProfileMode(profileData);
-                    } else {
-                        // عرض الملف الشخصي لشخص آخر
-                        setOtherProfileMode(profileData);
-                    }
-                    
-                    const posts = await loadUserPosts(userId);
-                    postsCount.textContent = posts.length;
-                    displayPosts(posts);
-                } else {
-                    showNotification('المستخدم غير موجود', 'error');
-                    setGuestMode();
-                }
-            }
+            // تحديد وضع العرض بناءً على معلمات URL
+            checkProfileMode();
         });
     </script>
 </body>
