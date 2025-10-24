@@ -1,20 +1,12 @@
 {
-  "name": "Ayn App",
-  "short_name": "Ayn",
-  "start_url": "/ard/index.html",
+  "name": "أيين",
+  "short_name": "أيين",
+  "start_url": "./install.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0b7ed1",
   "icons": [
-    {
-      "src": "/ard/ayn-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/ard/ayn-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "ayn-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "ayn-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
