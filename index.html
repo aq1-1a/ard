@@ -7,6 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link rel="manifest" href="/ard/manifest.json">
+<meta name="theme-color" content="#0b7ed1">
+
+<!-- أيقونات آبل -->
+<link rel="apple-touch-icon" sizes="180x180" href="/ard/ayn-180.png">
+
+<!-- يجعل صفحة الويب تعمل كنافذة مستقلة على iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ayn">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
     <style>
         * {
             margin: 0;
@@ -839,7 +851,7 @@
         <div class="nav-grid">
             <a href="#" class="nav-card" id="inboxBtn" data-page="mustkdm.html">
                 <i class="fas fa-th-list"></i>
-                <h3>المكاتب العقارية</h3>
+                <h3>الشركات والمستخدمين</h3>
             </a>
             <a href="#" class="nav-card" id="myPostsBtn" data-page="post.html">
                 <i class="fas fa-th-list"></i>
@@ -1827,5 +1839,12 @@ window.addEventListener('message', function(event) {
 });
     </script>
     <script src="common.js"></script>
+    <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/ard/sw.js')
+    .then(()=>console.log('SW registered'))
+    .catch(e=>console.warn('SW failed', e));
+}
+</script>
 </body>
 </html>
