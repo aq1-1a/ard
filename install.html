@@ -5,39 +5,226 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>تثبيت تطبيق أيين</title>
 
-<!-- روابط نسبية (تأكد أن الملفات موجودة في نفس المجلد) -->
-<link rel="manifest" href="manifest.json">
+<!-- روابط من جذر الموقع لضمان الوصول الصحيح -->
+<link rel="manifest" href="/ard/manifest.json">
 <meta name="theme-color" content="#0b7ed1">
-<link rel="apple-touch-icon" href="ayn-180.png">
+<link rel="apple-touch-icon" href="/ard/ayn-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Ayn">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
+<!-- استيراد خط Tajawal من Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
 <style>
-  body{font-family: "Tajawal", sans-serif;background:#f4f6f8;margin:0;padding:20px;text-align:center}
-  .card{background:#fff;border-radius:16px;box-shadow:0 6px 25px rgba(0,0,0,0.08);padding:25px;max-width:420px;margin:40px auto}
-  h1{margin-top:0;color:#0b7ed1}
-  p{color:#444;line-height:1.6}
-  .btn{display:inline-block;margin:8px;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:600;background:#0b7ed1;color:#fff;border:none;cursor:pointer; transition: background-color 0.2s;}
-  .btn:hover { background-color: #0968b3; }
-  .modal{display:none;position:fixed;z-index:999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5)}
-  .modal-content{background:#fff;margin:18% auto;padding:18px;border-radius:12px;width:86%;max-width:380px;text-align:center}
-  .close{background:#eee;border:none;padding:8px 12px;border-radius:8px;margin-top:10px;cursor:pointer}
-  #status { margin-top: 15px; font-weight: 600; color: #28a745; }
+  /* === متغيرات التصميم === */
+  :root {
+    --primary-color: #0b7ed1;
+    --primary-dark: #0968b3;
+    --secondary-color: #00c6ff;
+    --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-bg: rgba(255, 255, 255, 0.15);
+    --card-border: rgba(255, 255, 255, 0.2);
+    --text-color: #333;
+    --text-light: #f4f6f8;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+  }
+
+  /* === إعدادات عامة === */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Tajawal", sans-serif;
+    background: var(--background-gradient);
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--text-light);
+    overflow-x: hidden;
+  }
+
+  /* === حاوية المحتوى الرئيسية (تأثير الزجاج الضبابي) === */
+  .main-container {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 24px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 8px 32px 0 var(--shadow-color);
+    padding: 40px;
+    max-width: 420px;
+    width: 100%;
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  /* === الأيقونة المتحركة === */
+  .app-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 28px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    animation: pulse 2s infinite;
+  }
+
+  /* === النصوص === */
+  h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 2.2em;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.7;
+    font-size: 1.1em;
+    margin-bottom: 30px;
+  }
+
+  /* === الأزرار === */
+  .btn {
+    display: inline-block;
+    margin: 8px;
+    padding: 14px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1em;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  }
+
+  .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .btn:active {
+    transform: translateY(-1px);
+  }
+
+  /* === المودال (النافذة المنبثقة) === */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .modal-content {
+    background: #fff;
+    color: var(--text-color);
+    margin: 15% auto;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.4s ease-out;
+  }
+
+  .modal-content h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+  }
+
+  .modal-content ol {
+    text-align: right;
+    direction: rtl;
+    padding-right: 20px;
+  }
+
+  .modal-content li {
+    margin-bottom: 10px;
+  }
+
+  .close {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    margin-top: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+  }
+
+  .close:hover {
+    background-color: var(--primary-dark);
+  }
+
+  /* === رسالة الحالة === */
+  #status {
+    margin-top: 20px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+
+  /* === الرسوم المتحركة === */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+  }
+
 </style>
 </head>
 <body>
 
-<div class="card">
-  <img src="ayn-180.png" alt="شعار أيين" style="width:90px;margin-bottom:15px;">
-  <h1>تثبيت تطبيق أيين</h1>
-  <p>احصل على أفضل تجربة عبر تثبيت التطبيق على جهازك.</p>
+<div class="main-container">
+  <img src="/ard/ayn-180.png" alt="شعار أيين" class="app-icon">
+  <h1>تطبيق أيين</h1>
+  <p>احصل على أفضل تجربة عبر تثبيت التطبيق على جهازك. وصول سريع وسهل في أي وقت.</p>
 
-  <!-- زر التثبيت لأندرويد (سيتم إظهاره/إخفاؤه بواسطة JavaScript) -->
+  <!-- زر التثبيت لأندرويد -->
   <button id="installBtn" class="btn" style="display: none;">🤖 تثبيت التطبيق</button>
 
-  <!-- زر iOS (سيتم إظهاره فقط على أجهزة آيفون) -->
+  <!-- زر iOS -->
   <button id="iosBtn" class="btn" style="display: none;"> تثبيت على آيفون</button>
 
   <!-- رسالة الحالة -->
@@ -48,8 +235,8 @@
 <div id="iosModal" class="modal">
   <div class="modal-content">
     <h3>تثبيت على آيفون</h3>
-    <p>لتثبيت التطبيق على شاشة آيفون:</p>
-    <ol style="text-align:right; direction:rtl;">
+    <p>لإضافة التطبيق إلى شاشتك الرئيسية:</p>
+    <ol>
       <li>افتح هذه الصفحة في متصفح <strong>Safari</strong>.</li>
       <li>اضغط زر <strong>المشاركة (Share)</strong>.</li>
       <li>اختر <strong>Add to Home Screen</strong> ثم اضغط <strong>Add</strong>.</li>
@@ -57,7 +244,6 @@
     <button class="close">إغلاق</button>
   </div>
 </div>
-
 <script>
 /* ============================
    تسجيل Service Worker
