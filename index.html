@@ -1841,14 +1841,15 @@ window.addEventListener('message', function(event) {
 });
     </script>
     <script src="common.js"></script>
-    <script>
+  <script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/ard/sw.js')
-    .then(()=>console.log('SW registered'))
-    .catch(e=>console.warn('SW failed', e));
+    .then(() => console.log('SW registered on index.html'))
+    .catch(e => console.warn('SW failed on index.html', e));
 }
 </script>
 </body>
 </html>
+
 
 
