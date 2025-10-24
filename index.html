@@ -592,6 +592,96 @@
             transform: translateY(-2px);
         }
 
+        /* تأثير اهتزاز للأيقونة عند وصول إشعار جديد */
+        .vibrate {
+            animation: vibrate 0.5s ease-in-out;
+        }
+
+        @keyframes vibrate {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+
+        /* رسالة الترحيب */
+        .welcome-notification {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .welcome-content {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: scaleIn 0.3s ease;
+        }
+
+        .welcome-icon {
+            font-size: 3rem;
+            color: #1a2a6c;
+            margin-bottom: 15px;
+        }
+
+        .welcome-text h3 {
+            color: #1a2a6c;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .welcome-text p {
+            color: #555;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .welcome-btn {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto;
+        }
+
+        .welcome-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 42, 108, 0.3);
+        }
+
+        /* تأثير النبض للشارة */
+        .pulse-badge {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
         /* Responsive */
         @media (min-width: 768px) {
             header {
@@ -679,7 +769,6 @@
                 display: none;
             }
         }
-
     </style>
 </head>
 <body>
@@ -728,6 +817,21 @@
         <button class="close-toast" id="closeToastBtn">
             <i class="fas fa-times"></i>
         </button>
+    </div>
+
+    <!-- رسالة الترحيب لطلب الإذن -->
+    <div class="welcome-notification" id="welcomeNotification">
+        <div class="welcome-content">
+            <i class="fas fa-bell welcome-icon"></i>
+            <div class="welcome-text">
+                <h3>مرحباً بك في أيين!</h3>
+                <p>للحصول على أفضل تجربة، يرجى السماح بتشغيل الإشعارات الصوتية</p>
+            </div>
+            <button class="welcome-btn" id="welcomeBtn">
+                <i class="fas fa-check"></i>
+                <span>موافق</span>
+            </button>
+        </div>
     </div>
 
     <!-- الشريط الجانبي -->
@@ -821,15 +925,22 @@
         const toastMessage = document.getElementById('toastMessage');
         const closeToastBtn = document.getElementById('closeToastBtn');
         const createPostBtn = document.getElementById('createPostBtn');
+        
+        // عناصر رسالة الترحيب
+        const welcomeNotification = document.getElementById('welcomeNotification');
+        const welcomeBtn = document.getElementById('welcomeBtn');
 
         // متغيرات حالة
         let currentUser = null;
         let unreadMessagesCount = 0;
         let hasNewPosts = false;
         let realtimeSubscription = null;
-        let messageNotificationsCleared = false;
         let notificationsInitialized = false;
         let autoRefreshInterval = null;
+        let audioPermissionGranted = false;
+        let userInteracted = false;
+        let welcomeShown = false;
+        let lastMessageId = null; // لتتبع آخر رسالة تم عرضها
 
         // التحقق من حالة تسجيل الدخول
         async function checkLoginStatus() {
@@ -896,16 +1007,95 @@
             if (!currentUser) return;
             
             try {
-                if (!messageNotificationsCleared) {
-                    await loadUnreadMessagesCount();
-                }
-                
+                await loadUnreadMessagesCount();
                 await loadNotifications();
                 
                 console.log('Notifications auto-refreshed');
             } catch (error) {
                 console.error('Error in auto-refresh:', error);
             }
+        }
+
+        // دالة تشغيل صوت الإشعار (مُحسَّنة)
+        function playNotificationSound() {
+            if (!audioPermissionGranted || !userInteracted) {
+                console.log('Audio permission not yet granted or user has not interacted, skipping sound.');
+                return;
+            }
+
+            try {
+                // تأكد من وجود ملف الصوت في نفس مسار ملف HTML
+                const audio = new Audio('./notification.mp3');
+                
+                const playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        console.log('Notification sound played successfully.');
+                    }).catch(error => {
+                        console.error('Error playing notification sound:', error);
+                        playFallbackSound();
+                    });
+                }
+            } catch (error) {
+                console.error('Error creating audio element:', error);
+                playFallbackSound();
+            }
+        }
+
+        // بديل باستخدام Web Audio API (أكثر موثوقية)
+        function playFallbackSound() {
+            if (!audioPermissionGranted || !userInteracted) return;
+            
+            try {
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = context.createOscillator();
+                const gainNode = context.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(context.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, context.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
+                
+                oscillator.start(context.currentTime);
+                oscillator.stop(context.currentTime + 0.5);
+            } catch (error) {
+                console.error('Error playing fallback sound:', error);
+            }
+        }
+
+        // دالة للتحقق من إذن تشغيل الصوت
+        async function requestAudioPermission() {
+            if (audioPermissionGranted) return true;
+
+            try {
+                // إنشاء عنصر صوت صامت لطلب الإذن
+                const silentAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAAAQAEAAEAfAAAQAQABAAgAZGF0YQAAAAA=');
+                await silentAudio.play();
+                audioPermissionGranted = true;
+                console.log('Audio permission granted.');
+                return true;
+            } catch (error) {
+                console.log('Audio permission requires user interaction first.');
+                return false;
+            }
+        }
+
+        // عرض رسالة الترحيب
+        function showWelcomeNotification() {
+            if (welcomeShown) return;
+            
+            welcomeNotification.style.display = 'flex';
+            welcomeShown = true;
+        }
+
+        // إخفاء رسالة الترحيب
+        function hideWelcomeNotification() {
+            welcomeNotification.style.display = 'none';
         }
 
         // الحصول على اسم المستخدم أو الشركة من جدول users
@@ -979,13 +1169,11 @@
                         const notifications = [];
                         
                         for (const post of newPosts) {
-                            // جلب اسم المستخدم من جدول users باستخدام user_id
                             const displayName = await getUserDisplayName(post.user_id);
                             
                             notifications.push({
                                 user_id: currentUser.id,
                                 property_id: post.id,
-                                // استخدام حقل message لتخزين معرف المستخدم الناشر
                                 message: `${post.user_id}|${post.offer_type} ${post.property_type} ${post.property_condition} في ${post.governorate} ${post.precise_address}`,
                                 notification_type: 'new_post',
                                 title: displayName,
@@ -1014,46 +1202,132 @@
             }
         }
 
-        // تحميل عدد الرسائل غير المقروءة
-        async function loadUnreadMessagesCount() {
-            if (!currentUser) return;
+        // تعديل دالة loadUnreadMessagesCount
+async function loadUnreadMessagesCount() {
+    if (!currentUser) return;
+    
+    try {
+        // تحقق مما إذا كان المستخدم في صفحة الرسائل حاليًا
+        const isInMessagesPage = contentFrame.src.includes('msg.html');
+        
+        // فقط إذا لم يكن المستخدم في صفحة الرسائل، قم بتحديث العداد
+        if (!isInMessagesPage) {
+            const { data: messages, error } = await supabaseClient
+                .from('messages')
+                .select('id, created_at, sender_id')
+                .eq('receiver_id', currentUser.id)
+                .eq('is_read', false)  // الآن نستخدم الفلتر الصحيح
+                .order('created_at', { ascending: false })
+                .limit(50);
+            
+            if (error) {
+                console.error('Error loading messages count:', error);
+                unreadMessagesCount = 0;
+            } else {
+                const previousCount = unreadMessagesCount;
+                unreadMessagesCount = messages ? messages.length : 0;
+                console.log('Unread messages count:', unreadMessagesCount);
+                
+                // تحقق من وجود رسائل جديدة
+                if (messages && messages.length > 0) {
+                    const newestMessageId = messages[0].id;
+                    
+                    // إذا كانت هناك رسالة جديدة ولم تكن هي نفس الرسالة الأخيرة
+                    if (newestMessageId !== lastMessageId && previousCount >= 0) {
+                        playMessageNotification(messages[0]);
+                        lastMessageId = newestMessageId;
+                    }
+                }
+            }
+            
+            updateMessageBadge();
+        } else {
+            // إذا كان المستخدم في صفحة الرسائل، لا تعرض الإشعارات
+            unreadMessagesCount = 0;
+            updateMessageBadge();
+        }
+        
+    } catch (error) {
+        console.error('Error in loadUnreadMessagesCount:', error);
+        unreadMessagesCount = 0;
+        updateMessageBadge();
+    }
+}
+
+// إضافة دالة جديدة لتحديث الرسائل كمقروءة
+async function markMessagesAsRead(senderId = null) {
+    if (!currentUser) return;
+    
+    try {
+        let query = supabaseClient
+            .from('messages')
+            .update({ is_read: true })
+            .eq('receiver_id', currentUser.id);
+        
+        // إذا تم تحديد مرسل معين، قم بتحديث رسائله فقط
+        if (senderId) {
+            query = query.eq('sender_id', senderId);
+        }
+        
+        const { error } = await query;
+        
+        if (error) {
+            console.error('Error marking messages as read:', error);
+        } else {
+            console.log('Messages marked as read successfully');
+            // تحديث العداد فوراً
+            await loadUnreadMessagesCount();
+        }
+        
+    } catch (error) {
+        console.error('Error in markMessagesAsRead:', error);
+    }
+}
+
+        // تشغيل إشعار الرسالة الجديدة
+        async function playMessageNotification(latestMessage) {
+            if (!latestMessage) return;
             
             try {
-                if (messageNotificationsCleared) {
-                    unreadMessagesCount = 0;
-                    updateMessageBadge();
-                    return;
+                const senderName = await getUserDisplayName(latestMessage.sender_id);
+                
+                // عرض إشعار Toast
+                showToastNotification(
+                    'رسالة جديدة', 
+                    `رسالة من ${senderName}`
+                );
+                
+                // تشغيل الصوت فقط إذا كان المستخدم قد تفاعل مع الصفحة
+                if (userInteracted && audioPermissionGranted) {
+                    playNotificationSound();
                 }
                 
-                const { data: messages, error } = await supabaseClient
-                    .from('messages')
-                    .select('id')
-                    .eq('receiver_id', currentUser.id);
-                
-                if (error) {
-                    console.error('Error loading messages count:', error);
-                    unreadMessagesCount = 0;
-                } else {
-                    unreadMessagesCount = messages ? messages.length : 0;
-                    console.log('Unread messages count:', unreadMessagesCount);
+                // الاهتزاز فقط إذا كان المستخدم قد تفاعل مع الصفحة
+                if (userInteracted && navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200]);
                 }
-                
-                updateMessageBadge();
                 
             } catch (error) {
-                console.error('Error in loadUnreadMessagesCount:', error);
-                unreadMessagesCount = 0;
-                updateMessageBadge();
+                console.error('Error in playMessageNotification:', error);
             }
         }
 
         // تحديث شارة الرسائل
         function updateMessageBadge() {
-            if (unreadMessagesCount > 0 && !messageNotificationsCleared) {
+            if (unreadMessagesCount > 0) {
                 messageBadge.textContent = unreadMessagesCount > 99 ? '99+' : unreadMessagesCount;
                 messageBadge.style.display = 'flex';
+                messageBadge.classList.add('pulse-badge');
+                
+                // إضافة تأثير اهتزاز للأيقونة
+                messageBtn.classList.add('vibrate');
+                setTimeout(() => {
+                    messageBtn.classList.remove('vibrate');
+                }, 1000);
+                
             } else {
                 messageBadge.style.display = 'none';
+                messageBadge.classList.remove('pulse-badge');
             }
         }
 
@@ -1077,16 +1351,13 @@
                     hasNewPosts = data && data.length > 0;
                     console.log('Notifications loaded:', data?.length);
                     
-                    // تحديث عناوين الإشعارات بأسماء المستخدمين من جدول users
                     if (data && data.length > 0) {
                         for (const notification of data) {
-                            // استخراج معرف المستخدم الناشر من حقل message
                             if (notification.message && notification.message.includes('|')) {
                                 const parts = notification.message.split('|');
                                 const posterId = parts[0];
                                 
                                 if (!notification.title || notification.title === 'منشور جديد') {
-                                    // جلب اسم المستخدم من جدول users
                                     const displayName = await getUserDisplayName(posterId);
                                     notification.title = displayName;
                                 }
@@ -1125,7 +1396,6 @@
             }
             
             notificationsList.innerHTML = notifications.map(notification => {
-                // استخراج معرف المستخدم الناشر ورسالة الإشعار
                 let posterId = '';
                 let notificationMessage = notification.message || '';
                 
@@ -1164,7 +1434,6 @@
             await markNotificationAsRead(notificationId);
             hideNotificationsPanel();
             
-            // الانتقال إلى صفحة الملف الشخصي للمستخدم في وضع المشاهدة
             if (posterId) {
                 navigateToUserProfile(posterId);
             }
@@ -1174,19 +1443,14 @@
         function navigateToUserProfile(userId) {
             console.log('Navigating to user profile in view mode:', userId);
             
-            // إغلاق الشريط الجانبي إذا كان مفتوحاً
             closeSidebar();
             
-            // تحديث الأزرار النشطة
             navButtons.forEach(btn => btn.classList.remove('active'));
             taskbarButtons.forEach(btn => btn.classList.remove('active'));
             
-            // تفعيل زر الملف التعريفي
             const profileBtn = document.getElementById('profileBtn');
             profileBtn.classList.add('active');
             
-            // تحميل صفحة الملف الشخصي مع معرف المستخدم ووضع المشاهدة
-            // view_mode=other يحدد أننا نريد عرض الملف الشخصي للمستخدم الآخر
             contentFrame.src = `profile.html?user_id=${userId}&view_mode=other`;
         }
 
@@ -1211,74 +1475,76 @@
             }
         }
 
-        // إعداد الاشتراكات الفورية
-        function setupRealtimeSubscriptions() {
-            if (!currentUser) return;
-            
-            try {
-                realtimeSubscription = supabaseClient
-                    .channel('notifications')
-                    .on('postgres_changes', 
-                        { 
-                            event: 'INSERT', 
-                            schema: 'public', 
-                            table: 'messages',
-                            filter: `receiver_id=eq.${currentUser.id}`
-                        }, 
-                        async (payload) => {
-                            console.log('New message received:', payload);
-                            if (!messageNotificationsCleared) {
-                                await loadUnreadMessagesCount();
-                            }
-                        }
-                    )
-                    .on('postgres_changes',
-                        {
-                            event: 'INSERT',
-                            schema: 'public',
-                            table: 'msg3',
-                            filter: 'post_status=eq.الإعلان نشط الان'
-                        },
-                        async (payload) => {
-                            console.log('New post detected:', payload.new);
-                            
-                            // جلب اسم المستخدم من جدول users
-                            const displayName = await getUserDisplayName(payload.new.user_id);
-                            
-                            // استخدام حقل message لتخزين معرف المستخدم الناشر
-                            const notificationData = {
-                                user_id: currentUser.id,
-                                property_id: payload.new.id,
-                                message: `${payload.new.user_id}|${payload.new.offer_type} ${payload.new.property_type} ${payload.new.property_condition} في ${payload.new.governorate} ${payload.new.precise_address}`,
-                                notification_type: 'new_post',
-                                title: displayName,
-                                is_read: false
-                            };
-                            
-                            const { error } = await supabaseClient
-                                .from('notifications')
-                                .insert([notificationData]);
-                            
-                            if (!error) {
-                                console.log('Notification created for new post');
-                                hasNewPosts = true;
-                                updateBellBadge();
-                                
-                                showToastNotification(
-                                    displayName, 
-                                    `متوفر ${payload.new.offer_type} ${payload.new.property_type} في ${payload.new.governorate}`
-                                );
-                            }
-                        }
-                    )
-                    .subscribe((status) => {
-                        console.log('Realtime subscription status:', status);
-                    });
+       // تعديل دالة setupRealtimeSubscriptions
+function setupRealtimeSubscriptions() {
+    if (!currentUser) return;
+    
+    try {
+        realtimeSubscription = supabaseClient
+            .channel('notifications')
+            .on('postgres_changes', 
+                { 
+                    event: 'INSERT', 
+                    schema: 'public', 
+                    table: 'messages',
+                    filter: `receiver_id=eq.${currentUser.id}`
+                }, 
+                async (payload) => {
+                    console.log('New message received:', payload);
+                    // تحقق مما إذا كان المستخدم في صفحة الرسائل
+                    const isInMessagesPage = contentFrame.src.includes('msg.html');
                     
-            } catch (error) {
-                console.error('Error setting up realtime subscriptions:', error);
-            }
-        }
+                    // إذا لم يكن المستخدم في صفحة الرسائل، قم بتحديث العداد
+                    if (!isInMessagesPage) {
+                        loadUnreadMessagesCount();
+                    }
+                }
+            )
+            .on('postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'msg3',
+                    filter: 'post_status=eq.الإعلان نشط الان'
+                },
+                async (payload) => {
+                    console.log('New post detected:', payload.new);
+                    
+                    const displayName = await getUserDisplayName(payload.new.user_id);
+                    
+                    const notificationData = {
+                        user_id: currentUser.id,
+                        property_id: payload.new.id,
+                        message: `${payload.new.user_id}|${payload.new.offer_type} ${payload.new.property_type} ${payload.new.property_condition} في ${payload.new.governorate} ${payload.new.precise_address}`,
+                        notification_type: 'new_post',
+                        title: displayName,
+                        is_read: false
+                    };
+                    
+                    const { error } = await supabaseClient
+                        .from('notifications')
+                        .insert([notificationData]);
+                    
+                    if (!error) {
+                        console.log('Notification created for new post');
+                        hasNewPosts = true;
+                        updateBellBadge();
+                        
+                        showToastNotification(
+                            displayName, 
+                            `متوفر ${payload.new.offer_type} ${payload.new.property_type} في ${payload.new.governorate}`
+                        );
+                    }
+                }
+            )
+            .subscribe((status) => {
+                console.log('Realtime subscription status:', status);
+            });
+        
+    } catch (error) {
+        console.error('Error setting up realtime subscriptions:', error);
+    }
+}
 
         // عرض إشعار Toast
         function showToastNotification(title, message) {
@@ -1393,31 +1659,37 @@
             }
         }
 
-        // تغيير المحتوى المعروض
-        function changeContent(pageUrl, element) {
-            contentFrame.src = pageUrl;
-            
-            if (pageUrl === 'msg.html') {
-                messageNotificationsCleared = true;
-                unreadMessagesCount = 0;
-                updateMessageBadge();
-                
-                localStorage.setItem('messagesCleared', 'true');
-                console.log('Messages notifications cleared permanently');
-            }
-            
-            navButtons.forEach(btn => {
-                btn.classList.remove('active');
-            });
-            taskbarButtons.forEach(btn => {
-                btn.classList.remove('active');
-            });
-            if (element) {
-                element.classList.add('active');
-            }
-            
-            // إغلاق الشريط الجانبي عند تغيير المحتوى
-            closeSidebar();
+       // تعديل دالة changeContent
+function changeContent(pageUrl, element) {
+    contentFrame.src = pageUrl;
+    
+    navButtons.forEach(btn => btn.classList.remove('active'));
+    taskbarButtons.forEach(btn => btn.classList.remove('active'));
+    if (element) {
+        element.classList.add('active');
+    }
+    
+    closeSidebar();
+
+    // إذا كان المستخدم ينتقل إلى صفحة الرسائل
+    if (pageUrl === 'msg.html') {
+        // تحديث جميع الرسائل كمقروءة
+        markMessagesAsRead();
+    }
+
+    // تحديث حالة الإشعارات بعد تغيير الصفحة بفترة وجيزة
+    setTimeout(() => {
+        loadUnreadMessagesCount();
+    }, 300);
+}
+
+        // التحكم بالقائمة الجانبية
+        function openSidebar() {
+            body.classList.add('sidebar-open');
+        }
+
+        function closeSidebar() {
+            body.classList.remove('sidebar-open');
         }
 
         // إضافة مستمعي الأحداث
@@ -1443,15 +1715,6 @@
             });
         });
 
-        // التحكم بالقائمة الجانبية
-        function openSidebar() {
-            body.classList.add('sidebar-open');
-        }
-
-        function closeSidebar() {
-            body.classList.remove('sidebar-open');
-        }
-
         sidebarToggle.addEventListener('click', () => {
             if (body.classList.contains('sidebar-open')) {
                 closeSidebar();
@@ -1460,7 +1723,6 @@
             }
         });
 
-        // إغلاق الشريط الجانبي عند النقر على الـ overlay
         sidebarOverlay.addEventListener('click', () => {
             closeSidebar();
         });
@@ -1502,7 +1764,6 @@
 
         closeToastBtn.addEventListener('click', hideToastNotification);
 
-        // إغلاق لوحة الإشعارات عند النقر خارجها
         document.addEventListener('click', (e) => {
             if (!notificationsPanel.contains(e.target) && !bellBtn.contains(e.target)) {
                 hideNotificationsPanel();
@@ -1518,21 +1779,53 @@
             }
         });
 
+        // مراقب لتغييرات محتوى الـ iframe
+        contentFrame.addEventListener('load', function() {
+            console.log('Iframe loaded:', contentFrame.src);
+            loadUnreadMessagesCount();
+        });
+
         // تهيئة الصفحة
         document.addEventListener('DOMContentLoaded', () => {
-            const messagesCleared = localStorage.getItem('messagesCleared');
-            if (messagesCleared === 'true') {
-                messageNotificationsCleared = true;
-                unreadMessagesCount = 0;
-                updateMessageBadge();
-                console.log('Restored messages cleared state from localStorage');
-            }
-            
             checkLoginStatus();
+            
+            // التحقق مما إذا كانت رسالة الترحيب قد تم عرضها من قبل
+            const welcomeShownBefore = localStorage.getItem('welcomeShown');
+            if (!welcomeShownBefore) {
+                // إضافة مستمعي الأحداث لعرض رسالة الترحيب عند أول تفاعل
+                const showWelcomeOnInteraction = () => {
+                    if (!welcomeShown) {
+                        showWelcomeNotification();
+                        // إزالة مستمعي الأحداث بعد عرض الرسالة
+                        document.removeEventListener('click', showWelcomeOnInteraction);
+                        document.removeEventListener('touchstart', showWelcomeOnInteraction);
+                        document.removeEventListener('keydown', showWelcomeOnInteraction);
+                    }
+                };
+                
+                document.addEventListener('click', showWelcomeOnInteraction);
+                document.addEventListener('touchstart', showWelcomeOnInteraction);
+                document.addEventListener('keydown', showWelcomeOnInteraction);
+            }
         });
+
+        // معالج النقر على زر الموافقة في رسالة الترحيب
+        welcomeBtn.addEventListener('click', async () => {
+            userInteracted = true;
+            await requestAudioPermission();
+            hideWelcomeNotification();
+            localStorage.setItem('welcomeShown', 'true');
+        });
+// أضف هذا الكود في نهاية ملف index.html
+// استمع للرسائل من iframe
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'messagesRead') {
+        console.log('Messages read notification received:', event.data.senderId);
+        // تحديث عدد الرسائل غير المقروءة
+        loadUnreadMessagesCount();
+    }
+});
     </script>
     <script src="common.js"></script>
 </body>
 </html>
-
-
