@@ -1243,7 +1243,7 @@
     <!-- المحتوى الرئيسي -->
     <main>
         <div class="page-header">
-            <h1>إدارة المشاركات</h1>
+            <h1>إدارة الاعلانات</h1>
         </div>
         <button class="create-post-btn" id="openFormBtn">
             <i class="fas fa-plus"></i>
@@ -1259,12 +1259,12 @@
     <div id="postFormModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="formTitle">إنشاء مشاركة جديدة</h2>
+                <h2 id="formTitle">إنشاء أعلان جديد</h2>
                 <button class="close-modal" id="closeFormModal">&times;</button>
             </div>
             <form id="postForm">
                 <div class="form-group">
-                    <label for="offer_type">نوع العرض</label>
+                    <label for="offer_type">ماهو نوع الاعلان </label>
                     <select id="offer_type" name="offer_type" required>
                         <option value="">اختر...</option>
                         <option value="للبيع">للبيع</option>
@@ -1273,25 +1273,43 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="property_type">العرض</label>
+                    <label for="property_type">ما الذي تريد الاعلان عنه</label>
                     <select id="property_type" name="property_type" required>
                         <option value="">اختر...</option>
-                        <option value="بيت">بيت</option><option value="شقة">شقة</option><option value="عيادة طبية">عيادة طبية</option><option value="فيلا ">فيلا </option>
-                        <option value="قطعة أرض سكنية">قطعة أرض سكنية</option><option value="قطعة ارض تجارية">قطعة ارض تجارية</option><option value="محل تجاري">محل تجاري</option><option value="قاعة مناسبات">قاعة مناسبات</option>
-                        <option value="مكتب">مكتب</option><option value="مخزن">مخزن</option><option value="گراج">گراج</option><option value="مول">مول</option>
-                        <option value="مجمع تجاري">مجمع تجاري</option><option value="مزرعة">مزرعة</option><option value="أرض زراعية">أرض زراعية</option>
-                        <option value="معمل">معمل</option><option value="ورشة صناعية">ورشة صناعية</option>
+                        <option value="بيت">بيت</option><option value="شقة">شقة</option><option value="مشتمل صغير">مشتمل صغير</option><option value="قطعة ارض تجارية ">قطعة ارض تجارية </option>
+                        <option value="قطعة أرض سكنية">قطعة أرض سكنية</option><option value="مكتب">مكتب</option><option value="مكتب تجاري">مكتب تجاري</option><option value="محل">محل</option><option value="محل تجاري">محل تجاري</option><option value="قاعة ">قاعة </option>
+                        <option value="مخزن">مخزن</option><option value="مزرعة">مزرعة</option><option value="اسواق">اسواق</option><option value="مطعم">مطعم</option>
+                        <option value="كافتريا">كافتريا</option><option value="معرض">معرض</option><option value="معمل">معمل</option>
+                        <option value="مشتل">مشتل</option><option value="عيادة  ">عيادة</option><option value="مخبز">مخبز</option><option value="مجمع">مجمع</option><option value="شركة">شركة</option><option value="مركز خدمات">مركز خدمات</option>
                         <option value="عمارة سكنية">عمارة سكنية</option><option value="روضة أطفال">روضة أطفال</option><option value="صيدلية">صيدلية</option>
-                        <option value="قاعة">قاعة</option><option value="كافتريا">كافتريا</option><option value="مطعم">مطعم</option>
-                        <option value="اسواق">اسواق</option>
-                        
+                        <option value="قاعة فارغة">قاعة فارغة</option><option value="قاعة مناسبات ">قاعة مناسبات</option><option value="قاعة">قاعة</option>
+                        <option value="ملعب">ملعب</option><option value="كراج">كراج</option><option value="قاعة GYM">قاعة GYM</option><option value="مول">مول</option>
+                        <option value="مجمع سكني صغير">مجمع سكني صغير </option><option value="بيت داخل مجمع سكني">بيت داخل مجمع سكني</option><option value="كرفان">كرفان</option>
+                        <option value="سنتر حلاقة">سنتر حلاقة </option> <option value="مركز تجميل">مركز تجميل</option><option value="صالون">صالون</option><option value="ورشة">ورشة</option>
+                        <option value="معرض اجهزة">معرض اجهزة </option><option value="مكتب الكترونيات">مكتب الكترونيات</option><option value="محل ملابس">محل ملابس</option><option value="فندق ">فندق</option>
+                        <option value="شقق داخل فندق">شقق داخل فندق </option><option value="مجمع صغير">مجمع صغير</option>
+
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="governorate">المحافظة</label>
+                    <label for="governorate">المدينة</label>
                     <select id="governorate" name="governorate" required>
                         <option value="">اختر...</option>
-                        <option value="كركوك">كركوك</option>
+                        <option value=" كركوك"> كركوك</option>
+                          <option value="قضاء الحويجة ">قضاء الحويجة</option>
+                           <option value="قضاء الدبس">قضاء الدبس</option>
+                            <option value="قضاء داقوق ">قضاء داقوق </option>
+                             <option value="ناحية الزاب">ناحية الزاب</option>
+                              <option value="ناحية العباسي">ناحية العباسي</option>
+                               <option value="ناحية الرياض ">ناحية الرياض </option>
+                                <option value="ناحية التون كوبري">ناحية التون كوبري</option>
+                                 <option value="ناحية تازة">ناحية تازة</option>
+                                  <option value="ناحية شوان">ناحية شوان</option>
+                                   <option value="ناحية يائيجي">ناحية يائيجي</option>
+                                    <option value="ناحية الملتقى">ناحية الملتقى</option>
+                                     <option value="ناحية قرة هنجير">ناحية قرة هنجير</option>
+                                      <option value="ناحية الرشاد">ناحية الرشاد</option>
+                                       <option value="ناحية سركران">ناحية سركران</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1299,15 +1317,15 @@
                     <textarea id="precise_address" name="precise_address" maxlength="60" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="property_number">رقم العقار</label>
+                    <label for="property_number">الرقم ( رقم العقار او عدد المعروض )</label>
                     <input type="text" id="property_number" name="property_number">
                 </div>
                 <div class="form-group">
-                    <label for="deed_type">نوع العقار</label>
-                    <input type="text" id="deed_type" name="deed_type" placeholder="مثال: ملك طابو 25">
+                    <label for="deed_type">النوع او الملكية </label>
+                    <input type="text" id="deed_type" name="deed_type" placeholder="مثال: طابو 25 - طابو زاعي - ملك شخصي ...">
                 </div>
                 <div class="form-group">
-                    <label>مساحة العقار</label>
+                    <label>المساحة </label>
                     <div class="input-with-unit">
                         <input type="number" id="area_number" name="area_number" step="0.01">
                         <select id="area_unit" name="area_unit">
@@ -1317,24 +1335,25 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="property_condition">حالة العقار</label>
+                    <label for="property_condition">الحالة</label>
                     <select id="property_condition" name="property_condition" required>
                         <option value="">اختر...</option>
-                        <option value="جديد">جديد</option><option value="مستخدم">مستخدم</option><option value="قيد الانشاء">قيد الانشاء</option><option value="متهالك">متهالك</option>
+                        <option value="جديد">جديد</option><option value="مستخدم">مستخدم</option><option value="قيد الانشاء">قيد الانشاء</option><option value="ارض لا تحتوي شيء">ارض لا تحتوي شيء</option> <option value="متهالك">متهالك</option>
+                        <option value="ارض مشيدة ">ارض مشيدة</option><option value="مشيد">مشيد</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="features">مميزات العقار (أقصى 100 حرف)</label>
+                    <label for="features">بماذا يمتاز  (أقصى 100 حرف)</label>
                     <textarea id="features" name="features" maxlength="100"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="notes">ملاحظات حول العقار (أقصى 100 حرف)</label>
+                    <label for="notes">هل لديك ملاحضات اخرى  (أقصى 100 حرف)</label>
                     <textarea id="notes" name="notes" maxlength="100"></textarea>
                 </div>
                 <div class="form-group">
                     <label>السعر وحالة التفاوض</label>
                     <div class="input-with-unit">
-                        <input type="number" id="price" name="price" step="1000" placeholder="السعر">
+                        <input type="number" id="price" name="price" step="1000" placeholder="السعر ارقام فقط  ( لا تكتب فواصل او فوارز سيتم اضافتها تلقائيا )">
                         <select id="price_negotiable" name="price_negotiable">
                             <option value="قابل للتفاوض">قابل للتفاوض</option>
                             <option value="سعر نهائي">سعر نهائي</option>
@@ -1342,16 +1361,16 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>صور العقار (حتى 4 صور)</label>
+                    <label>صور العقار </label>
                     <div class="image-upload-area" id="imageUploadArea">
                         <i class="fas fa-cloud-upload-alt fa-2x"></i>
-                        <p>اضغط هنا أو اسحب الصور لرفعها</p>
+                        <p>يمكنك ارفاق صور من هنا او  يتم استخدام الصور الافتراضية الخاصه بالتطبيق </p>
                         <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
                     </div>
                     <div class="image-preview-container" id="imagePreviewContainer"></div>
                 </div>
                 <div class="form-group">
-                    <label>موقع العقار على الخريطة</label>
+                    <label>الموقع على الخريطة</label>
                     <button type="button" class="location-picker-btn" id="locationPickerBtn">
                         <i class="fas fa-map-marked-alt"></i> تحديد الموقع على الخريطة
                     </button>
@@ -1360,7 +1379,7 @@
                 <!-- حقل حالة المشاركة المخفي -->
                 <input type="hidden" id="post_status" name="post_status" value="النشر غير فعال">
                 <div class="modal-actions">
-                    <button type="submit" class="btn-primary">حفظ المشاركة</button>
+                    <button type="submit" class="btn-primary">حفظ الاعلان</button>
                     <button type="button" class="btn-secondary" id="cancelFormBtn">إلغاء</button>
                 </div>
             </form>
@@ -1371,7 +1390,7 @@
     <div id="mapModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>تحديد موقع العقار</h2>
+                <h2>تحديد الموقع</h2>
                 <button class="close-modal" id="closeMapModal">&times;</button>
             </div>
             <div id="map">
@@ -1413,14 +1432,14 @@
             <div class="confirm-icon send">
                 <i class="fas fa-paper-plane"></i>
             </div>
-            <h3 class="confirm-title">إرسال المشاركة للنشر</h3>
-            <p class="confirm-message">سيتم إرسال مشاركتك للمراجعة والنشر. بعد الإرسال، انتقل إلى صفحة مشاركاتي لإكمال عملية الدفع والنشر.</p>
+            <h3 class="confirm-title">إرسال الاعلان للنشر</h3>
+            <p class="confirm-message">سيتم إرسال مشاركتك للمراجعة والنشر. بعد الإرسال، انتقل إلى صفحة اعلاناتي لإكمال عملية النشر.</p>
             <div class="confirm-steps">
                 <h4>الخطوات التالية:</h4>
                 <ol>
-                    <li>سيتم نقلك تلقائياً إلى صفحة مشاركاتي</li>
-                    <li>اختر المشاركة وأكمل عملية الدفع</li>
-                    <li>بعد الدفع، سيتم نشر إعلانك فوراً</li>
+                    <li>سيتم نقلك تلقائياً إلى صفحة اعلاناتك</li>
+                    <li>اختر الاعلان وأكمل عملية النشر</li>
+                    <li> سيتم نشر إعلانك فوراً</li>
                 </ol>
             </div>
             <div class="confirm-actions">
@@ -1632,7 +1651,7 @@ const mapProviders = {
         function displayPosts(posts) {
             postsContainer.innerHTML = '';
             if (posts.length === 0) {
-                postsContainer.innerHTML = '<p style="text-align: center; color: #666; font-size: 1rem; padding: 30px;">لا توجد مشاركات بعد. قم بإنشاء أول مشاركة الآن!</p>';
+                postsContainer.innerHTML = '<p style="text-align: center; color: #666; font-size: 1rem; padding: 30px;">لا توجد اعلانات بعد. قم بإنشاء أول مشاركة الآن!</p>';
                 return;
             }
             posts.forEach(post => {
@@ -1819,7 +1838,7 @@ const mapProviders = {
         // فتح نافذة النموذج
         function openPostForm(postId = null) {
             editingPostId = postId;
-            formTitle.textContent = postId ? 'تعديل المشاركة' : 'إنشاء مشاركة جديدة';
+            formTitle.textContent = postId ? 'تعديل الاعلان' : 'إنشاء اعلان جديد';
             postFormModal.style.display = 'flex';
             if (postId) {
                 loadPostDataToForm(postId);
@@ -1833,7 +1852,7 @@ const mapProviders = {
             const { data, error } = await supabaseClient.from('msg1').select('*').eq('id', postId).single();
             if (error) {
                 console.error('Error loading post data:', error);
-                showNotification('خطأ', 'حدث خطأ أثناء تحميل بيانات المشاركة', 'error');
+                showNotification('خطأ', 'حدث خطأ أثناء تحميل بيانات الاعلان', 'error');
                 return;
             }
             populateForm(data);
