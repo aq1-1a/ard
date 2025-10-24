@@ -1,12 +1,16 @@
+const CACHE_NAME = 'ayn-cache-v1';
+const FILES_TO_CACHE = [
+  '/ard/',
+  '/ard/index.html',
+  '/ard/install.html',
+  '/ard/ayn-192.png',
+  '/ard/ayn-512.png',
+  '/ard/ayn-180.png'
+];
+
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open('ayn-cache-v1').then(cache => cache.addAll([
-      '/ard/',
-      '/ard/index.html',
-      '/ard/install.html',
-      '/ard/ayn-192.png',
-      '/ard/ayn-512.png'
-    ]))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
   );
   self.skipWaiting();
 });
