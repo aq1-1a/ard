@@ -35,15 +35,7 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
-
-        @keyframes gradientBG { 
-            0% { background-position: 0% 50%; } 
-            50% { background-position: 100% 50%; } 
-            100% { background-position: 0% 50%; } 
+            background-color: #f8f9fa;
         }
 
         /* Main Content */
@@ -60,34 +52,43 @@
         }
         .page-header h1 { 
             font-size: 1.8rem; 
-            color: rgba(255, 255, 255, 0.9); 
+            color: #1a2a6c; 
             font-weight: 700; 
         }
-        .post-counter { 
-            text-align: center; 
-            color: rgba(255, 255, 255, 0.8); 
-            font-size: 0.9rem; 
-            margin-bottom: 15px; 
-        }
+        
+        /* تصميم زر الإضافة الدائري الكبير */
         .create-post-btn { 
-            display: block; 
-            width: 90%;
-            max-width: 250px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
             margin: 0 auto 20px; 
-            padding: 12px; 
-            background: linear-gradient(90deg, #4CAF50, #45a049); 
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
             color: white; 
             border: none; 
-            border-radius: 10px; 
-            font-size: 1rem; 
+            border-radius: 50%; 
+            font-size: 2rem; 
             font-weight: 600; 
             cursor: pointer; 
             transition: all 0.3s ease; 
             text-align: center; 
+            box-shadow: 0 4px 15px rgba(26, 42, 108, 0.3);
+            position: relative;
+        }
+        .create-post-btn span {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            position: absolute;
+            bottom: -25px;
         }
         .create-post-btn:hover { 
             transform: translateY(-3px); 
-            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4); 
+            box-shadow: 0 8px 20px rgba(26, 42, 108, 0.4); 
+        }
+        .create-post-btn:active {
+            transform: translateY(0);
         }
 
         .posts-container { 
@@ -99,18 +100,19 @@
         
         /* تصميم المشاركات بدون إطارات أو بطاقات */
         .post-item { 
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 0;
+            background-color: white;
+            border-radius: 12px;
             overflow: hidden;
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             width: 100%;
             margin: 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
         }
         .post-item:hover { 
             transform: translateY(-3px); 
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); 
         }
         
         /* --- Image Carousel Redesign --- */
@@ -658,44 +660,39 @@
         }
 
         /* --- تصميم زر حفظ الموقع الاحترافي --- */
-.save-location-btn {
-    position: absolute;
-    bottom: 20px; /* رفع الزر للأعلى */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 12px 25px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 15px rgba(26, 42, 108, 0.4);
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    pointer-events: auto; /* التأكد من أن الزر قابل للنقر */
-}
+        .save-location-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 12px 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(26, 42, 108, 0.4);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            pointer-events: auto;
+        }
 
-.save-location-btn:hover {
-    transform: translateX(-50%) translateY(-3px);
-    box-shadow: 0 6px 20px rgba(26, 42, 108, 0.6);
-}
+        .save-location-btn:hover {
+            transform: translateX(-50%) translateY(-3px);
+            box-shadow: 0 6px 20px rgba(26, 42, 108, 0.6);
+        }
 
-.save-location-btn i {
-    font-size: 1rem;
-}
+        .save-location-btn i {
+            font-size: 1rem;
+        }
 
-/* منع التفاعل مع العناصر خلف الزر */
-.save-location-btn:active,
-.save-location-btn:focus {
-    pointer-events: auto;
-}
         /* تصميم الإشعارات الاحترافية */
         .notification-container {
             position: fixed;
@@ -1028,13 +1025,15 @@
                 font-size: 1.5rem;
             }
             
-            .post-counter {
-                font-size: 0.8rem;
+            .create-post-btn {
+                width: 70px;
+                height: 70px;
+                font-size: 1.8rem;
             }
             
-            .create-post-btn {
-                padding: 10px;
-                font-size: 0.9rem;
+            .create-post-btn span {
+                font-size: 0.7rem;
+                bottom: -22px;
             }
             
             .post-images {
@@ -1180,10 +1179,42 @@
                 font-size: 0.75rem;
             }
         }
+        
+        /* تحسينات التفاعلية */
+        .post-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .post-item:active {
+            transform: scale(0.98);
+        }
+        
+        /* تحسينات للهواتف */
+        @media (hover: none) {
+            .post-item:hover {
+                transform: none;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            }
+            
+            .post-item:active {
+                transform: translateY(-3px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            }
+            
+            .post-actions button:active {
+                transform: scale(0.95);
+            }
+            
+            .create-post-btn:active {
+                transform: scale(0.95);
+            }
+        }
+        
         /* إخفاء attribution للخصوصية */
-.leaflet-control-attribution {
-    display: none !important;
-}
+        .leaflet-control-attribution {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -1192,9 +1223,9 @@
         <div class="page-header">
             <h1>إدارة المشاركات</h1>
         </div>
-        <div class="post-counter" id="postCounter">لديك 0 مشاركات</div>
         <button class="create-post-btn" id="openFormBtn">
-            <i class="fas fa-plus-circle"></i> إنشاء مشاركة جديدة
+            <i class="fas fa-plus"></i>
+            <span>إضافة</span>
         </button>
 
         <div class="posts-container" id="postsContainer">
@@ -1271,12 +1302,12 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="features">مميزات العقار (أقصى 150 حرف)</label>
-                    <textarea id="features" name="features" maxlength="150"></textarea>
+                    <label for="features">مميزات العقار (أقصى 100 حرف)</label>
+                    <textarea id="features" name="features" maxlength="100"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="notes">ملاحظات حول العقار (أقصى 150 حرف)</label>
-                    <textarea id="notes" name="notes" maxlength="150"></textarea>
+                    <label for="notes">ملاحظات حول العقار (أقصى 100 حرف)</label>
+                    <textarea id="notes" name="notes" maxlength="100"></textarea>
                 </div>
                 <div class="form-group">
                     <label>السعر وحالة التفاوض</label>
@@ -1324,10 +1355,9 @@
             <div id="map">
                 <!-- Map Style Switcher -->
                 <div class="map-style-switcher">
-    <button class="map-style-btn active" data-provider="maptiler">MapTiler</button>
-    <button class="map-style-btn" data-provider="carto">CartoDB</button>
-    <!-- احذف زر OpenStreetMap -->
-</div>
+                    <button class="map-style-btn active" data-provider="maptiler">MapTiler</button>
+                    <button class="map-style-btn" data-provider="carto">CartoDB</button>
+                </div>
                 <!-- زر حفظ الموقع الاحترافي -->
                 <button class="save-location-btn" id="saveLocationBtn">
                     <i class="fas fa-map-pin"></i>
@@ -1393,7 +1423,6 @@
 
         // عناصر DOM
         const postsContainer = document.getElementById('postsContainer');
-        const postCounter = document.getElementById('postCounter');
         const notificationContainer = document.getElementById('notificationContainer');
         
         // عناصر نافذة تأكيد الحذف
@@ -1430,23 +1459,22 @@
         let uploadedImages = [];
         let postIdToDelete = null;
         let postIdToSend = null;
+        let isLocationSaved = false; // متغير جديد لتتبع حالة حفظ الموقع
 
-       
-        // --- مزودو الخرائط المجانية والآمنة ---
-// --- مزودو الخرائط الآمنة فقط ---
-const mapProviders = {
-    maptiler: {
-        name: 'MapTiler Basic',
-        url: 'https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf5kcxKDmxByQC',
-        attribution: '© <a href="https://www.maptiler.com/copyright/" target="_blank">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>'
-    },
-    carto: {
-        name: 'CartoDB',
-        url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-        attribution: '© OpenStreetMap contributors © CARTO'
-    }
-  
-};
+        // --- مزودو الخرائط الآمنة فقط ---
+        const mapProviders = {
+            maptiler: {
+                name: 'MapTiler Basic',
+                url: 'https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf5kcxKDmxByQC',
+                attribution: '© <a href="https://www.maptiler.com/copyright/" target="_blank">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>'
+            },
+            carto: {
+                name: 'CartoDB',
+                url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                attribution: '© OpenStreetMap contributors © CARTO'
+            }
+        };
+        
         // عرض إشعار احترافي
         function showNotification(title, message, type = 'success', duration = 5000) {
             const notification = document.createElement('div');
@@ -1559,7 +1587,7 @@ const mapProviders = {
         function setGuestMode() {
             // في وضع الزائر، عرض رسالة للمستخدم
             postsContainer.innerHTML = `
-                <div style="text-align: center; color: rgba(255,255,255,0.8); font-size: 1.1rem; padding: 30px;">
+                <div style="text-align: center; color: #666; font-size: 1.1rem; padding: 30px;">
                     <p>يجب تسجيل الدخول لعرض المشاركات</p>
                     <a href="login.html" style="display: inline-block; margin-top: 15px; padding: 8px 15px; background: #1a2a6c; color: white; text-decoration: none; border-radius: 5px;">تسجيل الدخول</a>
                 </div>
@@ -1576,19 +1604,13 @@ const mapProviders = {
                 return;
             }
             displayPosts(data);
-            updatePostCounter(data.length);
-        }
-
-        // تحديث عداد المشاركات
-        function updatePostCounter(count) {
-            postCounter.textContent = `لديك ${count} ${count === 1 ? 'مشاركة' : 'مشاركات'}`;
         }
 
         // عرض المشاركات
         function displayPosts(posts) {
             postsContainer.innerHTML = '';
             if (posts.length === 0) {
-                postsContainer.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7); font-size: 1rem; padding: 30px;">لا توجد مشاركات بعد. قم بإنشاء أول مشاركة الآن!</p>';
+                postsContainer.innerHTML = '<p style="text-align: center; color: #666; font-size: 1rem; padding: 30px;">لا توجد مشاركات بعد. قم بإنشاء أول مشاركة الآن!</p>';
                 return;
             }
             posts.forEach(post => {
@@ -1658,6 +1680,12 @@ const mapProviders = {
             }
         }
 
+        // دالة لاختيار صورة افتراضية عشوائية
+        function getRandomDefaultImage() {
+            const randomNum = Math.floor(Math.random() * 20) + 1;
+            return `${randomNum}.png`;
+        }
+
         // إنشاء عنصر مشاركة بدون إطارات
         function createPostItem(post) {
             const item = document.createElement('div');
@@ -1670,7 +1698,7 @@ const mapProviders = {
             const title = `متوفر <span class="highlight">${post.offer_type} ${post.property_type}</span> في ${post.governorate} ${post.precise_address}`;
 
             // التأكد من وجود صور على الأقل واحدة
-            const displayImages = images.length > 0 ? images : ['ard.png'];
+            const displayImages = images.length > 0 ? images : [getRandomDefaultImage()];
 
             // التحقق من وجود اسم الشركة
             const companyName = post.company_name && post.company_name.trim() !== '' ? 
@@ -1883,114 +1911,119 @@ const mapProviders = {
         }
 
         // --- تهيئة الخريطة المحسنة ---
-        // --- تهيئة الخريطة المحسنة ---
-function initializeMap() {
-    if (!map) {
-        // تهيئة الخريطة مع تعطيل التحكم الافتراضي بالتقريب والتبعيد
-        map = L.map('map', {
-            zoomControl: false,  // تعطيل التحكم الافتراضي
-            closePopupOnClick: false // منع إغلاق النوافذ المنبثقة عند النقر
-        }).setView([35.3367506929845, 43.7862521409988], 11); // إحداثيات الحويجة
-
-        // إضافة الطبقة الأولى (MapTiler)
-        currentTileLayer = L.tileLayer(mapProviders.maptiler.url, {
-            attribution: false, // تعطيل attribution هنا أيضاً
-            maxZoom: 19
-        }).addTo(map);
-
-        // إضافة أداة التقريب والتبعيد مخصصة
-        L.control.zoom({
-            position: 'topleft'
-        }).addTo(map);
-
-        // إضافة أداة البحث
-        const geocoder = L.Control.geocoder({
-            defaultMarkGeocode: false,
-            placeholder: 'ابحث عن موقع...',
-            errorMessage: 'لم يتم العثور على نتائج',
-            showResultIcons: true,
-            suggestMinLength: 2,
-            suggestTimeout: 250,
-            queryMinLength: 1,
-            geocoder: L.Control.Geocoder.nominatim({
-                geocodingQueryParams: {
-                    countrycodes: 'iq',
-                    acceptlanguage: 'ar'
-                }
-            })
-        }).on('markgeocode', function(e) {
-            const bbox = e.geocode.bbox;
-            const poly = L.polygon([
-                bbox.getSouthEast(),
-                bbox.getNorthEast(),
-                bbox.getNorthWest(),
-                bbox.getSouthWest()
-            ]);
-            map.fitBounds(poly.getBounds());
-            
-            // وضع علامة في وسط النتيجة
-            const center = e.geocode.center;
-            setMarker(center.lat, center.lng);
-        }).addTo(map);
-
-        // إضافة حدث النقر على الخريطة - مع منع الانتشار
-        map.on('click', function(e) {
-            // التأكد من أن النقر ليس على زر الحفظ
-            if (!e.originalEvent.target.closest('.save-location-btn')) {
-                setMarker(e.latlng.lat, e.latlng.lng);
-            }
-        });
-
-        // منع انتشار الأحداث من زر الحفظ إلى الخريطة
-        const saveBtn = document.getElementById('saveLocationBtn');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
+        function initializeMap() {
+            if (!map) {
+                // تهيئة الخريطة مع تعطيل التحكم الافتراضي بالتقريب والتبعيد
+               map = L.map('map', {
+                    zoomControl: false,  // تعطيل التحكم الافتراضي
+                    closePopupOnClick: false // منع إغلاق النوافذ المنبثقة عند النقر
+                }).setView([35.3367506929845, 43.7862521409988], 11); // إحداثيات الحويجة
                 
-                if (selectedLocation) {
-                    selectedLocationText.textContent = `تم تحديد الموقع: ${selectedLocation}`;
-                    saveDraftToLocalStorage();
-                    showNotification('نجاح', 'تم حفظ الموقع بنجاح', 'success');
-                    mapModal.style.display = 'none';
-                } else {
-                    showNotification('تنبيه', 'يرجى تحديد الموقع على الخريطة أولاً', 'info');
-                }
-            });
+                // إضافة الطبقة الأولى (MapTiler)
+                currentTileLayer = L.tileLayer(mapProviders.maptiler.url, {
+                    attribution: false, // تعطيل attribution هنا أيضاً
+                    maxZoom: 19
+                }).addTo(map);
 
-            // منع انتشار الأحداث الأخرى
-            ['mousedown', 'mouseup', 'touchstart', 'touchend'].forEach(event => {
-                saveBtn.addEventListener(event, function(e) {
-                    e.stopPropagation();
+                // إضافة أداة التقريب والتبعيد مخصصة
+                L.control.zoom({
+                    position: 'topleft'
+                }).addTo(map);
+
+                // إضافة أداة البحث
+                const geocoder = L.Control.geocoder({
+                    defaultMarkGeocode: false,
+                    placeholder: 'ابحث عن موقع...',
+                    errorMessage: 'لم يتم العثور على نتائج',
+                    showResultIcons: true,
+                    suggestMinLength: 2,
+                    suggestTimeout: 250,
+                    queryMinLength: 1,
+                    geocoder: L.Control.Geocoder.nominatim({
+                        geocodingQueryParams: {
+                            countrycodes: 'iq',
+                            acceptlanguage: 'ar'
+                        }
+                    })
+                }).on('markgeocode', function(e) {
+                    const bbox = e.geocode.bbox;
+                    const poly = L.polygon([
+                        bbox.getSouthEast(),
+                        bbox.getNorthEast(),
+                        bbox.getNorthWest(),
+                        bbox.getSouthWest()
+                    ]);
+                    map.fitBounds(poly.getBounds());
+                    
+                    // وضع علامة في وسط النتيجة
+                    const center = e.geocode.center;
+                    setMarker(center.lat, center.lng);
+                }).addTo(map);
+
+                // إضافة حدث النقر على الخريطة - مع منع الانتشار
+                map.on('click', function(e) {
+                    // التأكد من أن النقر ليس على زر الحفظ
+                    if (!e.originalEvent.target.closest('.save-location-btn')) {
+                        setMarker(e.latlng.lat, e.latlng.lng);
+                    }
                 });
-            });
+
+                // منع انتشار الأحداث من زر الحفظ إلى الخريطة
+                const saveBtn = document.getElementById('saveLocationBtn');
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        
+                        if (selectedLocation) {
+                            selectedLocationText.textContent = `تم تحديد الموقع: ${selectedLocation}`;
+                            saveDraftToLocalStorage();
+                            // إظهار إشعار واحد فقط
+                            if (!isLocationSaved) {
+                                showNotification('نجاح', 'تم حفظ الموقع بنجاح', 'success');
+                                isLocationSaved = true;
+                            }
+                            mapModal.style.display = 'none';
+                        } else {
+                            showNotification('تنبيه', 'يرجى تحديد الموقع على الخريطة أولاً', 'info');
+                        }
+                    });
+
+                    // منع انتشار الأحداث الأخرى
+                    ['mousedown', 'mouseup', 'touchstart', 'touchend'].forEach(event => {
+                        saveBtn.addEventListener(event, function(e) {
+                            e.stopPropagation();
+                        });
+                    });
+                }
+
+                // إضافة أحداث أزرار تغيير نمط الخريطة
+                const styleButtons = document.querySelectorAll('.map-style-btn');
+                styleButtons.forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        // إزالة الكلاس active من جميع الأزرار
+                        styleButtons.forEach(b => b.classList.remove('active'));
+                        // إضافة الكلاس active للزر المضغوط عليه
+                        this.classList.add('active');
+                        // تغيير مزود الخريطة
+                        changeMapProvider(this.dataset.provider);
+                    });
+                });
+
+                // التأكد من أن الخريطة تظهر بشكل صحيح عند فتح النافذة
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 100);
+            }
         }
-
-        // إضافة أحداث أزرار تغيير نمط الخريطة
-        const styleButtons = document.querySelectorAll('.map-style-btn');
-        styleButtons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                // إزالة الكلاس active من جميع الأزرار
-                styleButtons.forEach(b => b.classList.remove('active'));
-                // إضافة الكلاس active للزر المضغوط عليه
-                this.classList.add('active');
-                // تغيير مزود الخريطة
-                changeMapProvider(this.dataset.provider);
-            });
-        });
-
-        // التأكد من أن الخريطة تظهر بشكل صحيح عند فتح النافذة
-        setTimeout(() => {
-            map.invalidateSize();
-        }, 100);
-    }
-}
 
         // --- معالجة اختيار الموقع مع OpenStreetMap المحسنة ---
         locationPickerBtn.addEventListener('click', () => {
             mapModal.style.display = 'flex';
             initializeMap();
+            // إعادة تعيين متغير تتبع حفظ الموقع عند فتح الخريطة
+            isLocationSaved = false;
         });
 
         // دالة تغيير مزود الخريطة
@@ -2046,19 +2079,23 @@ function initializeMap() {
         }
 
         // إزالة مستمع الحدث القديم وإضافة الجديد
-document.getElementById('saveLocationBtn').addEventListener('click', function(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    if (selectedLocation) {
-        selectedLocationText.textContent = `تم تحديد الموقع: ${selectedLocation}`;
-        saveDraftToLocalStorage();
-        showNotification('نجاح', 'تم حفظ الموقع بنجاح', 'success');
-        mapModal.style.display = 'none';
-    } else {
-        showNotification('تنبيه', 'يرجى تحديد الموقع على الخريطة أولاً', 'info');
-    }
-});
+        document.getElementById('saveLocationBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            if (selectedLocation) {
+                selectedLocationText.textContent = `تم تحديد الموقع: ${selectedLocation}`;
+                saveDraftToLocalStorage();
+                // إظهار إشعار واحد فقط
+                if (!isLocationSaved) {
+                    showNotification('نجاح', 'تم حفظ الموقع بنجاح', 'success');
+                    isLocationSaved = true;
+                }
+                mapModal.style.display = 'none';
+            } else {
+                showNotification('تنبيه', 'يرجى تحديد الموقع على الخريطة أولاً', 'info');
+            }
+        });
 
         document.getElementById('closeMapModal').addEventListener('click', () => {
             mapModal.style.display = 'none';
@@ -2089,6 +2126,13 @@ document.getElementById('saveLocationBtn').addEventListener('click', function(e)
         postForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(postForm);
+            
+            // التحقق من وجود صور، وإذا لم توجد، إضافة صورة افتراضية عشوائية
+            let finalImages = uploadedImages;
+            if (finalImages.length === 0) {
+                finalImages = [getRandomDefaultImage()];
+            }
+            
             const postData = {
                 user_id: currentUserData.id,
                 advertiser_name: currentUserData.full_name,
@@ -2096,7 +2140,7 @@ document.getElementById('saveLocationBtn').addEventListener('click', function(e)
                 company_name: currentUserData.company_name || null,
                 post_code: generatePostCode(),
                 post_status: 'النشر غير فعال', // إضافة حالة المشاركة الافتراضية
-                images: uploadedImages,
+                images: finalImages,
                 location: selectedLocation,
                 ...Object.fromEntries(formData.entries())
             };
@@ -2129,6 +2173,7 @@ document.getElementById('saveLocationBtn').addEventListener('click', function(e)
             selectedLocation = null;
             selectedLocationText.textContent = '';
             editingPostId = null;
+            isLocationSaved = false; // إعادة تعيين متغير تتبع حفظ الموقع
             clearDraftFromLocalStorage();
         }
 
@@ -2303,6 +2348,6 @@ document.getElementById('saveLocationBtn').addEventListener('click', function(e)
             checkLoginStatus();
         });
     </script>
+    <script src="common.js"></script>
 </body>
-
 </html>
