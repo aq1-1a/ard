@@ -1860,14 +1860,14 @@
                         marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع الدقيق `).openPopup();
                     } else {
                         // إذا كانت الإحداثيات غير صالحة، استخدم موقع افتراضي
-                        map = L.map('map').setView([33.3152, 44.3661], 10);
-                        marker = L.marker([33.3152, 44.3661]).addTo(map);
+                        map = L.map('map').setView([35.32124953921274, 43.77408027648926], 15);
+                        marker = L.marker([35.32124953921274, 43.77408027648926]).addTo(map);
                         marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع التقريبي`).openPopup();
                     }
                 } else {
                     // إذا لم تكن الإحداثيات متوفرة، استخدم موقع افتراضي
-                    map = L.map('map').setView([33.3152, 44.3661], 10);
-                    marker = L.marker([33.3152, 44.3661]).addTo(map);
+                    map = L.map('map').setView([35.32124953921274, 43.77408027648926], 15);
+                        marker = L.marker([35.32124953921274, 43.77408027648926]).addTo(map);
                     marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع التقريبي`).openPopup();
                 }
                 
