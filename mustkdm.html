@@ -419,9 +419,10 @@
         }
 
         // الانتقال إلى ملف الشركة الشخصي
-        function goToCompanyProfile(companyId) {
-            window.location.href = `profile.html?id=${companyId}`;
-        }
+function goToCompanyProfile(companyId) {
+    // الانتقال إلى صفحة الملف الشخصي في وضع مشاهدة المستخدم الآخر
+    window.location.href = `profile.html?user_id=${companyId}&view_mode=other`;
+}
 
         // مستمعو الأحداث
         searchInput.addEventListener('input', (e) => {
