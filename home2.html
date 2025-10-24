@@ -1552,7 +1552,7 @@
     <!-- Header with Search -->
     <header class="header">
         <div class="search-container">
-            <input type="text" class="search-input" id="searchInput" placeholder="ابحث عن عقار، شركة، رقم هاتف...">
+            <input type="text" class="search-input" id="searchInput" placeholder="ابحث عن عقار، شركة، اخرى...">
             <i class="fas fa-search search-icon"></i>
             <button class="clear-search" id="clearSearch">
                 <i class="fas fa-times"></i>
@@ -1628,7 +1628,7 @@
     <div id="sliderModal" class="slider-modal">
         <div class="slider-modal-content">
             <div class="slider-modal-header">
-                <h2>تفاصيل العقار</h2>
+                <h2>التفاصيل</h2>
                 <button class="close-slider-modal" id="closeSliderModal">&times;</button>
             </div>
             <div class="slider-modal-body" id="sliderModalBody">
@@ -1654,7 +1654,7 @@
     <div id="mapModal" class="map-modal">
         <div class="map-modal-content">
             <div class="map-modal-header">
-                <h2>موقع العقار</h2>
+                <h2>الموقع</h2>
                 <button class="close-map-modal" id="closeMapModal">&times;</button>
             </div>
             <div class="map-container" id="mapContainer">
@@ -2094,7 +2094,7 @@ async function checkLoginStatus() {
                     <div class="no-results">
                         <i class="fas fa-search"></i>
                         <h3>لا توجد نتائج</h3>
-                        <p>لم يتم العثور على عقارات تطابق بحثك</p>
+                        <p>لم يتم العثور على نتائج تطابق بحثك</p>
                     </div>
                 `;
                 return;
@@ -2118,7 +2118,7 @@ async function checkLoginStatus() {
                     <div class="no-results">
                         <i class="fas fa-search"></i>
                         <h3>لا توجد نتائج</h3>
-                        <p>لم يتم العثور على عقارات تطابق بحثك</p>
+                        <p>لم يتم العثور على نتائج تطابق بحثك</p>
                     </div>
                 `;
                 return;
@@ -2491,18 +2491,18 @@ let actionsHTML = `
                 // إنشاء HTML للمحتوى
                 let contentHTML = `
                      <div class="detail-section">
-                        <h4>معلومات العقار</h4>
-                        ${post.property_number ? `<p><strong>رقم العقار:</strong> <span>${post.property_number}</span></p>` : ''}
-                        ${post.deed_type ? `<p><strong>نوع العقار:</strong> <span>${post.deed_type}</span></p>` : ''}
+                        <h4>تفاصيل العرض</h4>
+                        ${post.property_number ? `<p><strong>الرقم او العدد:</strong> <span>${post.property_number}</span></p>` : ''}
+                        ${post.deed_type ? `<p><strong>نوع العرض:</strong> <span>${post.deed_type}</span></p>` : ''}
                         <p><strong>المساحة:</strong> <span>${post.area_number} ${post.area_unit}</span></p>
-                        <p><strong>حالة العقار:</strong> <span>${post.property_condition}</span></p>
+                        <p><strong>الحالة:</strong> <span>${post.property_condition}</span></p>
                         ${post.features ? `<p><strong>المميزات:</strong> <span>${post.features}</span></p>` : ''}
                         ${post.notes ? `<p><strong>ملاحظات:</strong> <span>${post.notes}</span></p>` : ''}
                         <p><strong>السعر:</strong> <span class="price-display">${priceFormatted} (${post.price_negotiable})</span></p>
                     </div>
                     <div class="detail-section">
                         <h4>معلومات الموقع</h4>
-                        <p><strong>المحافظة:</strong> <span>${post.governorate}</span></p>
+                        <p><strong>المدينة:</strong> <span>${post.governorate}</span></p>
                         <p><strong>العنوان الدقيق:</strong> <span>${post.precise_address}</span></p>
                         ${post.location ? `
                             <div style="margin-top: 10px;">
@@ -2667,18 +2667,18 @@ let actionsHTML = `
                 
                 let detailsHTML = `
                     <div class="detail-section">
-                        <h4>معلومات العقار</h4>
-                        ${post.property_number ? `<p><strong>رقم العقار:</strong> <span>${post.property_number}</span></p>` : ''}
-                        ${post.deed_type ? `<p><strong>نوع العقار:</strong> <span>${post.deed_type}</span></p>` : ''}
+                        <h4>تفاصيل العرض</h4>
+                        ${post.property_number ? `<p><strong>الرقم او العدد:</strong> <span>${post.property_number}</span></p>` : ''}
+                        ${post.deed_type ? `<p><strong>نوع العرض:</strong> <span>${post.deed_type}</span></p>` : ''}
                         <p><strong>المساحة:</strong> <span>${post.area_number} ${post.area_unit}</span></p>
-                        <p><strong>حالة العقار:</strong> <span>${post.property_condition}</span></p>
+                        <p><strong>الحالة:</strong> <span>${post.property_condition}</span></p>
                         ${post.features ? `<p><strong>المميزات:</strong> <span>${post.features}</span></p>` : ''}
                         ${post.notes ? `<p><strong>ملاحظات:</strong> <span>${post.notes}</span></p>` : ''}
                         <p><strong>السعر:</strong> <span class="price-display">${priceFormatted} (${post.price_negotiable})</span></p>
                     </div>
                     <div class="detail-section">
                         <h4>معلومات الموقع</h4>
-                        <p><strong>المحافظة:</strong> <span>${post.governorate}</span></p>
+                        <p><strong>المدينة:</strong> <span>${post.governorate}</span></p>
                         <p><strong>العنوان الدقيق:</strong> <span>${post.precise_address}</span></p>
                         ${post.location ? `
                             <div style="margin-top: 10px;">
@@ -2853,14 +2853,14 @@ function closeLoginModal() {
                         marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع الدقيق للعقار`).openPopup();
                     } else {
                         // إذا كانت الإحداثيات غير صالحة، استخدم موقع افتراضي
-                        mapInstance = L.map('mapContainer').setView([33.3152, 44.3661], 10);
-                        marker = L.marker([33.3152, 44.3661]).addTo(mapInstance);
+                        mapInstance = L.map('mapContainer').setView([35.32124953921274, 43.77408027648926], 15);
+                        marker = L.marker([35.32124953921274, 43.77408027648926]).addTo(mapInstance);
                         marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع التقريبي`).openPopup();
                     }
                 } else {
                     // إذا لم تكن الإحداثيات متوفرة، استخدم موقع افتراضي
-                    mapInstance = L.map('mapContainer').setView([33.3152, 44.3661], 10);
-                    marker = L.marker([33.3152, 44.3661]).addTo(mapInstance);
+                    mapInstance = L.map('mapContainer').setView([35.32124953921274, 43.77408027648926], 15);
+                        marker = L.marker([35.32124953921274, 43.77408027648926]).addTo(mapInstance);
                     marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع التقريبي`).openPopup();
                 }
                 
@@ -3073,4 +3073,3 @@ document.addEventListener('DOMContentLoaded', () => {
     <script src="common.js"></script>
 </body>
 </html>
-
