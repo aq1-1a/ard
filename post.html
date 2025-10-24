@@ -1728,84 +1728,69 @@
             postIdToDelete = null;
         }
 
-        // حذف المشاركة من msg2 أو msg3 - نسخة محسنة
         async function deletePost(postId) {
-            try {
-                let imagesToDelete = [];
-                let postSource = null;
-                
-                // البحث عن المنشور في msg2 أولاً
-                const { data: msg2Post, error: msg2Error } = await supabaseClient
-                    .from('msg2')
-                    .select('*')
-                    .eq('id', postId)
-                    .single();
-                
-                if (!msg2Error && msg2Post) {
-                    postSource = 'msg2';
-                    // تخزين الصور للحذف
-                    if (msg2Post.images && Array.isArray(msg2Post.images)) {
-                        imagesToDelete = msg2Post.images;
+    try {
+        console.log('حذف منشور من msg3:', postId);
+        
+        // 1. البحث عن المنشور في msg3 فقط
+        const { data: msg3Post, error: findError } = await supabaseClient
+            .from('msg3')
+            .select('*')
+            .eq('post_id', postId)  // مهم: نستخدم post_id ليس id
+            .single();
+        
+        if (findError) {
+            console.error('لم يتم العثور على المنشور في msg3:', findError);
+            showNotification('خطأ', 'لم يتم العثور على المشاركة في المنشورات النشطة', 'error');
+            return;
+        }
+        
+        console.log('تم العثور على المنشور:', msg3Post);
+        
+        // 2. حذف المنشور من msg3
+        const { error: deleteError } = await supabaseClient
+            .from('msg3')
+            .delete()
+            .eq('post_id', postId);  // مهم: نستخدم post_id هنا أيضاً
+        
+        if (deleteError) {
+            console.error('خطأ في الحذف:', deleteError);
+            showNotification('خطأ', 'فشل في حذف المشاركة: ' + deleteError.message, 'error');
+            return;
+        }
+        
+        // 3. حذف الصور إذا وجدت
+        let imagesToDelete = msg3Post.images || [];
+        if (imagesToDelete.length > 0) {
+            console.log('حذف الصور المرتبطة:', imagesToDelete);
+            for (const imageUrl of imagesToDelete) {
+                try {
+                    if (imageUrl && imageUrl.includes('property-images') && !imageUrl.includes('ard.png')) {
+                        const fileName = imageUrl.split('/').pop();
+                        await supabaseClient.storage
+                            .from('property-images')
+                            .remove([fileName]);
+                        console.log('تم حذف الصورة:', fileName);
                     }
-                    
-                    // حذف المنشور من msg2
-                    const { error: deleteError } = await supabaseClient
-                        .from('msg2')
-                        .delete()
-                        .eq('id', postId);
-                    
-                    if (deleteError) throw deleteError;
-                } else {
-                    // البحث عن المنشور في msg3
-                    const { data: msg3Post, error: msg3Error } = await supabaseClient
-                        .from('msg3')
-                        .select('*')
-                        .eq('post_id', postId)
-                        .single();
-                    
-                    if (msg3Error) throw msg3Error;
-                    postSource = 'msg3';
-                    
-                    // تخزين الصور للحذف
-                    if (msg3Post.images && Array.isArray(msg3Post.images)) {
-                        imagesToDelete = msg3Post.images;
-                    }
-                    
-                    // حذف المنشور من msg3
-                    const { error: deleteError } = await supabaseClient
-                        .from('msg3')
-                        .delete()
-                        .eq('post_id', postId);
-                    
-                    if (deleteError) throw deleteError;
+                } catch (imgError) {
+                    console.log('خطأ في حذف صورة:', imgError);
                 }
-                
-                // حذف الصور من التخزين
-                if (imagesToDelete.length > 0) {
-                    for (const imageUrl of imagesToDelete) {
-                        try {
-                            const parts = imageUrl.split('/');
-                            const bucketIndex = parts.findIndex(part => part === 'property-images');
-                            if (bucketIndex !== -1) {
-                                const filePath = parts.slice(bucketIndex + 1).join('/');
-                                await supabaseClient.storage.from('property-images').remove([filePath]);
-                            }
-                        } catch (err) {
-                            console.log('Error deleting image:', err);
-                            // تجاهل أخطاء حذف الصور الفردية
-                        }
-                    }
-                }
-                
-                showNotification('نجاح', 'تم حذف المشاركة بنجاح', 'success');
-                loadUserPosts();
-                
-            } catch (error) {
-                console.error('Error deleting post:', error);
-                showNotification('خطأ', 'حدث خطأ أثناء حذف المشاركة', 'error');
             }
         }
-
+        
+        // 4. إظهار النجاح وتحديث القائمة
+        showNotification('نجاح', 'تم حذف المشاركة النشطة بنجاح', 'success');
+        
+        // انتظر قليلاً ثم حدث القائمة
+        setTimeout(() => {
+            loadUserPosts();
+        }, 1000);
+        
+    } catch (error) {
+        console.error('خطأ غير متوقع:', error);
+        showNotification('خطأ', 'حدث خطأ غير متوقع: ' + error.message, 'error');
+    }
+}
         // مستمعو الأحداث للنشر
         confirmPublishBtn.addEventListener('click', handlePublish);
         
