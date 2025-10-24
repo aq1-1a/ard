@@ -1,0 +1,7 @@
+<!-- Paste into your <head> for PWA and iOS support -->
+<link rel="manifest" href="/ard/manifest.json">
+<meta name="theme-color" content="#0b7ed1">
+<link rel="apple-touch-icon" href="/ard/ayn-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ayn">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">

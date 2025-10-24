@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>تثبيت تطبيق Ayn</title>
+
+<link rel="manifest" href="/ard/manifest.json">
+<meta name="theme-color" content="#0b7ed1">
+<link rel="apple-touch-icon" href="/ard/ayn-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ayn">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<style>
+body{font-family: Tahoma, Arial, sans-serif; background:#f5f8fb; color:#222; padding:20px;}
+.card{max-width:720px;margin:30px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,0.08)}
+h1{margin-top:0}
+.btn{display:inline-block;padding:10px 14px;border-radius:9px;text-decoration:none;margin:6px 6px;background:#0b7ed1;color:#fff}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>تثبيت تطبيق Ayn</h1>
+  <p>هذا الحزمة تجهز صفحتك لتعمل كاختصار/تطبيق على أجهزة Android و iPhone. تأكد أن ترفع أيقونات (ayn.png) وملفات الحزمة إلى المجلد <code>/ard/</code> على موقعك: <strong>https://aq1-1a.github.io/ard/</strong></p>
+
+  <h3>خطوات سريعة للمستخدم النهائي</h3>
+  <ul>
+    <li><strong>أندرويد (Chrome):</strong> افتح الرابط في Chrome → زر القائمة → Add to Home screen → Add.</li>
+    <li><strong>آيفون (Safari):</strong> افتح الرابط في Safari → زر المشاركة → Add to Home Screen → Add.</li>
+  </ul>
+
+  <p>إذا أردت، ارفع ملف APK في نفس المجلد وأضف زر تنزيل داخل موقعك؛ لكن iOS لا يسمح بتثبيت تطبيقات خارج App Store.</p>
+
+  <a class="btn" href="https://aq1-1a.github.io/ard/" target="_blank">فتح الموقع</a>
+</div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/ard/sw.js').catch(e => console.warn('SW failed', e));
+}
+</script>
+</body>
+</html>
