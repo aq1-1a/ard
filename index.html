@@ -853,11 +853,12 @@
         <div class="nav-grid">
             <a href="#" class="nav-card" id="inboxBtn" data-page="mustkdm.html">
                 <i class="fas fa-th-list"></i>
-                <h3>الشركات والمستخدمين</h3>
+                <h3>الشركات والمكاتب العقارية</h3>
+                
             </a>
             <a href="#" class="nav-card" id="myPostsBtn" data-page="post.html">
                 <i class="fas fa-th-list"></i>
-                <h3>مشاركاتي</h3>
+                <h3>اعلاناتي</h3>
             </a>
             <a href="#" class="nav-card" id="supportBtn" data-page="dam.html">
                 <i class="fas fa-headset"></i>
@@ -1371,7 +1372,7 @@ async function markMessagesAsRead(senderId = null) {
                                 const parts = notification.message.split('|');
                                 const posterId = parts[0];
                                 
-                                if (!notification.title || notification.title === 'منشور جديد') {
+                                if (!notification.title || notification.title === 'اعلان جديد') {
                                     const displayName = await getUserDisplayName(posterId);
                                     notification.title = displayName;
                                 }
@@ -1423,7 +1424,7 @@ async function markMessagesAsRead(senderId = null) {
                     <div class="notification-item ${notification.is_read ? '' : 'unread'}" 
                          data-id="${notification.id}"
                          data-poster-id="${posterId}">
-                        <div class="notification-title">${notification.title || 'منشور جديد'}</div>
+                        <div class="notification-title">${notification.title || 'اعلان جديد'}</div>
                         <div class="notification-message">${notificationMessage}</div>
                         <div class="notification-time">${formatTime(notification.created_at)}</div>
                     </div>
@@ -1848,8 +1849,10 @@ if ('serviceWorker' in navigator) {
     .catch(e => console.warn('SW failed on index.html', e));
 }
 </script>
+    <script src="common.js"></script>
 </body>
 </html>
+
 
 
 
