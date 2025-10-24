@@ -1,26 +1,23 @@
 const CACHE_NAME = 'ayn-cache-v1';
 const FILES_TO_CACHE = [
-  '/ard/',
-  '/ard/index.html',
-  '/ard/install.html',
-  '/ard/ayn-192.png',
-  '/ard/ayn-512.png',
-  '/ard/ayn-180.png'
+  './',
+  './install.html',
+  './ayn-180.png',
+  './ayn-192.png',
+  './ayn-512.png'
 ];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
+self.addEventListener('install', evt => {
+  evt.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
   );
   self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(self.clients.claim());
+self.addEventListener('activate', evt => {
+  evt.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(resp => resp || fetch(event.request))
-  );
+self.addEventListener('fetch', evt => {
+  evt.respondWith(caches.match(evt.request).then(resp => resp || fetch(evt.request)));
 });
