@@ -275,7 +275,7 @@
     background-color: #fff3cd;
     border: 1px solid #ffeeba;
     color: #856404;
-    padding: 10px;
+    padding: 15px;
     border-radius: 8px;
     margin-bottom: 15px;
     font-size: 0.9em;
@@ -358,7 +358,7 @@
     <h3>تثبيت على آيفون</h3>
     
     <div id="browserWarning">
-      أنت تستخدم متصفحًا آخر. للتثبيت، يجب استخدام متصفح سفاري. اضغط على الزر بالأسفل للانتقال.
+      يبدو أنك تفتح الرابط من داخل تطبيق آخر (مثل فيسبوك أو واتساب). للتثبيت، يجب استخدام متصفح سفاري. اضغط على الزر بالأسفل للانتقال.
     </div>
 
     <!-- زر الفتح في سفاري (يظهر فقط إذا لم يكن المستخدم في سفاري) -->
@@ -372,8 +372,8 @@
         <!-- أيقونة المشاركة -->
         <svg class="share-icon" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
       </li>
-      <li><span class="step-number">2</span> اختر <strong>"Add to Home Screen - أضف إلى الشاشة الرئيسية"</strong>.</li>
-      <li><span class="step-number">3</span> اضغط على <strong>"Add - اضافة "</strong> لإتمام التثبيت.</li>
+      <li><span class="step-number">2</span> اختر <strong>"Add to Home Screen"</strong>.</li>
+      <li><span class="step-number">3</span> اضغط على <strong>"Add"</strong> لإتمام التثبيت.</li>
     </ol>
 
     <!-- زر المشاركة التلقائي (يظهر فقط في سفاري ويدعم Web Share API) -->
@@ -434,7 +434,7 @@ if (isIos) {
 }
 
 /* ============================
-   التعامل مع مودال الآيفون (المحسّن)
+   التعامل مع مودال الآيفون (المحسّن والموثوق)
    ============================ */
 const iosModal = document.getElementById('iosModal');
 const openInSafariBtn = document.getElementById('openInSafariBtn');
@@ -442,27 +442,34 @@ const safariInstructions = document.getElementById('safariInstructions');
 const nativeShareBtn = document.getElementById('nativeShareBtn');
 const browserWarning = document.getElementById('browserWarning');
 
-// دالة للتحقق مما إذا كان المتصفح سفاري
-function isSafari() {
-  return /safari/.test(window.navigator.userAgent.toLowerCase()) && !/chrome|crios|fxios|opera/.test(window.navigator.userAgent.toLowerCase());
+// دالة محسّنة للتحقق مما إذا كان المتصفح هو سفاري الحقيقي (وليس متصفح داخل تطبيق)
+function isStandaloneSafari() {
+  const ua = window.navigator.userAgent.toLowerCase();
+  
+  // قائمة بأشهر المتصفحات المدمجة داخل التطبيقات
+  const isInApp = /fban|fbav|instagram|whatsapp|telegram|twitter|line|wechat|snapchat|linkedin|miuibrowser|samsungbrowser/.test(ua);
+  
+  // التحقق من أنه سفاري وليس كروم أو فايرفوكس أو متصفح داخل تطبيق
+  const isSafariEngine = /safari/.test(ua) && !/chrome|crios|fxios|opera/.test(ua);
+
+  return isSafariEngine && !isInApp;
 }
 
 // عند فتح المودال
 iosBtn.onclick = () => {
   iosModal.style.display = 'block';
-  if (isSafari()) {
-    // إذا كان سفاري، أظهر التعليمات وزر المشاركة
+  if (isStandaloneSafari()) {
+    // إذا كان سفاري حقيقي، أظهر التعليمات
     browserWarning.style.display = 'none';
     openInSafariBtn.style.display = 'none';
     safariInstructions.style.display = 'block';
-    // تحقق من دعم Web Share API
     if (navigator.share) {
       nativeShareBtn.style.display = 'block';
     } else {
       nativeShareBtn.style.display = 'none';
     }
   } else {
-    // إذا لم يكن سفاري، أظهر رسالة التحذير وزر الفتح في سفاري
+    // إذا كان متصفح داخل تطبيق، أظهر التحذير وزر الفتح في سفاري
     browserWarning.style.display = 'block';
     openInSafariBtn.style.display = 'block';
     safariInstructions.style.display = 'none';
@@ -472,7 +479,8 @@ iosBtn.onclick = () => {
 
 // عند الضغط على زر "فتح في سفاري"
 openInSafariBtn.onclick = () => {
-  window.location.href = 'https://aq1-1a.github.io/ard/install.html';
+  // استخدام window.open لفرض نظام التشغيل على فتح الرابط في سفاري
+  window.open('https://aq1-1a.github.io/ard/install.html', '_blank');
 };
 
 // عند الضغط على زر "مشاركة الآن"
