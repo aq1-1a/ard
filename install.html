@@ -60,7 +60,7 @@
     border: 1px solid var(--card-border);
     box-shadow: 0 8px 32px 0 var(--shadow-color);
     padding: 40px;
-    max-width: 420px;
+    max-width: 450px; /* زيادة العرض قليلاً لاستيعاب النص */
     width: 100%;
     animation: fadeIn 0.8s ease-out;
   }
@@ -89,7 +89,70 @@
     color: rgba(255, 255, 255, 0.9);
     line-height: 1.7;
     font-size: 1.1em;
+    margin-bottom: 20px;
+  }
+  
+  /* === قسم الوصف المضاف === */
+  .description {
+    text-align: right;
     margin-bottom: 30px;
+  }
+
+  .description h2 {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .description p {
+    font-size: 0.95em;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+
+  .description .closing-text {
+    font-weight: 500;
+    margin-top: 25px;
+  }
+
+  .description .tagline {
+    font-weight: 700;
+    font-style: italic;
+    margin-top: 10px;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .features-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    text-align: right;
+  }
+
+  .features-list li {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px 15px 12px 10px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    position: relative;
+    font-size: 0.95em;
+    transition: background-color 0.3s ease;
+  }
+
+  .features-list li:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .features-list li::before {
+    content: '✓';
+    color: var(--secondary-color);
+    font-weight: bold;
+    font-size: 1.2em;
+    display: inline-block;
+    width: 25px;
+    margin-left: 10px;
   }
 
   /* === الأزرار === */
@@ -221,10 +284,24 @@
   <h1>تطبيق أيين</h1>
   <p>احصل على أفضل تجربة عبر تثبيت التطبيق على جهازك. وصول سريع وسهل في أي وقت.</p>
 
-  <!-- زر التثبيت لأندرويد -->
-  <button id="installBtn" class="btn" style="display: none;">🤖 تثبيت التطبيق</button>
+  <!-- === قسم الوصف الجديد === -->
+  <div class="description">
+    <h2>اكتشف أيين – منصتك الذكية للبحث عن العقارات</h2>
+    <p>مرحباً بك في أيين، المنصة المجانية المصممة لتسهيل حياتك في البحث عن العقارات! سواء كنت تبحث عن بيع، إيجار أو استثمار عقاري، توفر لك أيين تجربة سهلة وسريعة لتجد ما تبحث عنه دون عناء أو تكاليف إضافية.</p>
+    
+    <ul class="features-list">
+      <li>تصفح عروض العقارات بسهولة، واطلع على جميع التفاصيل المهمة.</li>
+      <li>تواصل مباشرة مع البائع أو المكتب العقاري بدون وسيط مكلف.</li>
+      <li>أضف عروضك الخاصة وشاركها مع آلاف المستخدمين مجاناً.</li>
+      <li>كل خدمات المنصة مجانية بالكامل، بدون رسوم أو اشتراكات.</li>
+    </ul>
 
-  <!-- زر iOS -->
+    <p class="closing-text">انضم اليوم إلى أيين واستمتع بتجربة سلسة وآمنة للبحث عن العقارات في كركوك، وقريباً في جميع المحافظات.</p>
+    <p class="tagline">أيين – حيث يصبح البحث عن العقار أسهل وأذكى.</p>
+  </div>
+
+  <!-- === أزرار التثبيت === -->
+  <button id="installBtn" class="btn" style="display: none;">🤖 تثبيت التطبيق</button>
   <button id="iosBtn" class="btn" style="display: none;"> تثبيت على آيفون</button>
 
   <!-- رسالة الحالة -->
