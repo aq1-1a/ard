@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>تثبيت تطبيق أيين</title>
 
-<!-- روابط نسبية (تأكد أن الملفات موجودة في نفس المجلد /ard/) -->
+<!-- Manifest PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0b7ed1">
 <link rel="apple-touch-icon" href="ayn-180.png">
@@ -30,10 +30,10 @@
 <div class="card">
   <img src="ayn-180.png" alt="شعار أيين" style="width:90px;margin-bottom:15px;">
   <h1>تثبيت تطبيق أيين</h1>
-  <p>اختر جهازك: زر "تنزيل لأندرويد" سيحاول تنزيل APK مباشرة. زر "تثبيت على آيفون" يشرح طريقة إضافة الاختصار على الشاشة.</p>
+  <p>اختر جهازك:</p>
 
-  <!-- رابط APK (ضع ayn-app.apk في نفس المجلد أو غيّر الاسم) -->
-  <a id="downloadApk" href="ayn-app.apk" class="btn" download>⬇ تنزيل لأندرويد</a>
+  <!-- زر Android (PWA) -->
+  <button id="installBtn" class="btn" style="display:none;">⬇ تثبيت على أندرويد</button>
 
   <!-- زر iOS يفتح المودال -->
   <button id="iosBtn" class="btn"> تثبيت على آيفون</button>
@@ -55,20 +55,45 @@
 
 <script>
 /* ============================
-   تسجيل Service Worker (مسار نسبي)
-   إذا sw.js موجود في نفس المجلد مع install.html فاستخدم 'sw.js'
-   ============================ */
+   تسجيل Service Worker (PWA)
+============================ */
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js')
     .then(()=>console.log('SW registered'))
     .catch(e=>console.warn('SW failed', e));
 }
 
-/* فتح/اغلاق المودال */
+/* ============================
+   زر iOS - فتح/اغلاق المودال
+============================ */
 const modal = document.getElementById('iosModal');
 document.getElementById('iosBtn').onclick = () => modal.style.display = 'block';
 document.querySelector('.close').onclick = () => modal.style.display = 'none';
 window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+
+/* ============================
+   زر Android - إضافة PWA
+============================ */
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); // منع الإظهار التلقائي
+  deferredPrompt = e;
+  installBtn.style.display = 'inline-block'; // إظهار الزر
+});
+
+installBtn.addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt(); // عرض نافذة التثبيت
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log('User choice:', outcome); // accepted أو dismissed
+    deferredPrompt = null;
+    installBtn.style.display = 'none'; // إخفاء الزر بعد المحاولة
+  } else {
+    alert('هذه الصفحة لا يمكن تثبيتها كاختصار حالياً. استخدم متصفح Chrome أو Edge على Android.');
+  }
+});
 </script>
 
 </body>
