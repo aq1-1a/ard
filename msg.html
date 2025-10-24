@@ -54,6 +54,99 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2a6c, #2a3f8f);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-container {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-logo {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .loading-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.8);
+            animation: loadingDot 1.5s infinite ease-in-out;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loadingDot {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0); }
+        }
+
+        .loading-progress {
+            width: 200px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            background-color: white;
+            border-radius: 2px;
+            width: 0%;
+            animation: loadingProgress 2s ease-in-out;
+        }
+
+        @keyframes loadingProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
         /* Mobile-First Chat Container */
         .chat-container {
             display: flex;
@@ -61,6 +154,12 @@
             width: 100%;
             background-color: #f5f5f5;
             position: relative;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .chat-container.loaded {
+            opacity: 1;
         }
 
         /* Conversations List - Mobile Optimized */
@@ -130,6 +229,31 @@
             transition: all 0.2s ease;
             position: relative;
             background-color: #fff;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .conversation-item:nth-child(1) { animation-delay: 0.1s; }
+        .conversation-item:nth-child(2) { animation-delay: 0.2s; }
+        .conversation-item:nth-child(3) { animation-delay: 0.3s; }
+        .conversation-item:nth-child(4) { animation-delay: 0.4s; }
+        .conversation-item:nth-child(5) { animation-delay: 0.5s; }
+        .conversation-item:nth-child(6) { animation-delay: 0.6s; }
+        .conversation-item:nth-child(7) { animation-delay: 0.7s; }
+        .conversation-item:nth-child(8) { animation-delay: 0.8s; }
+        .conversation-item:nth-child(9) { animation-delay: 0.9s; }
+        .conversation-item:nth-child(10) { animation-delay: 1.0s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .conversation-item:hover {
@@ -160,6 +284,19 @@
             font-weight: 700;
             margin-left: 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .conversation-avatar.online::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 14px;
+            height: 14px;
+            background-color: #4CAF50;
+            border: 2px solid white;
+            border-radius: 50%;
         }
 
         .conversation-info {
@@ -214,6 +351,15 @@
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
+        }
+
+        .unread-indicator {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
         }
 
         .delete-conversation {
@@ -868,8 +1014,26 @@
     </style>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-container">
+            <div class="loading-logo">
+                <i class="fas fa-comments"></i>
+            </div>
+            <div class="loading-text">جاري تحميل المحادثات...</div>
+            <div class="loading-dots">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            </div>
+            <div class="loading-progress">
+                <div class="loading-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Chat Container -->
-    <div class="chat-container">
+    <div class="chat-container" id="chatContainer">
         <!-- Conversations List -->
         <div class="conversations-list" id="conversationsList">
             <div class="search-section">
@@ -981,6 +1145,8 @@
         const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
         // عناصر DOM
+        const loadingScreen = document.getElementById('loadingScreen');
+        const chatContainer = document.getElementById('chatContainer');
         const searchInput = document.getElementById('searchInput');
         const conversationsList = document.getElementById('conversationsList');
         const conversationsContainer = document.getElementById('conversationsContainer');
@@ -1013,8 +1179,7 @@
         let messagePollingInterval = null;
         let conversationPollingInterval = null;
         let lastMessageCount = 0;
-        let unreadMessages = new Map(); // لتتبع الرسائل غير المقروءة
-        let lastReadTimestamps = new Map(); // لتتبع آخر مرة تمت قراءة المحادثة
+        let conversationReads = new Map(); // لتتبع قراءة المحادثات من قاعدة البيانات
 
         // عرض إشعار
         function showNotification(message, type = 'success') {
@@ -1024,6 +1189,15 @@
             setTimeout(() => {
                 notification.style.display = 'none';
             }, 3000);
+        }
+
+        // إخفاء شاشة التحميل
+        function hideLoadingScreen() {
+            loadingScreen.classList.add('hidden');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                chatContainer.classList.add('loaded');
+            }, 500);
         }
 
         // التحقق من حالة تسجيل الدخول
@@ -1120,7 +1294,7 @@
                             .order('created_at', { ascending: false })
                             .limit(1);
                         
-                        // حساب الرسائل غير المقروءة باستخدام الطريقة البديلة
+                        // حساب الرسائل غير المقروءة باستخدام قاعدة البيانات
                         const unreadCount = await getUnreadMessagesCount(conv.id);
                         
                         return {
@@ -1138,27 +1312,43 @@
             }
         }
 
-        // حساب الرسائل غير المقروءة (بدون استخدام is_read)
+        // حساب الرسائل غير المقروءة باستخدام قاعدة البيانات
         async function getUnreadMessagesCount(conversationId) {
             try {
-                // الحصول على آخر مرة تمت قراءة المحادثة
-                const lastRead = lastReadTimestamps.get(conversationId);
+                // الحصول على آخر وقت قراءة من قاعدة البيانات
+                const { data: readData, error: readError } = await supabaseClient
+                    .from('conversation_reads')
+                    .select('last_read_at')
+                    .eq('conversation_id', conversationId)
+                    .eq('user_id', currentUser.id)
+                    .single();
                 
-                if (!lastRead) {
-                    // إذا لم تكن هناك سجلات، عد جميع الرسائل كمقروءة
+                if (readError && readError.code !== 'PGRST116') {
+                    console.error('Error fetching read status:', readError);
                     return 0;
                 }
                 
+                let lastReadTime = null;
+                if (readData) {
+                    lastReadTime = readData.last_read_at;
+                    conversationReads.set(conversationId, lastReadTime);
+                }
+                
                 // حساب الرسائل التي تم إرسالها بعد آخر قراءة
-                const { data: unreadMessages, error } = await supabaseClient
+                let query = supabaseClient
                     .from('messages')
                     .select('id')
                     .eq('conversation_id', conversationId)
-                    .eq('receiver_id', currentUser.id)
-                    .gt('created_at', lastRead);
+                    .eq('receiver_id', currentUser.id);
                 
-                if (error) {
-                    console.error('Error counting unread messages:', error);
+                if (lastReadTime) {
+                    query = query.gt('created_at', lastReadTime);
+                }
+                
+                const { data: unreadMessages, error: unreadError } = await query;
+                
+                if (unreadError) {
+                    console.error('Error counting unread messages:', unreadError);
                     return 0;
                 }
                 
@@ -1200,7 +1390,7 @@
                 return;
             }
             
-            conversations.forEach(conv => {
+            conversations.forEach((conv, index) => {
                 const otherUserId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
                 const otherUser = allUsers.find(u => u.id === otherUserId);
                 
@@ -1211,6 +1401,9 @@
                 conversationItem.dataset.conversationId = conv.id;
                 conversationItem.dataset.userId = otherUserId;
                 
+                // إضافة تأخير للأنيميشن
+                conversationItem.style.animationDelay = `${index * 0.1}s`;
+                
                 // استخراج الحرف الأول من الاسم
                 const firstLetter = otherUser.full_name ? otherUser.full_name.charAt(0).toUpperCase() : 'U';
                 
@@ -1219,14 +1412,20 @@
                 const messagePreview = lastMessage ? lastMessage.content : 'لا توجد رسائل';
                 const messageTime = lastMessage ? formatTime(lastMessage.created_at) : '';
                 
+                // تحديد ما إذا كانت المحادثة غير مقروءة
+                const isUnread = conv.unread_count > 0;
+                
                 let unreadBadge = '';
-                if (conv.unread_count > 0) {
+                let unreadIndicator = '';
+                
+                if (isUnread) {
                     unreadBadge = `<div class="unread-badge">${conv.unread_count}</div>`;
+                    unreadIndicator = '<div class="unread-indicator"></div>';
                 }
                 
                 conversationItem.innerHTML = `
                     <div class="conversation-header">
-                        <div class="conversation-avatar">${firstLetter}</div>
+                        <div class="conversation-avatar ${isUnread ? 'online' : ''}">${firstLetter}</div>
                         <div class="conversation-info">
                             <div class="conversation-name">${otherUser.full_name || 'مستخدم'}</div>
                             ${otherUser.company_name ? `<div class="conversation-company">${otherUser.company_name}</div>` : ''}
@@ -1235,6 +1434,7 @@
                     <div class="conversation-preview">${messagePreview}</div>
                     <div class="conversation-time">${messageTime}</div>
                     ${unreadBadge}
+                    ${unreadIndicator}
                     <button class="delete-conversation" onclick="deleteConversation('${conv.id}', '${otherUserId}', event)">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -1331,6 +1531,19 @@
             const activeItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
             if (activeItem) {
                 activeItem.classList.add('active');
+                // إزالة مؤشر الرسائل غير المقروءة
+                const unreadIndicator = activeItem.querySelector('.unread-indicator');
+                if (unreadIndicator) {
+                    unreadIndicator.remove();
+                }
+                const unreadBadge = activeItem.querySelector('.unread-badge');
+                if (unreadBadge) {
+                    unreadBadge.remove();
+                }
+                const avatar = activeItem.querySelector('.conversation-avatar');
+                if (avatar) {
+                    avatar.classList.remove('online');
+                }
             }
             
             // إغلاق قائمة المحادثات في الموبايل
@@ -1343,8 +1556,8 @@
             lastMessageCount = 0; // إعادة تعيين العداد
             displayMessages(messages);
             
-            // وضع علامة مقروءة على المحادثة
-            markConversationAsRead(conversationId);
+            // وضع علامة مقروءة على المحادثة في قاعدة البيانات
+            await markConversationAsRead(conversationId);
             
             // تحديث قائمة المحادثات لإزالة الإشعارات
             allConversations = await loadConversations();
@@ -1354,15 +1567,34 @@
             startMessagePolling();
         }
 
-        // وضع علامة مقروءة على المحادثة (بدون استخدام is_read)
-        function markConversationAsRead(conversationId) {
-            // حفظ وقت القراءة الحالي
-            lastReadTimestamps.set(conversationId, new Date().toISOString());
-            
-            // حفظ في localStorage للاستمرارية
-            const readData = JSON.parse(localStorage.getItem('readConversations') || '{}');
-            readData[conversationId] = new Date().toISOString();
-            localStorage.setItem('readConversations', JSON.stringify(readData));
+        // وضع علامة مقروءة على المحادثة في قاعدة البيانات
+        async function markConversationAsRead(conversationId) {
+            try {
+                const now = new Date().toISOString();
+                
+                // تحديث أو إدخال سجل القراءة
+                const { data, error } = await supabaseClient
+                    .from('conversation_reads')
+                    .upsert({
+                        conversation_id: conversationId,
+                        user_id: currentUser.id,
+                        last_read_at: now,
+                        updated_at: now
+                    }, {
+                        onConflict: 'conversation_id,user_id'
+                    });
+                
+                if (error) {
+                    console.error('Error marking conversation as read:', error);
+                    return;
+                }
+                
+                // حفظ في الذاكرة المؤقتة
+                conversationReads.set(conversationId, now);
+                
+            } catch (error) {
+                console.error('Error marking conversation as read:', error);
+            }
         }
 
         // بدء الاستطلاع للرسائل الجديدة
@@ -1376,6 +1608,8 @@
                     const messages = await loadMessages(currentConversation);
                     if (messages.length > lastMessageCount) {
                         displayMessages(messages, true);
+                        // تحديث حالة القراءة عند تلقي رسالة جديدة
+                        await markConversationAsRead(currentConversation);
                     }
                 }
             }, 2000); // كل ثانيتين للتحديث الأسرع
@@ -1509,7 +1743,18 @@
                     return;
                 }
                 
-                // 3. تنظيف أي سجلات في deleted_conversations
+                // 3. حذف سجل القراءة
+                const { error: readError } = await supabaseClient
+                    .from('conversation_reads')
+                    .delete()
+                    .eq('conversation_id', conversationId)
+                    .eq('user_id', currentUser.id);
+                
+                if (readError) {
+                    console.error('Error deleting conversation read:', readError);
+                }
+                
+                // 4. تنظيف أي سجلات في deleted_conversations
                 const { error: cleanupError } = await supabaseClient
                     .from('deleted_conversations')
                     .delete()
@@ -1519,19 +1764,16 @@
                     console.error('Error cleaning up deleted conversations:', cleanupError);
                 }
                 
-                // 4. تنظيف البيانات المحلية
-                lastReadTimestamps.delete(conversationId);
-                const readData = JSON.parse(localStorage.getItem('readConversations') || '{}');
-                delete readData[conversationId];
-                localStorage.setItem('readConversations', JSON.stringify(readData));
+                // 5. تنظيف البيانات المحلية
+                conversationReads.delete(conversationId);
                 
-                // 5. إزالة المحادثة من القائمة
+                // 6. إزالة المحادثة من القائمة
                 const conversationItem = document.querySelector(`[data-conversation-id="${conversationId}"]`);
                 if (conversationItem) {
                     conversationItem.remove();
                 }
                 
-                // 6. إذا كانت المحادثة الحالية هي المحذوفة، إعادة تعيين الواجهة
+                // 7. إذا كانت المحادثة الحالية هي المحذوفة، إعادة تعيين الواجهة
                 if (currentConversation === conversationId) {
                     currentConversation = null;
                     currentConversationUser = null;
@@ -1744,12 +1986,15 @@
                 return;
             }
             
-            users.forEach(user => {
+            users.forEach((user, index) => {
                 if (user.id === currentUser.id) return; // لا عرض المستخدم الحالي
                 
                 const userItem = document.createElement('div');
                 userItem.className = 'conversation-item';
                 userItem.dataset.userId = user.id;
+                
+                // إضافة تأخير للأنيميشن
+                userItem.style.animationDelay = `${index * 0.1}s`;
                 
                 // استخراج الحرف الأول من الاسم
                 const firstLetter = user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U';
@@ -1887,12 +2132,23 @@
             return date.toLocaleDateString('ar-EG');
         }
 
-        // تحميل بيانات القراءة من localStorage
-        function loadReadData() {
+        // تحميل بيانات القراءة من قاعدة البيانات
+        async function loadReadData() {
             try {
-                const readData = JSON.parse(localStorage.getItem('readConversations') || '{}');
-                for (const [conversationId, timestamp] of Object.entries(readData)) {
-                    lastReadTimestamps.set(conversationId, timestamp);
+                const { data, error } = await supabaseClient
+                    .from('conversation_reads')
+                    .select('conversation_id, last_read_at')
+                    .eq('user_id', currentUser.id);
+                
+                if (error) {
+                    console.error('Error loading read data:', error);
+                    return;
+                }
+                
+                if (data) {
+                    data.forEach(item => {
+                        conversationReads.set(item.conversation_id, item.last_read_at);
+                    });
                 }
             } catch (error) {
                 console.error('Error loading read data:', error);
@@ -1978,8 +2234,8 @@
             currentUser = await checkLoginStatus();
             if (!currentUser) return;
             
-            // تحميل بيانات القراءة
-            loadReadData();
+            // تحميل بيانات القراءة من قاعدة البيانات
+            await loadReadData();
             
             // تحميل جميع المستخدمين
             allUsers = await loadAllUsers();
@@ -2005,6 +2261,11 @@
             if (window.innerWidth < 768 && !userId) {
                 conversationsList.classList.add('active');
             }
+            
+            // إخفاء شاشة التحميل بعد اكتمال التحميل
+            setTimeout(() => {
+                hideLoadingScreen();
+            }, 2000);
         });
 
         // تنظيف عند إغلاق الصفحة
