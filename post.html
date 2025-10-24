@@ -1072,7 +1072,7 @@
     <!-- المحتوى الرئيسي -->
     <main>
         <div class="page-header">
-            <h1>مشاركاتي</h1>
+            <h1>اعلاناتي</h1>
         </div>
         
        <!-- عدادات المشاركات الجديدة -->
@@ -1113,7 +1113,7 @@
     <div id="publishModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>نشر المشاركة</h2>
+                <h2>نشر اعلان</h2>
                 <button class="close-modal" id="closePublishModal">&times;</button>
             </div>
             <div class="modal-body">
@@ -1121,7 +1121,7 @@
                     <div class="form-section">
                         <div class="form-section-title">
                             <i class="fas fa-calendar-alt"></i>
-                            <span>مدة النشر</span>
+                            <span>اختر مدة النشر </span>
                         </div>
                         <div class="form-group">
                             <select id="publishDuration" name="publishDuration" required>
@@ -1147,8 +1147,8 @@
                             <span>معلومات النشر</span>
                         </div>
                         <p style="font-size: 0.85rem; color: #666; line-height: 1.4;">
-                            سيتم نشر إعلانك فوراً دون الحاجة لمراجعة من الإدارة. 
-                            يمكنك تعديل أو حذف الإعلان في أي وقت من صفحة مشاركاتي.
+                            سيتم نشر إعلانك فوراً . 
+                            بعد النشر لا يمكنك تعديل الاعلان فقط حذف الإعلان في أي وقت من صفحة اعلاناتي.
                         </p>
                     </div>
                 </form>
@@ -1169,7 +1169,7 @@
             <div class="confirm-body">
                 <p class="confirm-message">هل أنت متأكد من رغبتك في حذف هذه المشاركة؟</p>
                 <div class="confirm-warning">
-                    <p><i class="fas fa-info-circle"></i> هذا الإجراء لا يمكن التراجع عنه. سيتم حذف جميع البيانات والصور المرتبطة بالمشاركة نهائياً.</p>
+                    <p><i class="fas fa-info-circle"></i> هذا الإجراء لا يمكن التراجع عنه. سيتم حذف المشاركة نهائياً.</p>
                 </div>
             </div>
             <div class="confirm-actions">
@@ -1395,10 +1395,10 @@
                 postsContainer.innerHTML = `
                     <div style="text-align: center; padding: 30px; grid-column: 1/-1;">
                         <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
-                        <p style="color: #999; font-size: 1rem; margin-bottom: 20px;">لا توجد مشاركات بعد</p>
+                        <p style="color: #999; font-size: 1rem; margin-bottom: 20px;">لا توجد اعلانات بعد</p>
                         <button class="empty-state-add-btn" onclick="window.location.href='newpost.html'">
                             <i class="fas fa-plus"></i>
-                            <span>إضافة مشاركة</span>
+                            <span>إضافة </span>
                         </button>
                     </div>
                 `;
@@ -1560,10 +1560,10 @@
                 
                 actionsHTML = `
                     <div class="post-details">
-                        ${post.property_number ? `<p><strong>رقم العقار:</strong> <span>${post.property_number}</span></p>` : ''}
-                        ${post.deed_type ? `<p><strong>نوع العقار:</strong> <span>${post.deed_type}</span></p>` : ''}
+                        ${post.property_number ? `<p><strong>الرقم او العدد:</strong> <span>${post.property_number}</span></p>` : ''}
+                        ${post.deed_type ? `<p><strong>نوع:</strong> <span>${post.deed_type}</span></p>` : ''}
                         <p><strong>المساحة:</strong> <span>${post.area_number} ${post.area_unit}</span></p>
-                        <p><strong>حالة العقار:</strong> <span>${post.property_condition}</span></p>
+                        <p><strong>الحالة:</strong> <span>${post.property_condition}</span></p>
                         ${post.features ? `<p><strong>المميزات:</strong> <span>${post.features}</span></p>` : ''}
                         ${post.notes ? `<p><strong>ملاحظات:</strong> <span>${post.notes}</span></p>` : ''}
                         <p><strong>السعر:</strong> <span class="price-display">${priceFormatted} (${post.price_negotiable})</span></p>
@@ -1857,7 +1857,7 @@
                         
                         // إضافة علامة للموقع الحقيقي
                         marker = L.marker([lat, lng]).addTo(map);
-                        marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع الدقيق للعقار`).openPopup();
+                        marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع الدقيق `).openPopup();
                     } else {
                         // إذا كانت الإحداثيات غير صالحة، استخدم موقع افتراضي
                         map = L.map('map').setView([33.3152, 44.3661], 10);
@@ -1885,5 +1885,6 @@
             }, 100);
         }
     </script>
+    <script src="common.js"></script>
 </body>
 </html>
