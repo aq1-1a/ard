@@ -1215,6 +1215,28 @@
         .leaflet-control-attribution {
             display: none !important;
         }
+        /* إظهار Attribution للخريطة */
+.leaflet-control-attribution {
+    display: block !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    padding: 3px 8px !important;
+    font-size: 10px !important;
+    color: #333 !important;
+    border-radius: 4px !important;
+    margin: 5px !important;
+    max-width: calc(100% - 10px) !important;
+    text-align: center !important;
+}
+
+.leaflet-control-attribution a {
+    color: #1a2a6c !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+}
+
+.leaflet-control-attribution a:hover {
+    text-decoration: underline !important;
+}
     </style>
 </head>
 <body>
@@ -1461,19 +1483,19 @@
         let postIdToSend = null;
         let isLocationSaved = false; // متغير جديد لتتبع حالة حفظ الموقع
 
-        // --- مزودو الخرائط الآمنة فقط ---
-        const mapProviders = {
-            maptiler: {
-                name: 'MapTiler Basic',
-                url: 'https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf5kcxKDmxByQC',
-                attribution: '© <a href="https://www.maptiler.com/copyright/" target="_blank">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>'
-            },
-            carto: {
-                name: 'CartoDB',
-                url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-                attribution: '© OpenStreetMap contributors © CARTO'
-            }
-        };
+        // --- مزودو الخرائط مع Attribution الصحيح ---
+const mapProviders = {
+    maptiler: {
+        name: 'MapTiler Basic',
+        url: 'https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf5kcxKDmxByQC',
+        attribution: '© <a href="https://www.maptiler.com/copyright/" target="_blank">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>'
+    },
+    carto: {
+        name: 'CartoDB',
+        url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+        attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a> © <a href="https://carto.com/attributions" target="_blank">CARTO</a>'
+    }
+};
         
         // عرض إشعار احترافي
         function showNotification(title, message, type = 'success', duration = 5000) {
@@ -1912,18 +1934,25 @@
 
         // --- تهيئة الخريطة المحسنة ---
         function initializeMap() {
-            if (!map) {
-                // تهيئة الخريطة مع تعطيل التحكم الافتراضي بالتقريب والتبعيد
-               map = L.map('map', {
-                    zoomControl: false,  // تعطيل التحكم الافتراضي
-                    closePopupOnClick: false // منع إغلاق النوافذ المنبثقة عند النقر
-                }).setView([35.3367506929845, 43.7862521409988], 11); // إحداثيات الحويجة
-                
-                // إضافة الطبقة الأولى (MapTiler)
-                currentTileLayer = L.tileLayer(mapProviders.maptiler.url, {
-                    attribution: false, // تعطيل attribution هنا أيضاً
-                    maxZoom: 19
-                }).addTo(map);
+             if (!map) {
+        // تهيئة الخريطة مع تعطيل التحكم الافتراضي بالتقريب والتبعيد
+        map = L.map('map', {
+            zoomControl: false,
+            closePopupOnClick: false,
+            attributionControl: true // تمكين التحكم في Attribution
+        }).setView([35.32124953921274, 43.77408027648926], 15);
+        
+        // إضافة Attribution مخصص
+        L.control.attribution({
+            position: 'bottomright',
+            prefix: 'خرائط:'
+        }).addTo(map);
+
+        // إضافة الطبقة الأولى (MapTiler)
+        currentTileLayer = L.tileLayer(mapProviders.maptiler.url, {
+            attribution: mapProviders.maptiler.attribution,
+            maxZoom: 19
+        }).addTo(map);
 
                 // إضافة أداة التقريب والتبعيد مخصصة
                 L.control.zoom({
