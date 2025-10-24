@@ -1,44 +1,75 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>تثبيت تطبيق Ayn</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>تثبيت تطبيق أيين</title>
 
-<link rel="manifest" href="/ard/manifest.json">
+<!-- روابط نسبية (تأكد أن الملفات موجودة في نفس المجلد /ard/) -->
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0b7ed1">
-<link rel="apple-touch-icon" href="/ard/ayn-180.png">
+<link rel="apple-touch-icon" href="ayn-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes"> <!-- للتوافق -->
 <meta name="apple-mobile-web-app-title" content="Ayn">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
 <style>
-body{font-family: Tahoma, Arial, sans-serif; background:#f5f8fb; color:#222; padding:20px;}
-.card{max-width:720px;margin:30px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,0.08)}
-h1{margin-top:0}
-.btn{display:inline-block;padding:10px 14px;border-radius:9px;text-decoration:none;margin:6px 6px;background:#0b7ed1;color:#fff}
+  body{font-family: "Tajawal", sans-serif;background:#f4f6f8;margin:0;padding:20px;text-align:center}
+  .card{background:#fff;border-radius:16px;box-shadow:0 6px 25px rgba(0,0,0,0.08);padding:25px;max-width:420px;margin:40px auto}
+  h1{margin-top:0;color:#0b7ed1}
+  p{color:#444;line-height:1.6}
+  .btn{display:inline-block;margin:8px;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:600;background:#0b7ed1;color:#fff;border:none;cursor:pointer}
+  .modal{display:none;position:fixed;z-index:999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5)}
+  .modal-content{background:#fff;margin:18% auto;padding:18px;border-radius:12px;width:86%;max-width:380px;text-align:center}
+  .close{background:#eee;border:none;padding:8px 12px;border-radius:8px;margin-top:10px;cursor:pointer}
 </style>
 </head>
 <body>
+
 <div class="card">
-  <h1>تثبيت تطبيق Ayn</h1>
-  <p>هذا الحزمة تجهز صفحتك لتعمل كاختصار/تطبيق على أجهزة Android و iPhone. تأكد أن ترفع أيقونات (ayn.png) وملفات الحزمة إلى المجلد <code>/ard/</code> على موقعك: <strong>https://aq1-1a.github.io/ard/</strong></p>
+  <img src="ayn-180.png" alt="شعار أيين" style="width:90px;margin-bottom:15px;">
+  <h1>تثبيت تطبيق أيين</h1>
+  <p>اختر جهازك: زر "تنزيل لأندرويد" سيحاول تنزيل APK مباشرة. زر "تثبيت على آيفون" يشرح طريقة إضافة الاختصار على الشاشة.</p>
 
-  <h3>خطوات سريعة للمستخدم النهائي</h3>
-  <ul>
-    <li><strong>أندرويد (Chrome):</strong> افتح الرابط في Chrome → زر القائمة → Add to Home screen → Add.</li>
-    <li><strong>آيفون (Safari):</strong> افتح الرابط في Safari → زر المشاركة → Add to Home Screen → Add.</li>
-  </ul>
+  <!-- رابط APK (ضع ayn-app.apk في نفس المجلد أو غيّر الاسم) -->
+  <a id="downloadApk" href="ayn-app.apk" class="btn" download>⬇ تنزيل لأندرويد</a>
 
-  <p>إذا أردت، ارفع ملف APK في نفس المجلد وأضف زر تنزيل داخل موقعك؛ لكن iOS لا يسمح بتثبيت تطبيقات خارج App Store.</p>
+  <!-- زر iOS يفتح المودال -->
+  <button id="iosBtn" class="btn"> تثبيت على آيفون</button>
+</div>
 
-  <a class="btn" href="https://aq1-1a.github.io/ard/" target="_blank">فتح الموقع</a>
+<!-- مودال iPhone -->
+<div id="iosModal" class="modal">
+  <div class="modal-content">
+    <h3>تثبيت على آيفون</h3>
+    <p>لتثبيت التطبيق على شاشة آيفون:</p>
+    <ol style="text-align:right; direction:rtl;">
+      <li>افتح هذه الصفحة في متصفح <strong>Safari</strong>.</li>
+      <li>اضغط زر <strong>المشاركة (Share)</strong>.</li>
+      <li>اختر <strong>Add to Home Screen</strong> ثم اضغط <strong>Add</strong>.</li>
+    </ol>
+    <button class="close">إغلاق</button>
+  </div>
 </div>
 
 <script>
+/* ============================
+   تسجيل Service Worker (مسار نسبي)
+   إذا sw.js موجود في نفس المجلد مع install.html فاستخدم 'sw.js'
+   ============================ */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/ard/sw.js').catch(e => console.warn('SW failed', e));
+  navigator.serviceWorker.register('sw.js')
+    .then(()=>console.log('SW registered'))
+    .catch(e=>console.warn('SW failed', e));
 }
+
+/* فتح/اغلاق المودال */
+const modal = document.getElementById('iosModal');
+document.getElementById('iosBtn').onclick = () => modal.style.display = 'block';
+document.querySelector('.close').onclick = () => modal.style.display = 'none';
+window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
 </script>
+
 </body>
 </html>
