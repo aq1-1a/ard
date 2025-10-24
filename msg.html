@@ -1565,6 +1565,14 @@
             
             // بدء الاستطلاع للرسائل الجديدة
             startMessagePolling();
+            
+            // إرسال رسالة إلى النافذة الأم لتحديث الإشعارات
+            if (window.parent) {
+                window.parent.postMessage({ 
+                    type: 'messagesRead', 
+                    senderId: otherUser.id 
+                }, '*');
+            }
         }
 
         // وضع علامة مقروءة على المحادثة في قاعدة البيانات
@@ -1608,11 +1616,12 @@
                     const messages = await loadMessages(currentConversation);
                     if (messages.length > lastMessageCount) {
                         displayMessages(messages, true);
+                        
                         // تحديث حالة القراءة عند تلقي رسالة جديدة
                         await markConversationAsRead(currentConversation);
                     }
                 }
-            }, 2000); // كل ثانيتين للتحديث الأسرع
+            }, 2000);
         }
 
         // بدء الاستطلاع لتحديث قائمة المحادثات
@@ -1628,34 +1637,8 @@
                 if (JSON.stringify(newConversations) !== JSON.stringify(allConversations)) {
                     allConversations = newConversations;
                     displayConversations(allConversations);
-                    
-                    // إظهار إشعار إذا كانت هناك رسائل جديدة
-                    checkForNewMessages(newConversations);
                 }
             }, 5000); // كل 5 ثوانٍ لتحديث قائمة المحادثات
-        }
-
-        // التحقق من الرسائل الجديدة وعرض إشعار
-        function checkForNewMessages(conversations) {
-            let totalUnread = 0;
-            let newMessageFrom = null;
-            
-            conversations.forEach(conv => {
-                if (conv.unread_count > 0) {
-                    totalUnread += conv.unread_count;
-                    if (!newMessageFrom && conv.messages && conv.messages.length > 0) {
-                        const otherUserId = conv.user1_id === currentUser.id ? conv.user2_id : conv.user1_id;
-                        const otherUser = allUsers.find(u => u.id === otherUserId);
-                        if (otherUser) {
-                            newMessageFrom = otherUser.full_name || 'مستخدم';
-                        }
-                    }
-                }
-            });
-            
-            if (totalUnread > 0 && newMessageFrom && currentConversation === null) {
-                showNotification(`رسالة جديدة من ${newMessageFrom}`, 'info');
-            }
         }
 
         // إيقاف الاستطلاع
@@ -2281,8 +2264,18 @@
             e.preventDefault();
         }, { passive: false });
 
+        // استمع للرسائل من النافذة الأم
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'refreshMessages') {
+                if (currentConversation) {
+                    loadMessages(currentConversation).then(messages => {
+                        displayMessages(messages);
+                    });
+                }
+            }
+        });
+
     </script>
     <script src="common.js"></script>
 </body>
 </html>
-
