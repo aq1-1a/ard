@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فحص المتصفح</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            color: #1d1d1f;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        .safari-message {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .other-browser-message .open-button {
+            display: inline-block;
+            background-color: #007aff;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        .other-browser-message .open-button:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- سيتم إظهار هذا الجزء فقط في متصفح سفاري الحقيقي -->
+        <div id="safari-section" class="safari-message hidden">
+            <h1>✅ نعم</h1>
+            <p>هذا المتصفح هو سفاري.</p>
+            <p>الآن يمكنك استخدام خيار "إضافة إلى الشاشة الرئيسية" من قائمة المشاركة.</p>
+        </div>
+
+        <!-- سيتم إظهار هذا الجزء في جميع المتصفحات الأخرى (داخل التطبيقات) -->
+        <div id="other-browser-section" class="other-browser-message hidden">
+            <h1>⚠️ لفتح هذه الصفحة بشكل صحيح</h1>
+            <p>يبدو أنك تفتح الرابط من داخل تطبيق آخر.</p>
+            <p>للحصول على أفضل تجربة والوصول لجميع الخيارات، يرجى فتح الرابط في متصفح سفاري.</p>
+            
+            <!-- هذا هو الزر السحري -->
+            <a href="#" id="open-in-safari-btn" class="open-button">فتح في سفاري</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const safariSection = document.getElementById('safari-section');
+            const otherBrowserSection = document.getElementById('other-browser-section');
+            const openInSafariBtn = document.getElementById('open-in-safari-btn');
+
+            // --- الدالة السحرية للكشف الدقيق عن سفاري ---
+            function isStandaloneSafari() {
+                const ua = navigator.userAgent;
+                const vendor = navigator.vendor;
+
+                // الشرط الأول: يجب أن يكون الـ User Agent و Vendor مطابقاً لسفاري
+                const isSafariLike = /Safari/.test(ua) && /Apple Computer, Inc./.test(vendor);
+                
+                // الشرط الثاني (الأهم): نتأكد من أننا لسنا داخل متصفح تطبيق
+                // متصفحات التطبيقات غالباً ما تعرض كائن window.external أو window.webkit.messageHandlers
+                // سفاري الحقيقي لا يعرض هذه الكائنات
+                const isNotInAppBrowser = !window.external && !window.webkit?.messageHandlers;
+
+                // الشرط الثالث: نتأكد من أنه ليس متصفح كروم أو فايرفوكس على iOS
+                const isNotChromeOrFirefox = !/CriOS|FxiOS|OPiOS/.test(ua);
+
+                return isSafariLike && isNotInAppBrowser && isNotChromeOrFirefox;
+            }
+
+            if (isStandaloneSafari()) {
+                // إذا كان المتصفح سفاري حقيقي
+                safariSection.classList.remove('hidden');
+            } else {
+                // إذا كان أي متصفح آخر
+                otherBrowserSection.classList.remove('hidden');
+                
+                // --- الجزء الأهم: إعداد الرابط للإجبار على الفتح في سفاري ---
+                // نضع الرابط الحالي للصفحة في زر الفتح
+                openInSafariBtn.href = window.location.href;
+                
+                // نضيف target="_blank" لإجبار نظام التشغيل على فتح الرابط في التطبيق الافتراضي
+                openInSafariBtn.target = '_blank';
+            }
+        });
+    </script>
+
+</body>
+</html>
