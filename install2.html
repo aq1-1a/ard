@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>تثبيت تطبيق أيين</title>
+
+<!-- روابط من جذر الموقع لضمان الوصول الصحيح -->
+<link rel="manifest" href="/ard/manifest.json">
+<meta name="theme-color" content="#0b7ed1">
+<link rel="apple-touch-icon" href="/ard/ayn-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ayn">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<!-- استيراد خط Tajawal من Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* === متغيرات التصميم === */
+  :root {
+    --primary-color: #0b7ed1;
+    --primary-dark: #0968b3;
+    --secondary-color: #00c6ff;
+    --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-bg: rgba(255, 255, 255, 0.15);
+    --card-border: rgba(255, 255, 255, 0.2);
+    --text-color: #333;
+    --text-light: #f4f6f8;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+  }
+
+  /* === إعدادات عامة === */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Tajawal", sans-serif;
+    background: var(--background-gradient);
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--text-light);
+    overflow-x: hidden;
+  }
+
+  /* === حاوية المحتوى الرئيسية === */
+  .main-container {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 24px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 8px 32px 0 var(--shadow-color);
+    padding: 40px;
+    max-width: 450px;
+    width: 100%;
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  /* === الأيقونة المتحركة === */
+  .app-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 28px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    animation: pulse 2s infinite;
+  }
+
+  /* === النصوص === */
+  h1 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 2.2em;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.7;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+  }
+  
+  /* === قسم الوصف === */
+  .description {
+    text-align: right;
+    margin-bottom: 30px;
+  }
+
+  .description h2 {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .description p {
+    font-size: 0.95em;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+
+  .description .closing-text {
+    font-weight: 500;
+    margin-top: 25px;
+  }
+
+  .description .tagline {
+    font-weight: 700;
+    font-style: italic;
+    margin-top: 10px;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .features-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    text-align: right;
+  }
+
+  .features-list li {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px 15px 12px 10px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    position: relative;
+    font-size: 0.95em;
+    transition: background-color 0.3s ease;
+  }
+
+  .features-list li:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .features-list li::before {
+    content: '✓';
+    color: var(--secondary-color);
+    font-weight: bold;
+    font-size: 1.2em;
+    display: inline-block;
+    width: 25px;
+    margin-left: 10px;
+  }
+
+  /* === الأزرار === */
+  .btn {
+    display: inline-block;
+    margin: 8px;
+    padding: 14px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1em;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .btn:active {
+    transform: translateY(-1px);
+  }
+  
+  .btn-secondary {
+    background: #6c757d;
+  }
+  .btn-secondary:hover {
+    background: #5a6268;
+  }
+
+  /* === المودال (النافذة المنبثقة) === */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .modal-content {
+    background: #fff;
+    color: var(--text-color);
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.4s ease-out;
+    text-align: right;
+  }
+
+  .modal-content h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+    text-align: center;
+  }
+
+  .modal-content ol {
+    text-align: right;
+    direction: rtl;
+    padding-right: 20px;
+  }
+
+  .modal-content li {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .modal-content li .step-number {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    margin-left: 10px;
+    flex-shrink: 0;
+  }
+
+  .share-icon {
+    width: 24px;
+    height: 24px;
+    margin-left: 8px;
+    fill: var(--primary-color);
+  }
+
+  .close {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    margin-top: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    width: 100%;
+  }
+
+  .close:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  .modal-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 0.9em;
+  }
+
+  /* === رسالة الحالة === */
+  #status {
+    margin-top: 20px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+
+  /* === الرسوم المتحركة === */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(-50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="main-container">
+  <img src="/ard/ayn-180.png" alt="شعار أيين" class="app-icon">
+  <h1>تطبيق أيين</h1>
+  <p>احصل على أفضل تجربة عبر تثبيت التطبيق على جهازك. وصول سريع وسهل في أي وقت.</p>
+
+  <!-- === قسم الوصف === -->
+  <div class="description">
+    <h2>اكتشف أيين – منصتك الذكية للبحث عن العقارات</h2>
+    <p>مرحباً بك في أيين، المنصة المجانية المصممة لتسهيل حياتك في البحث عن العقارات! سواء كنت تبحث عن بيع، إيجار أو استثمار عقاري، توفر لك أيين تجربة سهلة وسريعة لتجد ما تبحث عنه دون عناء أو تكاليف إضافية.</p>
+    
+    <ul class="features-list">
+      <li>تصفح عروض العقارات بسهولة، واطلع على جميع التفاصيل المهمة.</li>
+      <li>تواصل مباشرة مع البائع أو المكتب العقاري بدون وسيط مكلف.</li>
+      <li>أضف عروضك الخاصة وشاركها مع آلاف المستخدمين مجاناً.</li>
+      <li>كل خدمات المنصة مجانية بالكامل، بدون رسوم أو اشتراكات.</li>
+    </ul>
+
+    <p class="closing-text">انضم اليوم إلى أيين واستمتع بتجربة سلسة وآمنة للبحث عن العقارات في كركوك، وقريباً في جميع المحافظات.</p>
+    <p class="tagline">أيين – حيث يصبح البحث عن العقار أسهل وأذكى.</p>
+  </div>
+
+  <!-- === أزرار التثبيت === -->
+  <button id="installBtn" class="btn">🤖 تثبيت التطبيق</button>
+  <button id="iosBtn" class="btn"> تثبيت على آيفون</button>
+
+  <!-- رسالة الحالة -->
+  <div id="status"></div>
+</div>
+
+<!-- مودال موحد للتعليمات -->
+<div id="installModal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle">تثبيت التطبيق</h3>
+    
+    <!-- محتوى متغير سيتم التحكم به عبر JavaScript -->
+    <div id="modalBody"></div>
+
+    <button class="close">إغلاق</button>
+  </div>
+</div>
+
+<script>
+/* ============================
+   تسجيل Service Worker
+   ============================ */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/ard/sw.js')
+    .then(() => console.log('Service Worker registered successfully.'))
+    .catch(e => console.warn('Service Worker registration failed:', e));
+}
+
+/* ============================
+   منطق التثبيت التلقائي (PWA)
+   ============================ */
+
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+const iosBtn = document.getElementById('iosBtn');
+const statusDiv = document.getElementById('status');
+const installModal = document.getElementById('installModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalBody = document.getElementById('modalBody');
+
+// التحقق من نوع الجهاز
+const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+
+if (isIos) {
+  installBtn.style.display = 'none';
+} else {
+  iosBtn.style.display = 'none';
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+  
+  // عند الضغط على زر التثبيت على أندرويد
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      // الحالة الطبيعية: المتصفح يدعم التثبيت
+      deferredPrompt.prompt();
+      installBtn.style.display = 'none';
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        statusDiv.textContent = 'شكرًا لك! تم تثبيت التطبيق بنجاح.';
+      } else {
+        statusDiv.textContent = 'تم إلغاء التثبيت.';
+      }
+      deferredPrompt = null;
+    } else {
+      // الحالة البديلة: المتصفح لا يدعم التثبيت (مثل متصفح فيسبوك)
+      showAndroidInstructions();
+    }
+  });
+}
+
+/* ============================
+   دوال المساعدة للمودال
+   ============================ */
+
+// دالة لإظهار تعليمات أندرويد (الحل المضمون)
+function showAndroidInstructions() {
+  modalTitle.textContent = 'تثبيت على أندرويد';
+  const currentUrl = location.href; // الحصول على الرابط الحالي
+  
+  modalBody.innerHTML = `
+    <div class="modal-warning">
+      للحصول على أفضل تجربة وتثبيت التطبيق، يجب استخدام متصفح Chrome.
+    </div>
+    <button id="openInChromeBtn" class="btn">
+      🌐 فتح في متصفح Chrome
+    </button>
+    <button id="copyLinkBtn" class="btn btn-secondary">
+      📋 نسخ الرابط
+    </button>
+    <p style="font-size: 0.9em; margin-top: 15px;">إذا لم ينجح الزر الأول، انسخ الرابط والصقه في Chrome يدويًا.</p>
+  `;
+  installModal.style.display = 'block';
+
+  // حدث زر "فتح في Chrome" باستخدام Intent
+  document.getElementById('openInChromeBtn').onclick = () => {
+    // رابط Intent الذي يطلب من نظام أندرويد فتح الرابط في Chrome
+    const intentUrl = `intent://${currentUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
+    window.location.href = intentUrl;
+  };
+
+  // حدث زر "نسخ الرابط"
+  document.getElementById('copyLinkBtn').onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(currentUrl);
+      const btn = document.getElementById('copyLinkBtn');
+      const originalText = btn.textContent;
+      btn.textContent = '✅ تم النسخ!';
+      btn.style.background = '#28a745';
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = ''; // إعادة اللون الأصلي
+      }, 2000);
+    } catch (err) {
+      alert('فشل نسخ الرابط، يرجى نسخه يدويًا: ' + currentUrl);
+    }
+  };
+}
+
+// دالة لإظهار تعليمات iOS
+function showIosInstructions() {
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const isChrome = /CriOS/.test(navigator.userAgent);
+  modalTitle.textContent = 'تثبيت على آيفون';
+
+  if (isSafari) {
+    // تعليمات سفاري
+    modalBody.innerHTML = `
+      <ol>
+        <li><span class="step-number">1</span> اضغط على زر المشاركة في أسفل الشاشة.
+          <svg class="share-icon" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+        </li>
+        <li><span class="step-number">2</span> قم بالتمرير لأسفل واختر <strong>"أضف إلى الشاشة الرئيسية"</strong>.</li>
+        <li><span class="step-number">3</span> اضغط على <strong>"أضف"</strong> لإتمام التثبيت.</li>
+      </ol>
+      ${navigator.share ? `<button id="shareBtn" class="btn" style="width: 100%; margin-top: 15px;"><svg style="width:20px; height:20px; vertical-align: middle; margin-left: 5px; fill: white;" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>فتح قائمة المشاركة</button>` : ''}
+    `;
+    
+    if (navigator.share) {
+      document.getElementById('shareBtn').onclick = async () => {
+        try {
+          await navigator.share({ 
+            title: 'تطبيق أيين', 
+            text: 'قم بتثبيت تطبيق أيين!', 
+            url: location.href 
+          });
+        } catch (err) { 
+          console.log('Share cancelled'); 
+        }
+      };
+    }
+  } else if (isChrome) {
+    // تعليمات كروم على iOS
+    modalBody.innerHTML = `
+      <ol>
+        <li><span class="step-number">1</span> اضغط على زر المشاركة في أعلى الشاشة (بجانب شريط العنوان).
+          <svg class="share-icon" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+        </li>
+        <li><span class="step-number">2</span> قم بالتمرير لأسفل واختر <strong>"أضف إلى الشاشة الرئيسية"</strong>.</li>
+        <li><span class="step-number">3</span> اضغط على <strong>"أضف"</strong> لإتمام التثبيت.</li>
+      </ol>
+      ${navigator.share ? `<button id="shareBtn" class="btn" style="width: 100%; margin-top: 15px;"><svg style="width:20px; height:20px; vertical-align: middle; margin-left: 5px; fill: white;" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>فتح قائمة المشاركة</button>` : ''}
+    `;
+    
+    if (navigator.share) {
+      document.getElementById('shareBtn').onclick = async () => {
+        try {
+          await navigator.share({ 
+            title: 'تطبيق أيين', 
+            text: 'قم بتثبيت تطبيق أيين!', 
+            url: location.href 
+          });
+        } catch (err) { 
+          console.log('Share cancelled'); 
+        }
+      };
+    }
+  } else {
+    // متصفحات أخرى على iOS
+    modalBody.innerHTML = `
+      <div class="modal-warning">
+        أنت تستخدم متصفحًا آخر. للحصول على أفضل تجربة، نوصي باستخدام متصفح سفاري.
+      </div>
+      <button id="openSafariBtn" class="btn" style="width: 100%; margin-bottom: 15px;">🌐 فتح في متصفح سفاري</button>
+    `;
+    document.getElementById('openSafariBtn').onclick = () => {
+      window.open(location.href, '_blank');
+    };
+  }
+  installModal.style.display = 'block';
+}
+
+// ============================
+// التعامل مع المودال
+// ============================
+
+iosBtn.onclick = showIosInstructions;
+
+document.querySelector('.close').onclick = () => installModal.style.display = 'none';
+window.onclick = e => { if (e.target === installModal) installModal.style.display = 'none'; };
+
+</script>
+<script src="common.js"></script>
+</body>
+</html>
