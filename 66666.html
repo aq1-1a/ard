@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختر المتصفح</title>
+    <style>
+        body { /* نفس الستايل السابق */ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f0f2f5; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; text-align: center; padding: 20px; box-sizing: border-box; }
+        .container { /* نفس الستايل السابق */ background-color: white; padding: 50px 40px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); max-width: 380px; width: 100%; }
+        h1 { color: #1d1d1f; margin-bottom: 15px; font-size: 24px; }
+        .description { color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 30px; }
+        .buttons-container { display: flex; flex-direction: column; gap: 15px; }
+        .share-button { /* نفس الستايل السابق */ background-color: #007aff; color: white; border: none; border-radius: 12px; padding: 18px 30px; font-size: 18px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s ease; -webkit-tap-highlight-color: transparent; width: 100%; }
+        .share-button:hover { background-color: #005ecb; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0, 122, 255, 0.3); }
+        .share-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0, 122, 255, 0.3); }
+        .share-button.chrome { background-color: #4285F4; }
+        .share-button.chrome:hover { background-color: #357ae8; }
+        .share-button svg { width: 24px; height: 24px; }
+        #message { /* نفس الستايل السابق */ margin-top: 25px; padding: 15px; background-color: #e7f4ff; border: 1px solid #b8daff; border-radius: 8px; color: #004085; font-size: 15px; opacity: 0; transform: translateY(-10px); transition: all 0.4s ease; }
+        #message.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>اختر المتصفح المفضل</h1>
+        <p class="description">
+            للحصول على خيار "إضافة إلى الشاشة الرئيسية"، اختر المتصفح الذي تريد استخدامه من الأسفل.
+        </p>
+
+        <div class="buttons-container">
+            <button id="openInSafariBtn" class="share-button">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
+                فتح في سفاري
+            </button>
+
+            <button id="openInChromeBtn" class="share-button chrome">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.5a8.5 8.5 0 1 1 8.5-8.5 8.51 8.51 0 0 1-8.5 8.5Zm0-16a7.5 7.5 0 1 0 7.5 7.5A7.51 7.51 0 0 0 12 4.5Z"/><path d="M12 15.5a3.5 3.5 0 1 1 3.5-3.5 3.5 3.5 0 0 1-3.5 3.5Zm0-6a2.5 2.5 0 1 0 2.5 2.5 2.5 2.5 0 0 0-2.5-2.5Z"/><path d="M19.44 12.5h-1a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1ZM5.56 12.5h-1a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1ZM12 19.44a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 1 0v1a.5.5 0 0 1-.5.5ZM12 6.06a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 1 0v1a.5.5 0 0 1-.5.5Z"/></svg>
+                فتح في كروم
+            </button>
+        </div>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openInSafariBtn = document.getElementById('openInSafariBtn');
+            const openInChromeBtn = document.getElementById('openInChromeBtn');
+            const messageDiv = document.getElementById('message');
+            const targetUrl = 'https://aq1-1a.github.io/ard/install2.html';
+
+            async function shareUrl() {
+                if (navigator.share) {
+                    try {
+                        await navigator.share({ title: 'إضافة إلى الشاشة الرئيسية', text: 'اختر المتصفح لفتح الرابط.', url: targetUrl });
+                    } catch (err) {
+                        copyToClipboard();
+                    }
+                } else {
+                    copyToClipboard();
+                }
+            }
+
+            function copyToClipboard() {
+                navigator.clipboard.writeText(targetUrl).then(() => {
+                    messageDiv.textContent = '✅ تم نسخ الرابط! الآن افتح سفاري أو كروم والصقه.';
+                    messageDiv.classList.add('visible');
+                });
+            }
+
+            openInSafariBtn.addEventListener('click', shareUrl);
+            openInChromeBtn.addEventListener('click', shareUrl);
+        });
+    </script>
+</body>
+</html>
