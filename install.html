@@ -35,6 +35,20 @@
   /* === إعدادات عامة === */
   * {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* السماح بتحديد النصوص في الفقرات فقط */
+  p, h1, h2, h3, li, .description {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
   }
 
   body {
@@ -172,6 +186,13 @@
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     width: 100%;
     margin-bottom: 10px;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    outline: none;
   }
 
   .btn:hover {
@@ -267,6 +288,13 @@
     font-weight: 600;
     transition: background-color 0.2s;
     width: 100%;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    outline: none;
   }
 
   .close:hover {
