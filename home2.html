@@ -1739,6 +1739,7 @@
         const imageModalIndicators = document.getElementById('imageModalIndicators');
 
         // متغيرات عامة
+        let touchTarget = null;
         let currentPostId = null;
         let map = null;
         let allPosts = [];
@@ -2140,70 +2141,94 @@ async function checkLoginStatus() {
              showNotification( ' ' ,`لديك ${premiumSlides.length} عروض مميزة`, 'success', 3000);
         }
 
-        // إعداد إيماءات السحب
-        function setupSwipeGestures() {
-            const slider = premiumSliderWrapper;
-            
-            // أحداث الماوس
-            slider.addEventListener('mousedown', handleDragStart);
-            slider.addEventListener('mousemove', handleDragMove);
-            slider.addEventListener('mouseup', handleDragEnd);
-            slider.addEventListener('mouseleave', handleDragEnd);
-            
-            // أحداث اللمس
-            slider.addEventListener('touchstart', handleTouchStart, { passive: true });
-            slider.addEventListener('touchmove', handleTouchMove, { passive: true });
-            slider.addEventListener('touchend', handleTouchEnd);
-        }
+        
+        // === إعداد إيماءات السحب ===
+function setupSwipeGestures() {
+    const slider = premiumSliderWrapper;
+    
+    // أحداث الماوس
+    slider.addEventListener('mousedown', handleDragStart);
+    slider.addEventListener('mousemove', handleDragMove);
+    slider.addEventListener('mouseup', handleDragEnd);
+    slider.addEventListener('mouseleave', handleDragEnd);
+    
+    // أحداث اللمس
+    slider.addEventListener('touchstart', handleTouchStart, { passive: true });
+    slider.addEventListener('touchmove', handleTouchMove, { passive: true });
+    slider.addEventListener('touchend', handleTouchEnd);
+}
+
 
         // بدء السحب
-        function handleDragStart(e) {
-            isDragging = true;
-            startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-            premiumSliderWrapper.classList.add('dragging');
-            pauseSlider();
-        }
+       function handleDragStart(e) {
+    isDragging = true;
+    startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    
+    // حفظ العنصر الذي تم لمسه في البداية (لأحداث اللمس فقط)
+    if (e.type === 'touchstart') {
+        touchTarget = e.target;
+    }
+    
+    premiumSliderWrapper.classList.add('dragging');
+    pauseSlider();
+}
 
         // حركة السحب
-        function handleDragMove(e) {
-            if (!isDragging) return;
-            e.preventDefault();
-            currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-        }
+       function handleDragMove(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+}
 
         // نهاية السحب
         function handleDragEnd(e) {
-            if (!isDragging) return;
-            isDragging = false;
-            premiumSliderWrapper.classList.remove('dragging');
-            
-            const diffX = startX - currentX;
-            
-            if (Math.abs(diffX) > dragThreshold) {
-                if (diffX > 0) {
-                    // السحب لليسار - الشريحة التالية
-                    nextPremiumSlide();
-                } else {
-                    // السحب لليمين - الشريحة السابقة
-                    prevPremiumSlide();
-                }
-            }
-            
-            resumeSlider();
+    if (!isDragging) return;
+    isDragging = false;
+    premiumSliderWrapper.classList.remove('dragging');
+    
+    const diffX = startX - currentX;
+    
+    if (Math.abs(diffX) > dragThreshold) {
+        // كانت هذه حركة سحب فعلية
+        if (diffX > 0) {
+            // السحب لليسار - الشريحة التالية
+            nextPremiumSlide();
+        } else {
+            // السحب لليمين - الشريحة السابقة
+            prevPremiumSlide();
         }
+    } else {
+        // هذه كانت نقرة، وليست سحب. يجب تشغيل النقر يدويًا لـ iOS.
+        if (e.type === 'touchend' && touchTarget) {
+            // ابحث عن العنصر القابل للنقر الأب
+            const clickableElement = touchTarget.closest('.premium-slide-content');
+            if (clickableElement) {
+                // استخدم setTimeout لتجنب أي تعارض مع أحداث اللمس الحالية
+                setTimeout(() => {
+                    clickableElement.click();
+                }, 10);
+            }
+        }
+    }
+    
+    // إعادة تعيين الهدف الذي تم لمسه
+    touchTarget = null;
+    
+    resumeSlider();
+}
 
         // أحداث اللمس
-        function handleTouchStart(e) {
-            handleDragStart(e);
-        }
+       function handleTouchStart(e) {
+    handleDragStart(e);
+}
 
-        function handleTouchMove(e) {
-            handleDragMove(e);
-        }
+function handleTouchMove(e) {
+    handleDragMove(e);
+}
 
-        function handleTouchEnd(e) {
-            handleDragEnd(e);
-        }
+function handleTouchEnd(e) {
+    handleDragEnd(e);
+}
 
         // بدء تشغيل عارض الشرائح المميز
         function startPremiumSlider() {
@@ -3323,3 +3348,4 @@ document.addEventListener('DOMContentLoaded', () => {
     <script src="common.js"></script>
 </body>
 </html>
+
