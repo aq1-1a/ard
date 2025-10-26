@@ -1658,7 +1658,13 @@
                 <button class="close-map-modal" id="closeMapModal">&times;</button>
             </div>
             <div class="map-container" id="mapContainer">
-                <!-- سيتم عرض الخريطة هنا ديناميكيًا -->
+                <!-- مؤشر التحميل الأولي للخريطة -->
+                <div id="mapLoader" class="initial-loader">
+                    <div class="loader-spinner"></div>
+                    <div class="loader-text">جاري استعادة الخريطة...</div>
+                </div>
+                <!-- زر إعادة تعيين الخريطة (للاستخدام الداخلي) -->
+                <button id="resetMapBtn" class="reset-btn" title="إعادة تعيين الخريطة">🔄</button>
             </div>
         </div>
     </div>
@@ -1721,6 +1727,8 @@
         const mapModal = document.getElementById('mapModal');
         const mapContainer = document.getElementById('mapContainer');
         const closeMapModal = document.getElementById('closeMapModal');
+        const mapLoader = document.getElementById('mapLoader');
+        const resetMapBtn = document.getElementById('resetMapBtn');
 
         // عناصر نافذة الصورة
         const imageModal = document.getElementById('imageModal');
@@ -1756,8 +1764,164 @@
         let imageSwipeThreshold = 50;
         let isImageSwiping = false;
 
-
-
+        // === نظام التخزين المؤقت المتقدم للخريطة ===
+        const MAPTILER_KEY = 'rxt8VXlf5kcxKDmxByQC';
+        
+        // حدود محافظة كركوك التقريبية
+        const korkukBounds = [
+            [34.685507, 43.262948], // جنوب غرب
+            [35.908843, 44.860252]  // شمال شرق
+        ];
+        
+        // فتح قاعدة بيانات IndexedDB
+        const openDB = () => {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('MapCacheDB', 1);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains('tiles')) {
+                        db.createObjectStore('tiles', { keyPath: 'url' });
+                    }
+                };
+            });
+        };
+        
+        // حفظ البلاطة في التخزين المؤقت
+        const saveTile = async (url, blob) => {
+            try {
+                const db = await openDB();
+                const transaction = db.transaction(['tiles'], 'readwrite');
+                const store = transaction.objectStore('tiles');
+                await store.put({ url, blob, timestamp: Date.now() });
+            } catch (error) {
+                // تجاهل الأخطاء الصامتة
+            }
+        };
+        
+        // جلب البلاطة من التخزين المؤقت
+        const getTile = async (url) => {
+            try {
+                const db = await openDB();
+                const transaction = db.transaction(['tiles'], 'readonly');
+                const store = transaction.objectStore('tiles');
+                const result = await store.get(url);
+                
+                // حذف البلاطات القديمة (أكثر من 30 يومًا)
+                if (result && Date.now() - result.timestamp > 30 * 24 * 60 * 60 * 1000) {
+                    const deleteTransaction = db.transaction(['tiles'], 'readwrite');
+                    deleteTransaction.objectStore('tiles').delete(url);
+                    return null;
+                }
+                
+                return result ? result.blob : null;
+            } catch (error) {
+                return null;
+            }
+        };
+        
+        // طبقة بلاطات مخصصة مع التخزين المؤقت
+        const CachedTileLayer = L.TileLayer.extend({
+            createTile: function(coords, done) {
+                const tile = document.createElement('img');
+                const url = this.getTileUrl(coords);
+                
+                // محاولة جلب البلاطة من التخزين المؤقت أولاً
+                getTile(url).then(blob => {
+                    if (blob) {
+                        tile.src = URL.createObjectURL(blob);
+                        done(null, tile);
+                    } else {
+                        // جلب البلاطة من الشبكة وحفظها
+                        fetch(url)
+                            .then(response => response.blob())
+                            .then(blob => {
+                                saveTile(url, blob);
+                                tile.src = URL.createObjectURL(blob);
+                                done(null, tile);
+                            })
+                            .catch(() => {
+                                tile.src = url;
+                                done(null, tile);
+                            });
+                    }
+                }).catch(() => {
+                    tile.src = url;
+                    done(null, tile);
+                });
+                
+                return tile;
+            }
+        });
+        
+        // === نظام حفظ الحالة التلقائي (في الخلفية) ===
+        
+        // حفظ حالة الخريطة
+        const saveMapState = (lat, lng, zoom) => {
+            const state = {
+                lat,
+                lng,
+                zoom,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('mapState', JSON.stringify(state));
+        };
+        
+        // جلب حالة الخريطة المحفوظة
+        const getMapState = () => {
+            const state = localStorage.getItem('mapState');
+            return state ? JSON.parse(state) : null;
+        };
+        
+        // حفظ الأماكن التي تمت زيارتها (في الخلفية)
+        const saveVisitedPlace = (lat, lng, zoom) => {
+            const places = getVisitedPlaces();
+            
+            // التحقق إذا كان المكان موجود بالفعل
+            const existingPlace = places.find(p => 
+                Math.abs(p.lat - lat) < 0.001 && Math.abs(p.lng - lng) < 0.001
+            );
+            
+            if (!existingPlace) {
+                const newPlace = {
+                    id: Date.now(),
+                    lat: parseFloat(lat.toFixed(6)),
+                    lng: parseFloat(lng.toFixed(6)),
+                    zoom: zoom,
+                    timestamp: Date.now()
+                };
+                places.push(newPlace);
+                
+                // الحفاظ على آخر 50 مكان فقط
+                if (places.length > 50) {
+                    places.shift();
+                }
+                
+                localStorage.setItem('visitedPlaces', JSON.stringify(places));
+            }
+        };
+        
+        // جلب الأماكن التي تمت زيارتها
+        const getVisitedPlaces = () => {
+            const places = localStorage.getItem('visitedPlaces');
+            return places ? JSON.parse(places) : [];
+        };
+        
+        // مسح كل البيانات المحفوظة
+        const clearAllMapData = () => {
+            localStorage.removeItem('visitedPlaces');
+            localStorage.removeItem('mapState');
+            
+            // مسح التخزين المؤقت للبلاطات
+            openDB().then(db => {
+                const transaction = db.transaction(['tiles'], 'readwrite');
+                const store = transaction.objectStore('tiles');
+                store.clear();
+            });
+        };
 
 // التحقق من حالة تسجيل الدخول
 async function checkLoginStatus() {
@@ -2828,7 +2992,10 @@ function closeLoginModal() {
             // منع التمرير في الخلفية
             document.body.style.overflow = 'hidden';
             
-            // تهيئة الخريطة
+            // إظهار مؤشر التحميل
+            mapLoader.style.display = 'flex';
+            
+            // تهيئة الخريطة مع تأخير بسيط لعرض مؤشر التحميل
             setTimeout(() => {
                 if (map) {
                     map.remove();
@@ -2845,32 +3012,104 @@ function closeLoginModal() {
                     
                     // التحقق من صحة الإحداثيات
                     if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
-                        // إنشاء الخريطة مع التركيز على موقع العقار الحقيقي
-                        mapInstance = L.map('mapContainer').setView([lat, lng], 15);
+                        // التحقق من حالة الخريطة المحفوظة
+                        const savedState = getMapState();
+                        const initialCenter = savedState ? [savedState.lat, savedState.lng] : [lat, lng];
+                        const initialZoom = savedState ? savedState.zoom : 15;
+                        
+                        // إنشاء الخريطة مع التركيز على موقع العقار الحقيقي أو الموقع المحفوظ
+                        mapInstance = L.map('mapContainer', {
+                            center: initialCenter,
+                            zoom: initialZoom,
+                            minZoom: 10,
+                            maxZoom: 18,
+                            maxBounds: korkukBounds,
+                            maxBoundsViscosity: 1.0
+                        });
                         
                         // إضافة علامة للموقع الحقيقي
                         marker = L.marker([lat, lng]).addTo(mapInstance);
                         marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع الدقيق للعقار`).openPopup();
                     } else {
                         // إذا كانت الإحداثيات غير صالحة، استخدم موقع افتراضي
-                        mapInstance = L.map('mapContainer').setView([35.32124953921274, 43.77408027648926], 15);
+                        const savedState = getMapState();
+                        const initialCenter = savedState ? [savedState.lat, savedState.lng] : [35.32124953921274, 43.77408027648926];
+                        const initialZoom = savedState ? savedState.zoom : 15;
+                        
+                        mapInstance = L.map('mapContainer', {
+                            center: initialCenter,
+                            zoom: initialZoom,
+                            minZoom: 10,
+                            maxZoom: 18,
+                            maxBounds: korkukBounds,
+                            maxBoundsViscosity: 1.0
+                        });
+                        
                         marker = L.marker([35.32124953921274, 43.77408027648926]).addTo(mapInstance);
                         marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع التقريبي`).openPopup();
                     }
                 } else {
                     // إذا لم تكن الإحداثيات متوفرة، استخدم موقع افتراضي
-                    mapInstance = L.map('mapContainer').setView([35.32124953921274, 43.77408027648926], 15);
-                        marker = L.marker([35.32124953921274, 43.77408027648926]).addTo(mapInstance);
+                    const savedState = getMapState();
+                    const initialCenter = savedState ? [savedState.lat, savedState.lng] : [35.32124953921274, 43.77408027648926];
+                    const initialZoom = savedState ? savedState.zoom : 15;
+                    
+                    mapInstance = L.map('mapContainer', {
+                        center: initialCenter,
+                        zoom: initialZoom,
+                        minZoom: 10,
+                        maxZoom: 18,
+                        maxBounds: korkukBounds,
+                        maxBoundsViscosity: 1.0
+                    });
+                    
+                    marker = L.marker([35.32124953921274, 43.77408027648926]).addTo(mapInstance);
                     marker.bindPopup(`<b>${governorate}</b><br>${preciseAddress}<br>الموقع التقريبي`).openPopup();
                 }
                 
-               // إضافة طبقة الخريطة الآمنة (MapTiler)
-L.tileLayer('https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf5kcxKDmxByQC', {
-    attribution: '© <a href="https://www.maptiler.com/copyright/" target="_blank">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap contributors</a>'
-}).addTo(mapInstance);
+                // إضافة طبقة البلاطات مع التخزين المؤقت
+                const tileLayer = new CachedTileLayer(
+                    `https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=${MAPTILER_KEY}`, {
+                        attribution: '&copy; MapTiler & OpenStreetMap contributors',
+                        minZoom: 10,
+                        maxZoom: 18
+                    }
+                );
+                
+                tileLayer.addTo(mapInstance);
+                
+                // تتبع حركة المستخدم وحفظ الحالة تلقائيًا
+                let saveTimeout;
+                let lastSavedPosition = null;
+                
+                mapInstance.on('moveend', () => {
+                    const center = mapInstance.getCenter();
+                    const zoom = mapInstance.getZoom();
+                    
+                    // حفظ حالة الخريطة الحالية
+                    saveMapState(center.lat, center.lng, zoom);
+                    
+                    // حفظ المكان إذا تحرك المستخدم مسافة كافية
+                    if (!lastSavedPosition || 
+                        Math.abs(center.lat - lastSavedPosition.lat) > 0.002 || 
+                        Math.abs(center.lng - lastSavedPosition.lng) > 0.002) {
+                        
+                        // تأخير الحفظ لتجنب حفظ الكثير من الأماكن
+                        clearTimeout(saveTimeout);
+                        saveTimeout = setTimeout(() => {
+                            saveVisitedPlace(center.lat, center.lng, zoom);
+                            lastSavedPosition = { lat: center.lat, lng: center.lng };
+                        }, 3000);
+                    }
+                });
+                
+                // إخفاء مؤشر التحميل بعد إنشاء الخريطة
+                setTimeout(() => {
+                    mapLoader.classList.add('hidden');
+                }, 800);
                 
                 map = mapInstance;
-            }, 100);
+            }, 300);
         }
 
         // دوال عرض الصور
@@ -2986,6 +3225,7 @@ L.tileLayer('https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf
                 map.remove();
                 map = null;
             }
+            mapLoader.classList.remove('hidden');
         });
 
         // مستمعو الأحداث لنافذة الصورة
@@ -3024,6 +3264,16 @@ L.tileLayer('https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}.png?key=rxt8VXlf
         clearSearchResultsBtn.addEventListener('click', () => {
             searchInput.value = '';
             searchPosts('');
+        });
+
+        // مستمع حدث زر إعادة تعيين الخريطة
+        resetMapBtn.addEventListener('click', () => {
+            if (confirm('هل تريد إعادة تعيين الخريطة إلى الحالة الافتراضية؟')) {
+                clearAllMapData();
+                if (map) {
+                    map.setView([35.32124953921274, 43.77408027648926], 15);
+                }
+            }
         });
 
         // منع السحب والقائمة السياقية على الصور
