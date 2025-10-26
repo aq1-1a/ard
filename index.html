@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>الرئيسية - أيين</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>الرئيسية - أيين</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <link rel="manifest" href="/ard/manifest.json">
+<link rel="manifest" href="/ard/manifest.json">
 <meta name="theme-color" content="#0b7ed1">
 
 <!-- أيقونات آبل -->
@@ -21,818 +21,850 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-
-        button, a, input, textarea, select {
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        button:active, a:active {
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            font-family: 'Tajawal', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            padding-bottom: 60px;
-            /* إضافة هذا لمنع التمرير تحت شريط العنوان */
-            padding-top: 50px;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Header */
-        header {
-            background-color: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1001;
-            height: 50px;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            flex: 1;
-        }
-
-        .logo {
-            font-size: 1.6rem;
-            color: #1a2a6c;
-            font-weight: 700;
-        }
-
-        .user-info {
-            color: #555;
-            font-weight: 500;
-            font-size: 0.85rem;
-            display: none;
-        }
-
-        .header-icons {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            justify-content: flex-end;
-            flex: 1;
-        }
-
-        .icon-btn {
-            position: relative;
-            background: none;
-            border: none;
-            font-size: 1.3rem;
-            color: #1a2a6c;
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 50%;
-            transition: background-color 0.3s ease;
-        }
-
-        .icon-btn:hover {
-            background-color: rgba(26, 42, 108, 0.1);
-        }
-
-        .badge {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: #dc3545;
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.65rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .bell-badge {
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            width: 10px;
-            height: 10px;
-            background-color: #28a745;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
-        .create-post-btn {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.65rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .create-post-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .create-post-btn i {
-            font-size: 1.1rem;
-            margin-bottom: 2px;
-        }
-        
-        .create-post-btn span {
-            font-size: 0.6rem;
-            margin-top: 2px;
-        }
-
-        /* Overlay للشريط الجانبي */
-        .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .sidebar-open .sidebar-overlay {
-            display: block;
-            opacity: 1;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 280px;
-            height: 100vh;
-            background-color: rgba(255, 255, 255, 0.98);
-            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
-            padding-top: 60px;
-            padding-bottom: 80px;
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 1000;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-open .sidebar {
-            transform: translateX(0);
-        }
-
-        .nav-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            padding: 0 15px;
-            flex-grow: 1;
-        }
-
-        .nav-card {
-            background-color: rgba(26, 42, 108, 0.05);
-            border-radius: 10px;
-            padding: 18px;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .nav-card:hover:not(:disabled) {
-            transform: translateX(-5px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
-        }
-
-        .nav-card:disabled {
-            cursor: not-allowed;
-            opacity: 0.6;
-            background-color: rgba(200, 200, 200, 0.3);
-        }
-
-        .nav-card.active {
-            background-color: rgba(26, 42, 108, 0.15);
-            border-right: 4px solid #1a2a6c;
-        }
-
-        .nav-card i {
-            font-size: 1.5rem;
-            color: #1a2a6c;
-            width: 30px;
-            text-align: center;
-        }
-
-        .nav-card h3 {
-            font-size: 1.1rem;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .sidebar-footer {
-            padding: 15px;
-            padding-bottom: 25px;
-            border-top: 1px solid #eee;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: rgba(255, 255, 255, 0.98);
-        }
-
-        .logout-btn {
-            width: 100%;
-            padding: 15px;
-            background-color: #c95d68;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .logout-btn:hover:not(:disabled) {
-            background-color: #c82333;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
-        }
-        
-        .logout-btn:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Main Content */
-        main {
-            margin-right: 0;
-            padding: 0; /* إزالة الحشو العلوي */
-            min-height: calc(100vh - 50px); /* تعديل الارتفاع */
-            transition: filter 0.3s ease-in-out;
-            width: 100%;
-            /* إضافة هذا لمنع التمرير تحت شريط العنوان */
-            margin-top: 0;
-        }
-
-        .sidebar-open main {
-            filter: blur(3px);
-            pointer-events: none;
-        }
-
-        .content-frame {
-            width: 100%;
-            height: calc(100vh - 50px); /* تعديل الارتفاع */
-            border: none;
-            background: transparent;
-            display: block;
-        }
-
-        /* شريط المهام السفلي */
-        .taskbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background-color: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            z-index: 1001;
-        }
-
-        .taskbar-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 5px 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: #1a2a6c;
-            border-radius: 8px;
-            min-width: 65px;
-        }
-
-        .taskbar-item:hover {
-            background-color: rgba(26, 42, 108, 0.1);
-        }
-
-        .taskbar-item.active {
-            background-color: rgba(26, 42, 108, 0.15);
-        }
-
-        .taskbar-item i {
-            font-size: 1.3rem;
-            margin-bottom: 2px;
-        }
-
-        .taskbar-item span {
-            font-size: 0.65rem;
-            font-weight: 500;
-        }
-
-        /* Notifications Panel */
-        .notifications-panel {
-            position: fixed;
-            top: 50px; /* تعديل الموقع ليكون تحت شريط العنوان */
-            left: 20px;
-            width: 350px;
-            max-height: 500px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            z-index: 2001;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .notifications-header {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #f8f9fa;
-        }
-
-        .notifications-header h3 {
-            color: #1a2a6c;
-            font-size: 1.1rem;
-            margin: 0;
-        }
-
-        .clear-notifications {
-            background: none;
-            border: none;
-            color: #dc3545;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .notifications-list {
-            flex: 1;
-            overflow-y: auto;
-            max-height: 400px;
-        }
-
-        .notification-item {
-            padding: 12px 15px;
-            border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .notification-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .notification-item.unread {
-            background-color: #e8f4fd;
-        }
-
-        .notification-title {
-            font-weight: 600;
-            color: #1a2a6c;
-            margin-bottom: 5px;
-            font-size: 0.95rem;
-        }
-
-        .notification-message {
-            color: #555;
-            font-size: 0.85rem;
-            line-height: 1.4;
-        }
-
-        .notification-time {
-            color: #888;
-            font-size: 0.75rem;
-            margin-top: 5px;
-        }
-
-        .no-notifications {
-            padding: 20px;
-            text-align: center;
-            color: #888;
-            font-size: 0.9rem;
-        }
-
-        /* Toast Notification */
-        .toast-notification {
-            position: fixed;
-            top: 65px; /* تعديل الموقع ليكون تحت شريط العنوان */
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            z-index: 2002;
-            max-width: 400px;
-            width: 90%;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-
-        .toast-icon {
-            color: #28a745;
-            font-size: 1.2rem;
-        }
-
-        .toast-content {
-            flex: 1;
-        }
-
-        .toast-title {
-            font-weight: 600;
-            color: #1a2a6c;
-            margin-bottom: 3px;
-            font-size: 0.95rem;
-        }
-
-        .toast-message {
-            color: #555;
-            font-size: 0.85rem;
-        }
-
-        .close-toast {
-            background: none;
-            border: none;
-            color: #888;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        /* Modal للزوار */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: 15px;
-            padding: 30px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            animation: scaleIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes scaleIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .modal-content h3 {
-            color: #1a2a6c;
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        .modal-content p {
-            color: #555;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .modal-btn {
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            flex: 1;
-            text-align: center;
-        }
-
-        .modal-btn.primary {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
-            color: white;
-        }
-
-        .modal-btn.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(26, 42, 108, 0.3);
-        }
-
-        .modal-btn.secondary {
-            background-color: #f8f9fa;
-            color: #555;
-            border: 1px solid #ddd;
-        }
-
-        .modal-btn.secondary:hover {
-            background-color: #e9ecef;
-            transform: translateY(-2px);
-        }
-
-        /* تأثير اهتزاز للأيقونة عند وصول إشعار جديد */
-        .vibrate {
-            animation: vibrate 0.5s ease-in-out;
-        }
-
-        @keyframes vibrate {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-3px); }
-            75% { transform: translateX(3px); }
-        }
-
-        /* تأثير النبض للشارة */
-        .pulse-badge {
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        /* Responsive */
-        @media (min-width: 768px) {
-            header {
-                padding: 10px 30px;
-            }
-            .logo {
-                font-size: 1.8rem;
-            }
-            .user-info {
-                display: block;
-                text-align: center;
-                flex: 1;
-            }
-            .sidebar {
-                transform: translateX(0);
-            }
-            main {
-                margin-right: 280px;
-                padding: 0; /* إزالة الحشو العلوي */
-                filter: none;
-                pointer-events: auto;
-            }
-            .sidebar-open main {
-                filter: none;
-                pointer-events: auto;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .user-info {
-                display: none;
-            }
-            .header-icons {
-                gap: 8px;
-            }
-            .icon-btn {
-                font-size: 1.1rem;
-                padding: 5px;
-            }
-            .notifications-panel {
-                width: 300px;
-                left: 10px;
-                right: 10px;
-                margin: 0 auto;
-            }
-            .modal-content {
-                padding: 20px;
-            }
-            .modal-buttons {
-                flex-direction: column;
-            }
-            .modal-btn {
-                width: 100%;
-            }
-            .taskbar-item {
-                min-width: 55px;
-                padding: 5px 8px;
-            }
-            .taskbar-item i {
-                font-size: 1.2rem;
-            }
-            .taskbar-item span {
-                font-size: 0.6rem;
-            }
-            .create-post-btn {
-                width: 40px;
-                height: 40px;
-            }
-            .create-post-btn i {
-                font-size: 1rem;
-            }
-            .create-post-btn span {
-                font-size: 0.5rem;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .logo-container {
-                flex: 0 0 auto;
-            }
-            .header-icons {
-                flex: 0 0 auto;
-            }
-            .user-info {
-                display: none;
-            }
-        }
-    </style>
+<style>
+  /* === متغيرات التصميم === */
+  :root {
+    --primary-color: #0b7ed1;
+    --primary-dark: #0968b3;
+    --secondary-color: #00c6ff;
+    --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-bg: rgba(255, 255, 255, 0.15);
+    --card-border: rgba(255, 255, 255, 0.2);
+    --text-color: #333;
+    --text-light: #f4f6f8;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+  }
+
+  /* === إعدادات عامة === */
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  button, a, input, textarea, select {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+  
+  button:active, a:active {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    background: var(--background-gradient);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* === Header === */
+  header {
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    height: 60px; /* زيادة ارتفاع الشريط العلوي قليلاً */
+    flex-shrink: 0;
+  }
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+
+  .logo {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    font-weight: 700;
+  }
+
+  .user-info {
+    color: #555;
+    font-weight: 500;
+    font-size: 0.9rem;
+    display: none;
+  }
+
+  .header-icons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: flex-end;
+    flex: 1;
+  }
+
+  .icon-btn {
+    position: relative;
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icon-btn:hover {
+    background-color: rgba(26, 42, 108, 0.1);
+  }
+
+  .icon-btn i {
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+  }
+  
+  .icon-btn span {
+    font-size: 0.6rem;
+    margin-top: 2px;
+  }
+
+  .badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+
+  .bell-badge {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 10px;
+    height: 10px;
+    background-color: #28a745;
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+
+  .create-post-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .create-post-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .create-post-btn i {
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+  }
+  
+  .create-post-btn span {
+    font-size: 0.6rem;
+    margin-top: 2px;
+  }
+
+  /* === Overlay للشريط الجانبي === */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .sidebar-open .sidebar-overlay {
+    display: block;
+    opacity: 1;
+  }
+
+  /* === Sidebar === */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.98);
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+    padding-top: 70px; /* زيادة الحشو العلوي */
+    padding-bottom: 80px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .nav-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 0 15px;
+    flex-grow: 1;
+  }
+
+  .nav-card {
+    background-color: rgba(26, 42, 108, 0.05);
+    border-radius: 10px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .nav-card:hover:not(:disabled) {
+    transform: translateX(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+  }
+
+  .nav-card:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    background-color: rgba(200, 200, 200, 0.3);
+  }
+
+  .nav-card.active {
+    background-color: rgba(26, 42, 108, 0.15);
+    border-right: 4px solid var(--primary-color);
+  }
+
+  .nav-card i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    width: 30px;
+    text-align: center;
+  }
+
+  .nav-card h3 {
+    font-size: 1.1rem;
+    color: #333;
+    font-weight: 600;
+  }
+
+  .sidebar-footer {
+    padding: 15px;
+    padding-bottom: 25px;
+    border-top: 1px solid #eee;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.98);
+  }
+
+  .logout-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #c95d68;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .logout-btn:hover:not(:disabled) {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+  }
+  
+  .logout-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* === Main Content === */
+  main {
+    margin-right: 0;
+    padding: 0;
+    flex-grow: 1;
+    transition: filter 0.3s ease-in-out;
+    width: 100%;
+    overflow: hidden;
+    margin-top: 60px; /* مسافة من الشريط العلوي */
+    margin-bottom: 50px; /* مسافة من شريط السفلي */
+  }
+
+  .sidebar-open main {
+    filter: blur(3px);
+    pointer-events: none;
+  }
+
+  .content-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: transparent;
+    display: block;
+  }
+
+  /* === شريط المهام السفلي (صغير مرئ) === */
+  .taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px; /* تقليل ارتفاع شريط المهام */
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1001;
+    flex-shrink: 0;
+  }
+
+  .taskbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--primary-color);
+    border-radius: 8px;
+    min-width: 65px;
+  }
+
+  .taskbar-item:hover {
+    background-color: rgba(26, 42, 108, 0.1);
+  }
+
+  .taskbar-item.active {
+    background-color: transparent;
+}
+
+  .taskbar-item i {
+    font-size: 1.3rem;
+    margin-bottom: 2px;
+  }
+
+  .taskbar-item span {
+    font-size: 0.65rem;
+    font-weight: 500;
+  }
+
+  /* === Notifications Panel === */
+  .notifications-panel {
+    position: fixed;
+    top: 70px; /* تعديل الموقع ليكون تحت الشريط العلوي */
+    left: 20px;
+    width: 350px;
+    max-height: 500px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 2001;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .notifications-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+  }
+
+  .notifications-header h3 {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .clear-notifications {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .notifications-list {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 400px;
+  }
+
+  .notification-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .notification-item:hover {
+    background-color: #f8f9fa;
+  }
+
+  .notification-item.unread {
+    background-color: #e8f4fd;
+  }
+
+  .notification-title {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+  }
+
+  .notification-message {
+    color: #555;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .notification-time {
+    color: #888;
+    font-size: 0.75rem;
+    margin-top: 5px;
+  }
+
+  .no-notifications {
+    padding: 20px;
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+  }
+
+  /* === Toast Notification === */
+  .toast-notification {
+    position: fixed;
+    top: 80px; /* تعديل الموقع ليكون تحت الشريط العلوي */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 2002;
+    max-width: 400px;
+    width: 90%;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    animation: slideDown 0.3s ease;
+  }
+
+  @keyframes slideDown {
+    from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+  }
+
+  .toast-icon {
+    color: #28a745;
+    font-size: 1.2rem;
+  }
+
+  .toast-content {
+    flex: 1;
+  }
+
+  .toast-title {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 3px;
+    font-size: 0.95rem;
+  }
+
+  .toast-message {
+    color: #555;
+    font-size: 0.85rem;
+  }
+
+  .close-toast {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  /* === Modal للزوار === */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .modal-content {
+    background-color: white;
+    border-radius: 15px;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: scaleIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .modal-content h3 {
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    font-weight: 700;
+  }
+
+  .modal-content p {
+    color: #555;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+  }
+
+  .modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+  }
+
+  .modal-btn {
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    flex: 1;
+    text-align: center;
+  }
+
+  .modal-btn.primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+  }
+
+  .modal-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(26, 42, 108, 0.3);
+  }
+
+  .modal-btn.secondary {
+    background-color: #f8f9fa;
+    color: #555;
+    border: 1px solid #ddd;
+  }
+
+  .modal-btn.secondary:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+  }
+
+  /* === تأثيرات إضافية === */
+  .vibrate {
+    animation: vibrate 0.5s ease-in-out;
+  }
+
+  @keyframes vibrate {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+  }
+
+  .pulse-badge {
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  /* === Responsive === */
+  @media (min-width: 768px) {
+    header {
+      padding: 10px 30px;
+    }
+    .logo {
+      font-size: 1.8rem;
+    }
+    .user-info {
+      display: block;
+      text-align: center;
+      flex: 1;
+    }
+    .sidebar {
+      transform: translateX(0);
+    }
+    main {
+      margin-right: 280px;
+      filter: none;
+      pointer-events: auto;
+    }
+    .sidebar-open main {
+      filter: none;
+      pointer-events: auto;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .user-info {
+      display: none;
+    }
+    .header-icons {
+      gap: 8px;
+    }
+    .icon-btn {
+      font-size: 1rem;
+      padding: 5px;
+    }
+    .notifications-panel {
+      width: 300px;
+      left: 10px;
+      right: 10px;
+      margin: 0 auto;
+    }
+    .modal-content {
+      padding: 20px;
+    }
+    .modal-buttons {
+      flex-direction: column;
+    }
+    .modal-btn {
+      width: 100%;
+    }
+    .taskbar-item {
+      min-width: 55px;
+      padding: 5px 8px;
+    }
+    .taskbar-item i {
+      font-size: 1.2rem;
+    }
+    .taskbar-item span {
+      font-size: 0.6rem;
+    }
+    .create-post-btn {
+      width: 40px;
+      height: 40px;
+    }
+    .create-post-btn i {
+      font-size: 1rem;
+    }
+    .create-post-btn span {
+      font-size: 0.5rem;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .logo-container {
+      flex: 0 0 auto;
+    }
+    .header-icons {
+      flex: 0 0 auto;
+    }
+    .user-info {
+      display: none;
+    }
+  }
+</style>
 </head>
 <body>
-    <!-- Overlay للشريط الجانبي -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <!-- Overlay للشريط الجانبي -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <header>
-        <div class="logo-container">
-            <div class="logo">أيين</div>
-        </div>
-        <div class="user-info" id="userInfo">مرحباً بك</div>
-        <div class="header-icons">
-            <button class="icon-btn" id="bellBtn" aria-label="الإشعارات">
-                <i class="fas fa-bell"></i>
-                <div class="bell-badge" id="bellBadge" style="display: none;"></div>
-            </button>
-            <button class="icon-btn" id="messageBtn" aria-label="الرسائل">
-                <i class="fas fa-envelope"></i>
-                <span class="badge" id="messageBadge" style="display: none;">0</span>
-            </button>
-            <button class="create-post-btn" id="createPostBtn" aria-label="إنشاء مشاركة">
-                <i class="fas fa-plus"></i>
-                <span>نشر</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- نافذة الإشعارات -->
-    <div class="notifications-panel" id="notificationsPanel">
-        <div class="notifications-header">
-            <h3>الإشعارات</h3>
-            <button class="clear-notifications" id="clearNotificationsBtn">مسح الكل</button>
-        </div>
-        <div class="notifications-list" id="notificationsList">
-            <!-- سيتم ملء الإشعارات ديناميكياً -->
-        </div>
+  <header>
+    <div class="logo-container">
+      <div class="logo">أيين</div>
     </div>
+    <div class="user-info" id="userInfo">مرحباً بك</div>
+    <div class="header-icons">
+      
+      
+      <button class="icon-btn" id="messageBtn" aria-label="الرسائل">
+          <i class="fas fa-envelope"></i>
+          <span>الرسائل</span>
+      </button>
+      <button class="icon-btn" id="bellBtn" aria-label="الإشعارات">
+          <i class="fas fa-bell"></i>
+          <span>الاشعارات</span>
+      </button>
+      <button class="create-post-btn" id="createPostBtn" aria-label="إنشاء مشاركة">
+          <i class="fas fa-plus"></i>
+          <span>نشر</span>
+      </button>
+      
+  </header>
 
-    <!-- Toast Notification -->
-    <div class="toast-notification" id="toastNotification">
-        <i class="fas fa-bell toast-icon"></i>
-        <div class="toast-content">
-            <div class="toast-title" id="toastTitle"></div>
-            <div class="toast-message" id="toastMessage"></div>
-        </div>
-        <button class="close-toast" id="closeToastBtn">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
+  <!-- نافذة الإشعارات -->
+  <div class="notifications-panel" id="notificationsPanel">
+      <div class="notifications-header">
+          <h3>الإشعارات</h3>
+          <button class="clear-notifications" id="clearNotificationsBtn">مسح الكل</button>
+      </div>
+      <div class="notifications-list" id="notificationsList">
+          <!-- سيتم ملء الإشعارات ديناميكياً -->
+      </div>
+  </div>
 
-    <!-- الشريط الجانبي -->
-    <nav class="sidebar">
-        <div class="nav-grid">
-            <a href="#" class="nav-card" id="inboxBtn" data-page="mustkdm.html">
-                <i class="fas fa-th-list"></i>
-                <h3>الشركات والمكاتب العقارية</h3>
-                
-            </a>
-            <a href="#" class="nav-card" id="myPostsBtn" data-page="post.html">
-                <i class="fas fa-th-list"></i>
-                <h3>اعلاناتي</h3>
-            </a>
-            <a href="#" class="nav-card" id="supportBtn" data-page="dam.html">
-                <i class="fas fa-headset"></i>
-                <h3>الدعم الفني</h3>
-            </a>
-             
-            <button class="logout-btn" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>تسجيل الخروج</span>
-            </button>
-        
-        </div>
-       
-    </nav>
+  <!-- Toast Notification -->
+  <div class="toast-notification" id="toastNotification">
+      <i class="fas fa-bell toast-icon"></i>
+      <div class="toast-content">
+          <div class="toast-title" id="toastTitle"></div>
+          <div class="toast-message" id="toastMessage"></div>
+      </div>
+      <button class="close-toast" id="closeToastBtn">
+          <i class="fas fa-times"></i>
+      </button>
+  </div>
 
-    <!-- المحتوى الرئيسي -->
-    <main>
-        <iframe id="contentFrame" class="content-frame" src="home2.html"></iframe>
-    </main>
+  <!-- الشريط الجانبي -->
+  <nav class="sidebar">
+      <div class="nav-grid">
+        <button class="icon-btn" id="profileBtnHeader" aria-label="الملف التعريفي">
+          <i class="fas fa-user-edit"></i>
+          <span>الملف التعريفي</span>
+      </button>
+          <a href="#" class="nav-card" id="inboxBtn" data-page="mustkdm.html">
+              <i class="fas fa-th-list"></i>
+              <h3>الشركات والمكاتب العقارية</h3>
+              
+          </a>
+          <a href="#" class="nav-card" id="myPostsBtn" data-page="post.html">
+              <i class="fas fa-th-list"></i>
+              <h3>اعلاناتي</h3>
+          </a>
+          <a href="#" class="nav-card" id="supportBtn" data-page="dam.html">
+              <i class="fas fa-headset"></i>
+              <h3>الدعم الفني</h3>
+          </a>
+               
+          <button class="logout-btn" id="logoutBtn">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>تسجيل الخروج</span>
+          </button>
+      
+      </div>
+     
+  </nav>
 
-    <!-- شريط المهام السفلي -->
-    <div class="taskbar">
-        <a href="#" class="taskbar-item" id="sidebarToggle" aria-label="فتح القائمة">
-            <i class="fas fa-bars"></i>
-            <span>المزيد</span>
-        </a>
-        <a href="#" class="taskbar-item active" id="homeBtn" data-page="home2.html" aria-label="الصفحة الرئيسية">
-            <i class="fas fa-home"></i>
-            <span>الصفحة الرئيسية</span>
-        </a>
-        <a href="#" class="taskbar-item" id="profileBtn" data-page="profile.html" aria-label="الملف التعريفي">
-            <i class="fas fa-user-edit"></i>
-            <span>الملف التعريفي</span>
-        </a>
-    </div>
+  <!-- المحتوى الرئيسي -->
+  <main>
+      <iframe id="contentFrame" class="content-frame" src="home2.html"></iframe>
+  </main>
 
-    <!-- نافذة منبثقة للزوار -->
-    <div id="guestModal" class="modal">
-        <div class="modal-content">
-            <i class="fas fa-user-lock" style="font-size: 3rem; color: #1a2a6c; margin-bottom: 15px;"></i>
-            <h3>يجب تسجيل الدخول</h3>
-            <p>عذراً، هذه الميزة متاحة فقط للأعضاء المسجلين. يرجى تسجيل الدخول إلى حسابك أو إنشاء حساب جديد للوصول إلى جميع ميزات التطبيق.</p>
-            <div class="modal-buttons">
-                <a href="logup.html" class="modal-btn primary">إنشاء حساب جديد</a>
-                <button class="modal-btn secondary" id="closeModalBtn">إلغاء</button>
-            </div>
-        </div>
-    </div>
+  <!-- شريط المهام السفلي -->
+  <div class="taskbar">
+      <a href="#" class="taskbar-item" id="sidebarToggle" aria-label="فتح القائمة">
+          <i class="fas fa-bars"></i>
+          <span>المزيد</span>
+      </a>
+      <a href="#" class="taskbar-item active" id="homeBtn" data-page="home2.html" aria-label="الصفحة الرئيسية">
+          <i class="fas fa-home"></i>
+          <span>الصفحة الرئيسية</span>
+      </a>
+  </div>
+
+  <!-- نافذة منبثقة للزوار -->
+  <div id="guestModal" class="modal">
+      <div class="modal-content">
+          <i class="fas fa-user-lock" style="font-size: 3rem; color: #1a2a6c; margin-bottom: 15px;"></i>
+          <h3>يجب تسجيل الدخول</h3>
+          <p>عذراً، هذه الميزة متاحة فقط للأعضاء المسجلين. يرجى تسجيل الدخول إلى حسابك أو إنشاء حساب جديد للوصول إلى جميع ميزات التطبيق.</p>
+          <div class="modal-buttons">
+              <a href="logup.html" class="modal-btn primary">إنشاء حساب جديد</a>
+              <button class="modal-btn secondary" id="closeModalBtn">إلغاء</button>
+          </div>
+      </div>
+  </div>
 
     <script>
         // إعداد Supabase
@@ -867,6 +899,7 @@
         const toastMessage = document.getElementById('toastMessage');
         const closeToastBtn = document.getElementById('closeToastBtn');
         const createPostBtn = document.getElementById('createPostBtn');
+        const profileBtnHeader = document.getElementById('profileBtnHeader');
 
         // متغيرات حالة
         let currentUser = null;
@@ -1163,20 +1196,23 @@ async function markMessagesAsRead(senderId = null) {
 
         // تحديث شارة الرسائل
         function updateMessageBadge() {
-            if (unreadMessagesCount > 0) {
-                messageBadge.textContent = unreadMessagesCount > 99 ? '99+' : unreadMessagesCount;
-                messageBadge.style.display = 'flex';
-                messageBadge.classList.add('pulse-badge');
-                
-                // إضافة تأثير اهتزاز للأيقونة
-                messageBtn.classList.add('vibrate');
-                setTimeout(() => {
-                    messageBtn.classList.remove('vibrate');
-                }, 1000);
-                
-            } else {
-                messageBadge.style.display = 'none';
-                messageBadge.classList.remove('pulse-badge');
+            // التحقق من وجود العنصر قبل محاولة الوصول إلى خصائصه
+            if (messageBtn && messageBadge) {
+                if (unreadMessagesCount > 0) {
+                    messageBadge.textContent = unreadMessagesCount > 99 ? '99+' : unreadMessagesCount;
+                    messageBadge.style.display = 'flex';
+                    messageBadge.classList.add('pulse-badge');
+                    
+                    // إضافة تأثير اهتزاز للأيقونة
+                    messageBtn.classList.add('vibrate');
+                    setTimeout(() => {
+                        messageBtn.classList.remove('vibrate');
+                    }, 1000);
+                    
+                } else {
+                    messageBadge.style.display = 'none';
+                    messageBadge.classList.remove('pulse-badge');
+                }
             }
         }
 
@@ -1234,7 +1270,10 @@ async function markMessagesAsRead(senderId = null) {
 
         // تحديث شارة الجرس
         function updateBellBadge() {
-            bellBadge.style.display = hasNewPosts ? 'block' : 'none';
+            // التحقق من وجود العنصر قبل محاولة الوصول إلى خصائصه
+            if (bellBtn && bellBadge) {
+                bellBadge.style.display = hasNewPosts ? 'block' : 'none';
+            }
         }
 
         // عرض الإشعارات في اللوحة
@@ -1297,8 +1336,7 @@ async function markMessagesAsRead(senderId = null) {
             navButtons.forEach(btn => btn.classList.remove('active'));
             taskbarButtons.forEach(btn => btn.classList.remove('active'));
             
-            const profileBtn = document.getElementById('profileBtn');
-            profileBtn.classList.add('active');
+            profileBtnHeader.classList.add('active');
             
             contentFrame.src = `profile.html?user_id=${userId}&view_mode=other`;
         }
@@ -1448,6 +1486,7 @@ function setupRealtimeSubscriptions() {
             messageBtn.disabled = false;
             bellBtn.disabled = false;
             createPostBtn.disabled = false;
+            profileBtnHeader.disabled = false;
         }
 
         // تفعيل وضع الزائر
@@ -1471,6 +1510,7 @@ function setupRealtimeSubscriptions() {
             messageBtn.disabled = true;
             bellBtn.disabled = true;
             createPostBtn.disabled = true;
+            profileBtnHeader.disabled = true;
             
             if (autoRefreshInterval) {
                 clearInterval(autoRefreshInterval);
@@ -1589,6 +1629,13 @@ function changeContent(pageUrl, element) {
         createPostBtn.addEventListener('click', () => {
             if (!createPostBtn.disabled) {
                 changeContent('newpost.html', null);
+            }
+        });
+
+        profileBtnHeader.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!this.disabled) {
+                changeContent('profile.html', this);
             }
         });
 
