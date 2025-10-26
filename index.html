@@ -50,6 +50,8 @@
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
             padding-bottom: 60px;
+            /* إضافة هذا لمنع التمرير تحت شريط العنوان */
+            padding-top: 50px;
         }
 
         @keyframes gradientBG {
@@ -169,6 +171,11 @@
         .create-post-btn i {
             font-size: 1.1rem;
             margin-bottom: 2px;
+        }
+        
+        .create-post-btn span {
+            font-size: 0.6rem;
+            margin-top: 2px;
         }
 
         /* Overlay للشريط الجانبي */
@@ -310,10 +317,12 @@
         /* Main Content */
         main {
             margin-right: 0;
-            padding: 50px 0 0;
-            min-height: 100vh;
+            padding: 0; /* إزالة الحشو العلوي */
+            min-height: calc(100vh - 50px); /* تعديل الارتفاع */
             transition: filter 0.3s ease-in-out;
             width: 100%;
+            /* إضافة هذا لمنع التمرير تحت شريط العنوان */
+            margin-top: 0;
         }
 
         .sidebar-open main {
@@ -323,7 +332,7 @@
 
         .content-frame {
             width: 100%;
-            height: calc(100vh - 50px);
+            height: calc(100vh - 50px); /* تعديل الارتفاع */
             border: none;
             background: transparent;
             display: block;
@@ -380,7 +389,7 @@
         /* Notifications Panel */
         .notifications-panel {
             position: fixed;
-            top: 50px;
+            top: 50px; /* تعديل الموقع ليكون تحت شريط العنوان */
             left: 20px;
             width: 350px;
             max-height: 500px;
@@ -466,7 +475,7 @@
         /* Toast Notification */
         .toast-notification {
             position: fixed;
-            top: 65px;
+            top: 65px; /* تعديل الموقع ليكون تحت شريط العنوان */
             left: 50%;
             transform: translateX(-50%);
             background-color: white;
@@ -617,74 +626,6 @@
             75% { transform: translateX(3px); }
         }
 
-        /* رسالة الترحيب */
-        .welcome-notification {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 3000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .welcome-content {
-            background-color: white;
-            border-radius: 15px;
-            padding: 30px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            animation: scaleIn 0.3s ease;
-        }
-
-        .welcome-icon {
-            font-size: 3rem;
-            color: #1a2a6c;
-            margin-bottom: 15px;
-        }
-
-        .welcome-text h3 {
-            color: #1a2a6c;
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .welcome-text p {
-            color: #555;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .welcome-btn {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 12px 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin: 0 auto;
-        }
-
-        .welcome-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(26, 42, 108, 0.3);
-        }
-
         /* تأثير النبض للشارة */
         .pulse-badge {
             animation: pulse 1s infinite;
@@ -714,7 +655,7 @@
             }
             main {
                 margin-right: 280px;
-                padding: 50px 0 0;
+                padding: 0; /* إزالة الحشو العلوي */
                 filter: none;
                 pointer-events: auto;
             }
@@ -768,7 +709,7 @@
                 font-size: 1rem;
             }
             .create-post-btn span {
-                display: none;
+                font-size: 0.5rem;
             }
         }
 
@@ -805,7 +746,7 @@
             </button>
             <button class="create-post-btn" id="createPostBtn" aria-label="إنشاء مشاركة">
                 <i class="fas fa-plus"></i>
-                <span>إضافة</span>
+                <span>نشر</span>
             </button>
         </div>
     </header>
@@ -831,21 +772,6 @@
         <button class="close-toast" id="closeToastBtn">
             <i class="fas fa-times"></i>
         </button>
-    </div>
-
-    <!-- رسالة الترحيب لطلب الإذن -->
-    <div class="welcome-notification" id="welcomeNotification">
-        <div class="welcome-content">
-            <i class="fas fa-bell welcome-icon"></i>
-            <div class="welcome-text">
-                <h3>مرحباً بك في أيين!</h3>
-                <p>للحصول على أفضل تجربة، يرجى السماح بتشغيل الإشعارات الصوتية</p>
-            </div>
-            <button class="welcome-btn" id="welcomeBtn">
-                <i class="fas fa-check"></i>
-                <span>موافق</span>
-            </button>
-        </div>
     </div>
 
     <!-- الشريط الجانبي -->
@@ -941,10 +867,6 @@
         const toastMessage = document.getElementById('toastMessage');
         const closeToastBtn = document.getElementById('closeToastBtn');
         const createPostBtn = document.getElementById('createPostBtn');
-        
-        // عناصر رسالة الترحيب
-        const welcomeNotification = document.getElementById('welcomeNotification');
-        const welcomeBtn = document.getElementById('welcomeBtn');
 
         // متغيرات حالة
         let currentUser = null;
@@ -953,9 +875,7 @@
         let realtimeSubscription = null;
         let notificationsInitialized = false;
         let autoRefreshInterval = null;
-        let audioPermissionGranted = false;
         let userInteracted = false;
-        let welcomeShown = false;
         let lastMessageId = null; // لتتبع آخر رسالة تم عرضها
 
         // التحقق من حالة تسجيل الدخول
@@ -1030,88 +950,6 @@
             } catch (error) {
                 console.error('Error in auto-refresh:', error);
             }
-        }
-
-        // دالة تشغيل صوت الإشعار (مُحسَّنة)
-        function playNotificationSound() {
-            if (!audioPermissionGranted || !userInteracted) {
-                console.log('Audio permission not yet granted or user has not interacted, skipping sound.');
-                return;
-            }
-
-            try {
-                // تأكد من وجود ملف الصوت في نفس مسار ملف HTML
-                const audio = new Audio('./notification.mp3');
-                
-                const playPromise = audio.play();
-                
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        console.log('Notification sound played successfully.');
-                    }).catch(error => {
-                        console.error('Error playing notification sound:', error);
-                        playFallbackSound();
-                    });
-                }
-            } catch (error) {
-                console.error('Error creating audio element:', error);
-                playFallbackSound();
-            }
-        }
-
-        // بديل باستخدام Web Audio API (أكثر موثوقية)
-        function playFallbackSound() {
-            if (!audioPermissionGranted || !userInteracted) return;
-            
-            try {
-                const context = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = context.createOscillator();
-                const gainNode = context.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(context.destination);
-                
-                oscillator.frequency.value = 800;
-                oscillator.type = 'sine';
-                
-                gainNode.gain.setValueAtTime(0.3, context.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.5);
-                
-                oscillator.start(context.currentTime);
-                oscillator.stop(context.currentTime + 0.5);
-            } catch (error) {
-                console.error('Error playing fallback sound:', error);
-            }
-        }
-
-        // دالة للتحقق من إذن تشغيل الصوت
-        async function requestAudioPermission() {
-            if (audioPermissionGranted) return true;
-
-            try {
-                // إنشاء عنصر صوت صامت لطلب الإذن
-                const silentAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAAAQAEAAEAfAAAQAQABAAgAZGF0YQAAAAA=');
-                await silentAudio.play();
-                audioPermissionGranted = true;
-                console.log('Audio permission granted.');
-                return true;
-            } catch (error) {
-                console.log('Audio permission requires user interaction first.');
-                return false;
-            }
-        }
-
-        // عرض رسالة الترحيب
-        function showWelcomeNotification() {
-            if (welcomeShown) return;
-            
-            welcomeNotification.style.display = 'flex';
-            welcomeShown = true;
-        }
-
-        // إخفاء رسالة الترحيب
-        function hideWelcomeNotification() {
-            welcomeNotification.style.display = 'none';
         }
 
         // الحصول على اسم المستخدم أو الشركة من جدول users
@@ -1300,23 +1138,18 @@ async function markMessagesAsRead(senderId = null) {
     }
 }
 
-        // تشغيل إشعار الرسالة الجديدة
+        // تشغيل إشعار الرسالة الجديدة (بدون صوت)
         async function playMessageNotification(latestMessage) {
             if (!latestMessage) return;
             
             try {
                 const senderName = await getUserDisplayName(latestMessage.sender_id);
                 
-                // عرض إشعار Toast
+                // عرض إشعار Toast فقط
                 showToastNotification(
                     'رسالة جديدة', 
                     `رسالة من ${senderName}`
                 );
-                
-                // تشغيل الصوت فقط إذا كان المستخدم قد تفاعل مع الصفحة
-                if (userInteracted && audioPermissionGranted) {
-                    playNotificationSound();
-                }
                 
                 // الاهتزاز فقط إذا كان المستخدم قد تفاعل مع الصفحة
                 if (userInteracted && navigator.vibrate) {
@@ -1804,35 +1637,8 @@ function changeContent(pageUrl, element) {
         // تهيئة الصفحة
         document.addEventListener('DOMContentLoaded', () => {
             checkLoginStatus();
-            
-            // التحقق مما إذا كانت رسالة الترحيب قد تم عرضها من قبل
-            const welcomeShownBefore = localStorage.getItem('welcomeShown');
-            if (!welcomeShownBefore) {
-                // إضافة مستمعي الأحداث لعرض رسالة الترحيب عند أول تفاعل
-                const showWelcomeOnInteraction = () => {
-                    if (!welcomeShown) {
-                        showWelcomeNotification();
-                        // إزالة مستمعي الأحداث بعد عرض الرسالة
-                        document.removeEventListener('click', showWelcomeOnInteraction);
-                        document.removeEventListener('touchstart', showWelcomeOnInteraction);
-                        document.removeEventListener('keydown', showWelcomeOnInteraction);
-                    }
-                };
-                
-                document.addEventListener('click', showWelcomeOnInteraction);
-                document.addEventListener('touchstart', showWelcomeOnInteraction);
-                document.addEventListener('keydown', showWelcomeOnInteraction);
-            }
         });
 
-        // معالج النقر على زر الموافقة في رسالة الترحيب
-        welcomeBtn.addEventListener('click', async () => {
-            userInteracted = true;
-            await requestAudioPermission();
-            hideWelcomeNotification();
-            localStorage.setItem('welcomeShown', 'true');
-        });
-// أضف هذا الكود في نهاية ملف index.html
 // استمع للرسائل من iframe
 window.addEventListener('message', function(event) {
     if (event.data.type === 'messagesRead') {
@@ -1853,7 +1659,3 @@ if ('serviceWorker' in navigator) {
 <script src="common.js"></script>
 </body>
 </html>
-
-
-
-
